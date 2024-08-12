@@ -5,7 +5,7 @@ This repository will store all code related to the decision support system effor
 When getting ready to push a branch and merge to develop be sure to run ```cdk synth``` and ```pytest tests``` to check for errors or failing tests.
 
 ## Git Flow
-Developers should also build features on a new branch then open a pull request to develop to merge and the CI/CD pipeline to run. ```dev``` goes to ```uat``` and finally UAT goes to main/prod. Each PR will kick off the pipeline for that environment of the same name.
+Developers should also build features on a new branch then open a pull request to develop to merge and the CI/CD pipeline to run. ```dev``` goes to ```uat``` and finally ```uat``` goes to main/prod. Each PR will kick off the pipeline for that environment of the same name.
 
 ## Development Team
 |Team Member|Contact|
