@@ -11,7 +11,7 @@ Developers should also build features on a new branch then open a pull request t
 |Team Member|Contact|
 |---|---|
 |Harry Schuster|hschuster@captechconsulting.com|
-|David Kearfott|dkearfott@captechconsulting.com
+|David Kearfott|dkearfott@captechconsulting.com|
 
 
 ## Documentation
