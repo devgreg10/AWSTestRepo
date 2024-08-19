@@ -49,22 +49,6 @@ class FtDataWarehouseAuroraStack(Stack):
             subnet_configuration=[public_subnet, private_subnet]
         )
         '''
-
-        '''
-        # dev/uat VPC
-        non_prod_vpc_name='pgatour-firsttee-dev-datalake-VPC'
-        non_prod_vpc_id='vpc-079fd4f484100b2eb'
-        non_prod_public_subnets = [ec2.Subnet.from_subnet_id(self, "PublicSubnetA", "subnet-012d037b1ad02d93e")]
-        non_prod_private_subnets = [ec2.Subnet.from_subnet_id(self, "PrivateSubnetA", "subnet-0300505f922f7bae5"),
-                                    ec2.Subnet.from_subnet_id(self, "PrivateSubnetD", "subnet-077e463bade38c02a")]
-
-        # prod VPC
-        prod_vpc_name='pgatour-firsttee-prod-datalake-VPC'
-        prod_vpc_id='vpc-0ee714c5f331c77d2'
-        prod_public_subnets = [ec2.Subnet.from_subnet_id(self, "PublicSubnetA", "subnet-098513801425ff4d2")]
-        prod_private_subnets = [ec2.Subnet.from_subnet_id(self, "PrivateSubnetA", "subnet-044363d0790483b33"),
-                                    ec2.Subnet.from_subnet_id(self, "PrivateSubnetD", "subnet-0b322844d620f011b")]
-        '''
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
         if (env=='prod'):
             load_dotenv(os.path.join(BASEDIR, "../.env.prod"))
