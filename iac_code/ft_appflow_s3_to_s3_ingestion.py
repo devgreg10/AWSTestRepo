@@ -130,6 +130,4 @@ class FtAppflowS3ToS3IngestionStack(Stack):
         source_bucket.grant_read_write(appflow_role)
         destination_bucket.grant_read_write(appflow_role)
         
-# app = cdk.App()
-# FtAppflowS3ToS3IngestionStack(app, "FtAppflowS3ToS3IngestionStack")
-# app.synth()
+
