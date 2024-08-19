@@ -80,11 +80,13 @@ class FtDataWarehouseAuroraStack(Stack):
             availability_zones=["us-east-1a"]
         )
 
-        public_subnets = [ec2.Subnet.from_subnet_id(self, "PublicSubnetA", "subnet-098513801425ff4d2")]
+        public_subnets = [ec2.Subnet.from_subnet_id(self, "PublicSubnetA", "subnet-012d037b1ad02d93e")]
 
-        private_subnets = [ec2.Subnet.from_subnet_id(self, "PrivateSubnetA", "subnet-044363d0790483b33"),
-                           ec2.Subnet.from_subnet_id(self, "PrivateSubnetD", "subnet-0b322844d620f011b")]
 
+        private_subnets = [ec2.Subnet.from_subnet_id(self, "PrivateSubnetA", "subnet-0300505f922f7bae5"),
+                           ec2.Subnet.from_subnet_id(self, "PrivateSubnetD", "subnet-077e463bade38c02a")]
+        
+    
         '''
 
         # add interface endpoint for secret manager
@@ -221,7 +223,7 @@ class FtDataWarehouseAuroraStack(Stack):
             secrets=[database_credential_secret],
             vpc=datawarehouse_vpc,
             vpc_subnets=ec2.SubnetSelection(
-                subnets=datawarehouse_vpc.private_subnets
+                subnets=private_subnets
             ),
             security_groups=[rds_proxy_sg],
             iam_auth=True  # Enable IAM authentication
