@@ -48,86 +48,15 @@ class FtDataWarehouseAuroraStack(Stack):
             vpc_id=vpc_id,
             availability_zones=["us-east-1a"]
         )
-# ______________________________________
-# BEGIN - Logic to generate EC2 Key Pair
-# ______________________________________
-
-        # S3 bucket to store the key pair
-        bucket = s3.Bucket(
-            self, 
-            "ft-" + env + "-key-pair-bucket"
-        )
-
-        # Lambda function to create EC2 key pair
-        create_key_lambda = _lambda.Function(
-                                self, 
-                                "ft-non-prod-create-key-pair-lambda",
-                                runtime=_lambda.Runtime.PYTHON_3_8,
-                                handler="create_key.handler",
-                                code=_lambda.Code.from_inline("""
-import boto3
-import os
-
-def handler(event, context):
-    ec2 = boto3.client('ec2')
-    key_name = os.environ['KEY_NAME']
-    bucket_name = os.environ['BUCKET_NAME']
-
-    # Create the key pair
-    key_pair = ec2.create_key_pair(KeyName=key_name)
-    
-    # Store the private key in S3
-    s3 = boto3.client('s3')
-    s3.put_object(Bucket=bucket_name, Key=f'{key_name}.pem', Body=key_pair['KeyMaterial'])
-
-    return {
-        'PhysicalResourceId': key_name,
-        'Data': {
-            'KeyName': key_name
-        }
-    }
-"""),
-                                             environment={
-                                                 'KEY_NAME': 'MyGeneratedKeyPair',
-                                                 'BUCKET_NAME': bucket.bucket_name
-                                             })
-
-        # Grant Lambda permission to write to the S3 bucket
-        bucket.grant_write(create_key_lambda)
-
-        # IAM policy to allow Lambda to create key pairs
-        create_key_lambda.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=["ec2:CreateKeyPair", "ec2:DeleteKeyPair"],
-                resources=["*"]
-            )
-        )
-
-        # Custom resource to invoke the Lambda function
-        key_pair_custom_resource = cr.AwsCustomResource(self, "KeyPairCustomResource",
-                                                        on_create=cr.AwsSdkCall(
-                                                            service="Lambda",
-                                                            action="invoke",
-                                                            parameters={
-                                                                "FunctionName": create_key_lambda.function_name
-                                                            },
-                                                            physical_resource_id=cr.PhysicalResourceId.of("CustomKeyPair")
-                                                        ),
-                                                        policy=cr.AwsCustomResourcePolicy.from_statements(
-                                                            [iam.PolicyStatement(
-                                                                actions=["lambda:InvokeFunction"],
-                                                                resources=[create_key_lambda.function_arn]
-                                                            )]
-                                                        ))
-
-        # Get the key pair name from the custom resource response
-        new_key_pair_name = key_pair_custom_resource.get_response_field("KeyName")
-
-# ______________________________________
-# END - Logic to generate EC2 Key Pair
-# ______________________________________
-
         '''
+        # Create a new EC2 key name pair
+        new_key_pair_name = "ft-" + env + "-key-pair"
+         
+        new_key_pair = ec2.CfnKeyPair(
+             self,
+             "NewKeyNamePair",
+             key_name=new_key_pair_name
+	    )
 
         # add interface endpoint for secret manager
         datawarehouse_vpc.add_interface_endpoint(
@@ -306,6 +235,7 @@ def handler(event, context):
             connection=ec2.Port.tcp(22)  # SSH port
         )
         
+        '''
         # Launch an EC2 instance as the bastion host
         bastion_host = ec2.Instance(
             self, 
@@ -313,9 +243,20 @@ def handler(event, context):
             instance_type=ec2.InstanceType("t2.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux(),
             vpc=datawarehouse_vpc,
-            key_name=new_key_pair_name,
+            # key_name=new_key_pair_name,
             security_group=bastion_sg,
             vpc_subnets=ec2.SubnetSelection(
+                subnets=public_subnets
+            )
+        )
+        '''
+
+        bastion_host = ec2.BastionHostLinux(
+            self, 
+            "ft-" + env + "-bastion-host",
+            vpc=datawarehouse_vpc,
+            security_group=bastion_sg,
+            subnet_selection=ec2.SubnetSelection(
                 subnets=public_subnets
             )
         )
