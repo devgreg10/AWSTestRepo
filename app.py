@@ -15,7 +15,7 @@ env = os.environ.get('env')
 app = cdk.App()
 
 # FirstTeeDecisionSupportStack(app, "FirstTee-CDK-{0}".format(env), env)
-# FtAppflowS3ToS3IngestionStack(app, "FirstTee-CDK-AppFlow-S3-To-S3-Ingestion-{0}".format(env), env)
+FtAppflowS3ToS3IngestionStack(app, "FirstTee-CDK-AppFlow-S3-To-S3-Ingestion-{0}".format(env), env)
 FtDataWarehouseAuroraStack(app, "FirstTee-CDK-Data-Warehouse-Aurora-{0}".format(env), env)
 
 cdk.Tags.of(app).add("Project", "First Tee Decision Support")

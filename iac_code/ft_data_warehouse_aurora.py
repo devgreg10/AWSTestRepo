@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_secretsmanager as secrets,
     aws_ssm as ssm,
+    aws_iam as iam,
     Duration,
     Environment,
     Stack,
@@ -57,7 +58,12 @@ class FtDataWarehouseAuroraStack(Stack):
 
         vpc_name = os.getenv('vpc_name')
         vpc_id = os.getenv('vpc_id')
-        public_subnets = [ec2.Subnet.from_subnet_id(self, "PublicSubnetA", os.getenv('public_subnet_a'))]
+        public_subnets = [ec2.Subnet.from_subnet_attributes(
+                            self, 
+                            "PublicSubnetA", 
+                            subnet_id=os.getenv('public_subnet_a'),
+                            availability_zone=os.getenv("public_subnet_a_az")
+                          )]
         private_subnets = [ec2.Subnet.from_subnet_id(self, "PrivateSubnetA", os.getenv('private_subnet_a')),
                            ec2.Subnet.from_subnet_id(self, "PrivateSubnetD", os.getenv('private_subnet_d'))]
 
@@ -205,13 +211,14 @@ class FtDataWarehouseAuroraStack(Stack):
 
         # Allow inbound traffic on the database port from your IP address
         rds_proxy_sg.add_ingress_rule(
-            peer=ec2.Peer.any_ipv4(), # ZZZ - allows all inbound traffic and will need to change
+            # peer=ec2.Peer.ipv4(datawarehouse_vpc.vpc_cidr_block), # Allows access from within the VPC
+            # RuntimeError: Error: Cannot perform this operation: 'vpcCidrBlock' was not supplied when creating this VPC
+            peer=ec2.Peer.any_ipv4(),  # ZZZ - Wide open, need to figure out better security here
             connection=ec2.Port.tcp(5432)  # PostgreSQL port
         )
         
         # Create an RDS Proxy for the Aurora DB
-        
-        db_cluster.add_proxy(
+        rds_proxy = db_cluster.add_proxy(
             "ft-" + env + "-rds-proxy",
             secrets=[database_credential_secret],
             vpc=datawarehouse_vpc,
@@ -236,14 +243,49 @@ class FtDataWarehouseAuroraStack(Stack):
             security_groups=[rds_proxy_sg]
         )
         '''
+
+        # Create a security group for the bastion host
+        bastion_sg = ec2.SecurityGroup(
+            self, 
+            "ft-" + env + "-bastion-security-group",
+            vpc=datawarehouse_vpc,
+            description="Security group for Bastion Host",
+            allow_all_outbound=True)
+        
+        # Allow the bastion host to connect to the RDS Proxy on port 5432 explicitly
+        rds_proxy_sg.add_ingress_rule(
+            peer=bastion_sg,
+            connection=ec2.Port.tcp(5432),  # Explicitly allowing port 5432
+            description="Allow Bastion Host to connect to RDS Proxy on port 5432"
+        )
+        
+        # Allow inbound SSH access to Bastion
+        bastion_sg.add_ingress_rule(
+            peer=ec2.Peer.any_ipv4(),  # ZZZ - Wide open, need to figure out better security here
+            connection=ec2.Port.tcp(22)  # SSH port
+        )
+        
+        # Launch an EC2 instance as the bastion host
+        bastion_host = ec2.BastionHostLinux(
+            self, 
+            "ft-" + env + "-bastion-host",
+            vpc=datawarehouse_vpc,
+            security_group=bastion_sg,
+            subnet_selection=ec2.SubnetSelection(
+                subnets=public_subnets
+            )
+        )
+
+        # Grant the necessary IAM role permissions for SSM
+        bastion_host.instance.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonSSMManagedInstanceCore")
+        )
+
         
         # Use DESTROY in Dev environment only only
         if (env=="dev"):
             db_cluster.removal_policy=RemovalPolicy.DESTROY 
-            #serverless_cluster.removal_policy=RemovalPolicy.DESTROY 
-            #datawarehouse_vpc.apply_removal_policy(RemovalPolicy.DESTROY)
-            
-
+            rds_proxy.apply_removal_policy(RemovalPolicy.DESTROY)
 
         # Output the RDS Proxy endpoint
         # CfnOutput(self, "RDSProxyEndpoint", value=db_cluster..endpoint)
