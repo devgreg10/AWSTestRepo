@@ -1,6 +1,7 @@
 from aws_cdk import (
     aws_rds as rds,
     aws_ec2 as ec2,
+    aws_secretsmanager as secrets,
     SecretValue,
     Stack,
     RemovalPolicy
@@ -68,7 +69,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
         # create AWS Secret for database username
         database_username = "ft" + env + "publicdbuser"
 
-        '''
+        
         database_credential_secret = secrets.Secret(
             self,
             "ft-" + env + "-public-database-credentials-secret",
@@ -80,7 +81,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
                 generate_string_key="password"
             )
         )
-        '''
+        
         
         # Create Aurora Serverless DB Cluster
         db_cluster = rds.DatabaseCluster(
@@ -107,9 +108,39 @@ class FtPublicDataWarehouseAuroraStack(Stack):
             ),
             serverless_v2_min_capacity=0.5,
             serverless_v2_max_capacity=8,
-            security_groups=[public_db_security_group]
+            security_groups=[public_db_security_group],
+            
         )
         
+         # Define a security group for the RDS Proxy
+        rds_proxy_sg = ec2.SecurityGroup(
+            self, 
+            "ft-" + env + "-public-rds-proxy-security-group",
+            vpc=datawarehouse_vpc,
+            description="Security group for RDS Proxy",
+            allow_all_outbound=True
+        )
+
+        # Allow inbound traffic on the database port from your IP address
+        rds_proxy_sg.add_ingress_rule(
+            # peer=ec2.Peer.ipv4(datawarehouse_vpc.vpc_cidr_block), # Allows access from within the VPC
+            # RuntimeError: Error: Cannot perform this operation: 'vpcCidrBlock' was not supplied when creating this VPC
+            peer=ec2.Peer.any_ipv4(),  # ZZZ - Wide open, need to figure out better security here
+            connection=ec2.Port.tcp(5432)  # PostgreSQL port
+        )
+        
+        # Create an RDS Proxy for the Aurora DB
+        rds_proxy = db_cluster.add_proxy(
+            "ft-" + env + "-rds-proxy",
+            vpc=datawarehouse_vpc,
+            vpc_subnets=ec2.SubnetSelection(
+                subnets=public_subnets
+            ),
+            security_groups=[rds_proxy_sg],
+            secrets=[database_credential_secret],
+            iam_auth=True  # Enable IAM authentication
+        )
+
         
         
 
