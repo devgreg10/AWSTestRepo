@@ -107,7 +107,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
                 publicly_accessible=True
             ),
             serverless_v2_min_capacity=0.5,
-            serverless_v2_max_capacity=8,
+            serverless_v2_max_capacity=2,
             security_groups=[public_db_security_group],
             
         )
@@ -141,10 +141,56 @@ class FtPublicDataWarehouseAuroraStack(Stack):
             iam_auth=True  # Enable IAM authentication
         )
 
+# Create a security group for the bastion host
+        bastion_sg = ec2.SecurityGroup(
+            self, 
+            "ft-" + env + "-bastion-security-group",
+            vpc=datawarehouse_vpc,
+            description="Security group for Bastion Host",
+            allow_all_outbound=True)
+        
+        # Allow the bastion host to connect to the RDS Proxy on port 5432 explicitly
+        rds_proxy_sg.add_ingress_rule(
+            peer=bastion_sg,
+            connection=ec2.Port.tcp(5432),  # Explicitly allowing port 5432
+            description="Allow Bastion Host to connect to RDS Proxy on port 5432"
+        )
+        
+        # Allow inbound SSH access to Bastion
+        bastion_sg.add_ingress_rule(
+            peer=ec2.Peer.any_ipv4(),  # ZZZ - Wide open, need to figure out better security here
+            connection=ec2.Port.tcp(22)  # SSH port
+        )
+        
+        '''
+        # Launch an EC2 instance as the bastion host
+        bastion_host = ec2.Instance(
+            self, 
+            "ft-" + env + "-bastion-host",
+            instance_type=ec2.InstanceType("t2.micro"),
+            machine_image=ec2.MachineImage.latest_amazon_linux(),
+            vpc=datawarehouse_vpc,
+            # key_name=new_key_pair_name,
+            security_group=bastion_sg,
+            vpc_subnets=ec2.SubnetSelection(
+                subnets=public_subnets
+            )
+        )
+        '''
+
+        bastion_host = ec2.BastionHostLinux(
+            self, 
+            "ft-" + env + "-bastion-host",
+            vpc=datawarehouse_vpc,
+            security_group=bastion_sg,
+            subnet_selection=ec2.SubnetSelection(
+                subnets=public_subnets
+            )
+        )
         
         
 
         # Use DESTROY in Dev environment only only
         if (env=="dev"):
             db_cluster.removal_policy=RemovalPolicy.DESTROY 
-            
+            rds_proxy.apply_removal_policy(RemovalPolicy.DESTROY)
