@@ -100,17 +100,6 @@ class FtPublicDataWarehouseAuroraStack(Stack):
                 version=rds.AuroraPostgresEngineVersion.VER_15_3 
             ),
             default_database_name="decision_support",
-            readers=[
-                rds.ClusterInstance.serverless_v2(
-                    "ft-" + env + "-public-reader-instance-1", 
-                    scale_with_writer=True,
-                    enable_performance_insights=True
-                ),
-                rds.ClusterInstance.serverless_v2(
-                    "ft-" + env + "-public-reader-instance-2",
-                    enable_performance_insights=True
-                )
-            ],
             writer=rds.ClusterInstance.serverless_v2(
                 "ft-" + env + "-public-writer-instance",
                 enable_performance_insights=True,
