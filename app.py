@@ -7,6 +7,7 @@ from iac_code.first_tee_decision_support_stack import FirstTeeDecisionSupportSta
 from iac_code.ft_appflow_s3_to_s3_ingestion import FtAppflowS3ToS3IngestionStack
 from iac_code.ft_data_warehouse_aurora import FtDataWarehouseAuroraStack
 from iac_code.ft_ec2_key_pair_lambda import FtEc2KeyPairLambda
+from iac_code.ft_public_data_warehouse_aurora import FtPublicDataWarehouseAuroraStack
 
 from dotenv import load_dotenv
 
@@ -18,7 +19,8 @@ app = cdk.App()
 # FirstTeeDecisionSupportStack(app, "FirstTee-CDK-{0}".format(env), env)
 # FtAppflowS3ToS3IngestionStack(app, "FirstTee-CDK-AppFlow-S3-To-S3-Ingestion-{0}".format(env), env)
 # FtDataWarehouseAuroraStack(app, "FirstTee-CDK-Data-Warehouse-Aurora-{0}".format(env), env)
-FtEc2KeyPairLambda(app, "FirstTee-CDK-Ec2-Key-Pair-Lambda", env)
+# FtEc2KeyPairLambda(app, "FirstTee-CDK-Ec2-Key-Pair-Lambda", env)
+FtPublicDataWarehouseAuroraStack(app, "FirstTee-CDK-Public-Data-Warehouse-Aurora-{0}".format(env), env)
 
 cdk.Tags.of(app).add("Project", "First Tee Decision Support")
 cdk.Tags.of(app).add("Deployment", "CDK")
