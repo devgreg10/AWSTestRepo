@@ -1,7 +1,7 @@
 from aws_cdk import (
     aws_rds as rds,
     aws_ec2 as ec2,
-    aws_secretsmanager as secrets,
+    SecretValue,
     Stack,
     RemovalPolicy
 )
@@ -68,6 +68,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
         # create AWS Secret for database username
         database_username = "ft" + env + "publicdbuser"
 
+        '''
         database_credential_secret = secrets.Secret(
             self,
             "ft-" + env + "-public-database-credentials-secret",
@@ -79,6 +80,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
                 generate_string_key="password"
             )
         )
+        '''
         
         # Create Aurora Serverless DB Cluster
         db_cluster = rds.DatabaseCluster(
@@ -89,7 +91,11 @@ class FtPublicDataWarehouseAuroraStack(Stack):
                 # subnets=private_subnets
                 subnets=public_subnets
             ),
-            credentials=rds.Credentials.from_secret(database_credential_secret),
+            # credentials=rds.Credentials.from_secret(database_credential_secret),
+            credentials=rds.Credentials.from_username(
+                username=database_username,
+                password=SecretValue.unsafe_plain_text("tempdbpassword_kirkcousinsqbatlantafalc0ns")
+            ),
             engine=rds.DatabaseClusterEngine.aurora_postgres(
                 version=rds.AuroraPostgresEngineVersion.VER_15_3 
             ),
