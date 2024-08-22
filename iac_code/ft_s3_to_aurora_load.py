@@ -15,11 +15,20 @@ class FtS3ToAuroraLoadStack(Stack):
         # Define the S3 bucket where the JSON files are stored
         bucket = s3.Bucket.from_bucket_name(self, "MyBucket", bucket_name)
 
+        # Define a Lambda Layer for the psycopg2 library
+        psycopg2_layer = lambda_.LayerVersion(
+            self, 'Psycopg2Layer',
+            code=lambda_.Code.from_asset('lambda_layers/lambda_layer_v1.zip'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
+            description="A layer for psycopg2",
+        )
+
         # Define the Lambda function
         lambda_function = lambda_.Function(self, "LambdaJsonToAurora",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name="ft-" + env + "-load-json-s3-to-aurora",
             handler="lambda_function.lambda_handler",
+            layers=[psycopg2_layer],
             code=lambda_.Code.from_inline(
                 """
                 import json

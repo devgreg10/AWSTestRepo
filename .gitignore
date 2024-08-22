@@ -18,3 +18,4 @@ venv
 cdk.out
 
 **/.DS_Store
+lambda_layers/python/psycopg2/*
