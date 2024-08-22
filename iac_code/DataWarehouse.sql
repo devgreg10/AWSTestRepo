@@ -278,7 +278,7 @@ CREATE SCHEMA IF NOT EXISTS ft_ds_admin;
 --     snapshot_date
 -- );
 
-CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact_phase_zero_point_five (
+CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact (
     PRIMARY KEY (snapshot_date, Id),
     snapshot_date TIMESTAMPTZ,
     Id TEXT,
@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact_phase_zero_point_five (
 --     snapshot_date
 -- );
 
-CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact_phase_zero_point_five (
+CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact (
     PRIMARY KEY (snapshot_date, contact_id_18),
 	snapshot_date TIMESTAMPTZ,
     contact_id_18 CHAR(18),
@@ -370,7 +370,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact_phase_zero_point_five (
 --     snapshot_date
 -- );
 
-CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_contact_phase_zero_point_five (
+CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_contact (
     PRIMARY KEY (snapshot_date, contact_id_18),
 	snapshot_date TIMESTAMPTZ,
     contact_id_18 CHAR(18),
@@ -398,8 +398,9 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_contact_phase_zero_point_five (
 --     'Domestic'
 -- );
 CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_active_participants_counts (
+    PRIMARY KEY(snapshot_date, chapter_id),
     snapshot_date TIMESTAMPTZ,
-    intl_status VARCHAR(100),
+    chapter_id CHAR(18),
     participant_count INTEGER
 );
 
@@ -427,12 +428,12 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_active_participant
 --     'White or Caucasian', 
 --     'Prefer not to respond'
 -- );
-CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_ethnic_breakdown (
-    snapshot_date TIMESTAMPTZ,
-    ethnicity VARCHAR(100),
-    ethnically_diverse BOOLEAN,
-    participant_count INTEGER
-);
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_ethnic_breakdown (
+--     snapshot_date TIMESTAMPTZ,
+--     ethnicity VARCHAR(100),
+--     ethnically_diverse BOOLEAN,
+--     participant_count INTEGER
+-- );
 
 -- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_ethnic_breakdown (
 --     snapshot_date TIMESTAMPTZ,
@@ -464,12 +465,12 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_ethnic_breakdown (
 --     'The options listed do not reflect me',
 --     'Prefer not to respond'
 -- );
-CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
-    snapshot_date TIMESTAMPTZ,
-    gender VARCHAR(100),
-    non_male BOOLEAN,
-    participant_count INTEGER
-);
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
+--     snapshot_date TIMESTAMPTZ,
+--     gender VARCHAR(100),
+--     non_male BOOLEAN,
+--     participant_count INTEGER
+-- );
 
 -- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
 --     snapshot_date TIMESTAMPTZ,
@@ -494,12 +495,13 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
 --     '12 -13',
 --     '14+'
 -- );
-CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
-    snapshot_date TIMESTAMPTZ,
-    age_group VARCHAR(100),
-    -- maybe a teen flag?
-    participant_count INTEGER
-);
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_age_breakdown (
+--     PRIMARY KEY ()
+--     snapshot_date TIMESTAMPTZ,
+--     age_group VARCHAR(100),
+--     -- maybe a teen flag?
+--     participant_count INTEGER
+-- );
 
 -- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_age_breakdown (
 --     snapshot_date TIMESTAMPTZ,
@@ -576,14 +578,14 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
 -- END;
 -- $$;
 
-CREATE OR REPLACE PROCEDURE ft_ds_admin.raw_to_valid_sf_contact_phase_zero_point_five ()
+CREATE OR REPLACE PROCEDURE ft_ds_admin.raw_to_valid_sf_contact ()
 RETURNS VOID
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    TRUNCATE ft_ds_valid.sf_contact_phase_zero_point_five;
+    TRUNCATE ft_ds_valid.sf_contact;
 
-    INSERT INTO ft_ds_valid.sf_contact_phase_zero_point_five
+    INSERT INTO ft_ds_valid.sf_contact
     SELECT
         snapshot_date AS snapshot_date,
         Id AS contact_id_18,
@@ -595,7 +597,7 @@ BEGIN
         OtherPostalCode AS mailing_zip_postal_code,
         Participation_Status__c AS participation_status,
         Contact_Type__c AS contact_type
-    FROM ft_ds_raw.sf_contact_phase_zero_point_five
+    FROM ft_ds_raw.sf_contact
     WHERE
         Chapter_Affiliation__c NOT IN (
             '0011R00002oM2hNQAS',
@@ -615,6 +617,9 @@ BEGIN
         AND Chapter_Affiliation__c <> ''
         AND Participation_Status__c = 'Active'
         AND Contact_Type__c = 'Participant'
+        AND snapshot_date = (
+            SELECT MIN(snapshot_date) FROM ft_ds_raw.sf_contact
+        )
     ;
 END;
 $$;
@@ -633,16 +638,33 @@ $$;
 -- END;
 -- $$;
 
-CREATE OR REPLACE PROCEDURE ft_ds_admin.valid_to_refined_sf_contact_phase_zero_point_five ()
+CREATE OR REPLACE PROCEDURE ft_ds_admin.valid_to_refined_sf_contact ()
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    TRUNCATE ft_ds_refined.sf_contact_phase_zero_point_five;
+    TRUNCATE ft_ds_refined.sf_contact;
 
-    INSERT INTO ft_ds_refined.sf_contact_phase_zero_point_five
+    INSERT INTO ft_ds_refined.sf_contact
     SELECT
         *
-    FROM ft_ds_valid.sf_contact_phase_zero_point_five
+    FROM ft_ds_valid.sf_contact
+    ;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE ft_ds_admin.historical_metric_sf_contact_counts_by_chapter ()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO ft_ds_refined.sf_contact
+    SELECT
+        snapshot_date,
+        chapter_id,
+        COUNT(Id) AS participant_count
+    FROM ft_ds_refined.sf_contact
+    GROUP BY
+    snapshot_date,
+    chapter_id
     ;
 END;
 $$;
