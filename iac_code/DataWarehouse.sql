@@ -579,7 +579,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_active_participant
 -- $$;
 
 CREATE OR REPLACE PROCEDURE ft_ds_admin.raw_to_valid_sf_contact ()
-RETURNS VOID
 LANGUAGE plpgsql
 AS $$
 BEGIN
