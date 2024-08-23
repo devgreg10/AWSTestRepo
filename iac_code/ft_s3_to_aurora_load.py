@@ -28,8 +28,8 @@ class FtS3ToAuroraLoadStack(Stack):
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name="ft-" + env + "-load-json-s3-to-aurora",
             layers=[psycopg2_layer],
-            code=lambda_.Code.from_asset('lambdas'),
-            handler='FTDecisionSupportLoadLayerS3ToAurora.lambda_function.lambda_handler',
+            code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayerS3ToAurora'),
+            handler='lambda_function.lambda_handler',
             environment={
                 "DB_SECRET_ARN": secret_arn,
                 "BUCKET_NAME": bucket_name,
