@@ -57,12 +57,12 @@ def lambda_handler(event, context):
         logging.info(f"Using Secret Region: {secret_region}")
         
         # Retrieve the secret
-        client = session.client(
+        secret_client = session.client(
             service_name='secretsmanager',
             region_name=secret_region
         )
         logging.info("1")
-        secret_response = client.get_secret_value(SecretId=secret_arn)
+        secret_response = secret_client.get_secret_value(SecretId=secret_arn)
         logging.info("2")
         secret = json.loads(secret_response['SecretString'])
         logging.info("3")
@@ -81,7 +81,7 @@ def lambda_handler(event, context):
                     file_key = file['Key']
                     
                     # Get the JSON file from S3
-                    response = s3.get_object(Bucket=bucket_name, Key=file_key)
+                    response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
                     json_data = json.loads(response['Body'].read())
                     
                     # Example: Insert JSON data into the table
@@ -95,8 +95,8 @@ def lambda_handler(event, context):
                     
                     # Move the file to the "Complete" folder
                     destination_key = f'Complete/{file_key.split("/")[-1]}'
-                    s3.copy_object(Bucket=bucket_name, CopySource={'Bucket': bucket_name, 'Key': file_key}, Key=destination_key)
-                    s3.delete_object(Bucket=bucket_name, Key=file_key)
+                    s3_client.copy_object(Bucket=bucket_name, CopySource={'Bucket': bucket_name, 'Key': file_key}, Key=destination_key)
+                    s3_client.delete_object(Bucket=bucket_name, Key=file_key)
                     
                 conn.commit()
         

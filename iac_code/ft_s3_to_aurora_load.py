@@ -3,7 +3,8 @@ from aws_cdk import (
     aws_iam as iam,
     aws_s3 as s3,
     aws_ec2 as ec2,
-    Stack
+    Stack,
+    Duration
 )
 
 from constructs import Construct
@@ -57,10 +58,11 @@ class FtS3ToAuroraLoadStack(Stack):
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name="ft-" + env + "-load-json-s3-to-aurora",
             layers=[psycopg2_layer],
-            vpc=datawarehouse_vpc,
-            vpc_subnets=ec2.SubnetSelection(
-                subnets=public_subnets
-            ),
+            #vpc=datawarehouse_vpc,
+            #vpc_subnets=ec2.SubnetSelection(
+            #    subnets=public_subnets
+            #),
+            timeout=Duration.seconds(120),
             code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayerS3ToAurora'),
             handler='lambda_function.lambda_handler',
             environment={
