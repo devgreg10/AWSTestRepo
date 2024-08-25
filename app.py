@@ -34,6 +34,7 @@ else:
 FtS3ToAuroraLoadStack(app, "FtS3ToAuroraLoadStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
+    secret_region=os.getenv('db_connection_secret_region'),
     bucket_name=os.getenv('load_s3_bucket_name'),
     bucket_prefix=os.getenv('load_s3_bucket_prefix'),
     num_files=5  # Process the first 5 files

@@ -4,6 +4,7 @@ import psycopg2
 import os
 import logging
 
+from botocore.exceptions import ClientError
 from datetime import datetime
 import pytz
 
@@ -13,6 +14,8 @@ logger.setLevel(logging.INFO)
 def lambda_handler(event, context):
 
     try:
+
+        session = boto3.session.Session()
 
         # Define the time zone
         eastern = pytz.timezone('America/New_York')
@@ -26,11 +29,11 @@ def lambda_handler(event, context):
         # Adjust the format to include the colon in the offset
         formatted_timestamp = f"{formatted_timestamp[:-2]}:{formatted_timestamp[-2:]}"
         
-        # Log the secret ARN
-        secret_arn = os.environ['DB_SECRET_ARN']
-        logger.info(f"Using Secret ARN: {secret_arn}")
+        s3_client=session.client(
+            service_name="s3",
+            region_name="us-east-1"
+        )
         
-        s3 = boto3.client('s3')
         bucket_name = os.environ['BUCKET_NAME']
         bucket_prefix = os.environ['BUCKET_PREFIX']
         num_files = int(os.environ['NUM_FILES'])
@@ -39,7 +42,7 @@ def lambda_handler(event, context):
         logging.info("Bucket Prefix: " + bucket_prefix)
         
         # List the first N JSON files in the bucket
-        response = s3.list_objects_v2(Bucket=bucket_name, MaxKeys=num_files, Prefix=bucket_prefix)  # Add prefix if needed
+        response = s3_client.list_objects_v2(Bucket=bucket_name, MaxKeys=num_files, Prefix=bucket_prefix)  # Add prefix if needed
         logging.info("Have response from s3.listobjects")
         files = response.get('Contents', [])
         logging.info("Have files")
@@ -47,8 +50,17 @@ def lambda_handler(event, context):
         if not files:
             return {'statusCode': 200, 'body': 'No files to process'}
         
+        # Log the secret ARN
+        secret_arn = os.environ['DB_SECRET_ARN']
+        logging.info(f"Using Secret ARN: {secret_arn}")
+        secret_region = os.environ['DB_SECRET_REGION']
+        logging.info(f"Using Secret Region: {secret_region}")
+        
         # Retrieve the secret
-        client = boto3.client('secretsmanager')
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=secret_region
+        )
         logging.info("1")
         secret_response = client.get_secret_value(SecretId=secret_arn)
         logging.info("2")

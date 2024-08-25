@@ -13,7 +13,7 @@ import os
 
 class FtS3ToAuroraLoadStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, env: str, secret_arn: str, bucket_name: str, bucket_prefix: str, num_files: int, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, env: str, secret_arn: str, secret_region: str, bucket_name: str, bucket_prefix: str, num_files: int, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -65,6 +65,7 @@ class FtS3ToAuroraLoadStack(Stack):
             handler='lambda_function.lambda_handler',
             environment={
                 "DB_SECRET_ARN": secret_arn,
+                "DB_SECRET_REGION": secret_region,
                 "BUCKET_NAME": bucket_name,
                 "BUCKET_PREFIX": bucket_prefix,
                 "NUM_FILES": str(num_files)  # Convert to string for Lambda environment variable
