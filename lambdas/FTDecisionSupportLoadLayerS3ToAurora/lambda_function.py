@@ -45,7 +45,7 @@ def lambda_handler(event, context):
         response = s3_client.list_objects_v2(Bucket=bucket_name, MaxKeys=num_files, Prefix=bucket_prefix)  # Add prefix if needed
         logging.info("Have response from s3.listobjects")
         files = response.get('Contents', [])
-        logging.info("Have files")
+        logging.info(f"Found {len(files)} files in the bucket to process")
         
         if not files:
             return {'statusCode': 200, 'body': 'No files to process'}
@@ -79,19 +79,25 @@ def lambda_handler(event, context):
             with conn.cursor() as cursor:
                 for file in files:
                     file_key = file['Key']
+                    logging.info(f"Processing file: {file_key}")
                     
                     # Get the JSON file from S3
                     response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
-                    json_data = json.loads(response['Body'].read())
-                    
-                    # Example: Insert JSON data into the table
-                    for record in json_data:
-                        cursor.execute(
-                            "INSERT INTO ft_ds_raw.sf_contact " \
-                            "(snapshot_date, id, otherpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c) " \
-                            "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                            (formatted_timestamp, record['Id'], record['OtherPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'])
-                        )
+
+                     # Read the content
+                    body = response['Body'].read().decode('utf-8')
+
+                    # Process each JSON object separately
+                    for line in body.splitlines():
+                        if line.strip():  # Skip empty lines
+                            record = json.loads(line)
+                            logger.info(f"Processing record: {record}")
+                            cursor.execute(
+                                "INSERT INTO ft_ds_raw.sf_contact " \
+                                "(snapshot_date, id, otherpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c) " \
+                                "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                (formatted_timestamp, record['Id'], record['OtherPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'])
+                            )
                     
                     # Move the file to the "Complete" folder
                     destination_key = f'Complete/{file_key.split("/")[-1]}'
