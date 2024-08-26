@@ -128,7 +128,7 @@ class FtLoadLayerStack(Stack):
         retrieve_secrets_task = tasks.LambdaInvoke(
             self, "Retrieve Secrets",
             lambda_function=lambda_retrieve_secrets,
-            output_path="$.Payload"
+            result_path="$.secret"
         ).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),
@@ -142,7 +142,6 @@ class FtLoadLayerStack(Stack):
         list_s3_files_task = tasks.LambdaInvoke(
             self, "List S3 Files",
             lambda_function=lambda_list_s3_files,
-            output_path="$.Payload",  # Capture the output to pass it to the next step
             input_path="$.secret",  # Pass the secret along to this step
             result_path="$.files"
         ).add_retry(
@@ -153,6 +152,7 @@ class FtLoadLayerStack(Stack):
             sfn.Fail(self, "ListS3FilesFailed", error="ListS3FilesFailed", cause="Failed to list files from S3"),
             errors=["States.ALL"]
         )
+        
 
         # Step 3: Process Files in Batch
         process_files_task = sfn.Map(
@@ -161,7 +161,7 @@ class FtLoadLayerStack(Stack):
             items_path="$.files",  # This assumes that the list of files is passed from the previous steps
             parameters={
                 "file.$": "$$.Map.Item.Value",  # Each file in the list
-                 "secret.$": "$.secret_data.secret"  # Pass the secret to each iteration
+                 "secret.$": "$.secret"  # Pass the secret to each iteration
             }
         )
 
