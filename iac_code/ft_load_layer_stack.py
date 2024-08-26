@@ -121,6 +121,8 @@ class FtLoadLayerStack(Stack):
                 "NUM_FILES": str(num_files)  # Convert to string for Lambda environment variable
             }
         )
+         # Grant the Lambda function permissions to read from S3 
+        bucket.grant_read_write(lambda_process_files)
 
         # Create Tasks for State Machine
 
