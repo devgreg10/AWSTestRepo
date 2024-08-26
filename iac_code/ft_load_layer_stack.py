@@ -128,7 +128,8 @@ class FtLoadLayerStack(Stack):
         retrieve_secrets_task = tasks.LambdaInvoke(
             self, "Retrieve Secrets",
             lambda_function=lambda_retrieve_secrets,
-            output_path="$.Payload"  # Capture the secret in the output
+            output_path="$.Payload",  # Capture the secret in the output
+            result_path="$.secret_data"  # Store the secret in $.secret_data
         ).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),
@@ -159,7 +160,7 @@ class FtLoadLayerStack(Stack):
             items_path="$.files",  # This assumes that the list of files is passed from the previous steps
             parameters={
                 "file.$": "$$.Map.Item.Value",  # Each file in the list
-                "secret.$": "$.secret"  # Pass the secret to each iteration
+                 "secret.$": "$.secret_data.secret"  # Pass the secret to each iteration
             }
         )
 

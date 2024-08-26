@@ -1,12 +1,6 @@
-import json
 import boto3
-import psycopg2
 import os
 import logging
-
-from botocore.exceptions import ClientError
-from datetime import datetime
-import pytz
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
