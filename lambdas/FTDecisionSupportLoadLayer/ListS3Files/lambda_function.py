@@ -32,12 +32,9 @@ def lambda_handler(event, context):
         file_keys = [file['Key'] for file in files]
         logging.info(f"Found files: {file_keys}")
 
-        if not files:
-            return {'statusCode': 200, 'body': 'No files to process'}
-        else:
-            return {
-                'files': file_keys
-            }
+        return {
+            'files': file_keys
+        }
 
     except Exception as e:
         logger.error(f"Error occurred: {e}")
