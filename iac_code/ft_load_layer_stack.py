@@ -64,7 +64,7 @@ class FtLoadLayerStack(Stack):
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
-            timeout=Duration.seconds(120),
+            timeout=Duration.seconds(30),
             code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/ListS3Files'),
             handler='lambda_function.lambda_handler',
             environment={
@@ -85,7 +85,7 @@ class FtLoadLayerStack(Stack):
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
-            timeout=Duration.seconds(120),
+            timeout=Duration.seconds(30),
             code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/RetrieveSecrets'),
             handler='lambda_function.lambda_handler',
             environment={
@@ -128,8 +128,7 @@ class FtLoadLayerStack(Stack):
         retrieve_secrets_task = tasks.LambdaInvoke(
             self, "Retrieve Secrets",
             lambda_function=lambda_retrieve_secrets,
-            output_path="$.Payload",  # Capture the secret in the output
-            result_path="$.secret_data"  # Store the secret in $.secret_data
+            output_path="$.Payload"
         ).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),
@@ -143,7 +142,9 @@ class FtLoadLayerStack(Stack):
         list_s3_files_task = tasks.LambdaInvoke(
             self, "List S3 Files",
             lambda_function=lambda_list_s3_files,
-            output_path="$.Payload"  # Capture the output to pass it to the next step
+            output_path="$.Payload",  # Capture the output to pass it to the next step
+            input_path="$.secret",  # Pass the secret along to this step
+            result_path="$.files"
         ).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),
