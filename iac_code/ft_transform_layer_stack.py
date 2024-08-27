@@ -107,7 +107,7 @@ class FtTransformLayerStack(Stack):
             interval=Duration.seconds(5),
             backoff_rate=2.0
         ).add_catch(
-            sfn.Fail(self, "Stored Procedure ft_ds_admin.raw_to_valid_sf_contact failed", error="Stored Procedure ft_ds_admin.raw_to_valid_sf_contact failed", cause="Stored Procedure ft_ds_admin.raw_to_valid_sf_contact failed"),
+            sfn.Fail(self, "Stored Procedure raw_to_valid failed", error="Stored Procedure raw_to_valid failed", cause="Stored Procedure raw_to_valid failed"),
             errors=["States.ALL"]
         )
 
@@ -126,7 +126,7 @@ class FtTransformLayerStack(Stack):
             interval=Duration.seconds(5),
             backoff_rate=2.0
         ).add_catch(
-            sfn.Fail(self, "Stored Procedure ft_ds_admin.valid_to_refined_sf_contact failed", error="Stored Procedure ft_ds_admin.raw_to_valid_sf_contact failed", cause="Stored Procedure ft_ds_admin.raw_to_valid_sf_contact failed"),
+            sfn.Fail(self, "Stored Procedure valid_to_refined failed", error="Stored Procedure valid_to_refined failed", cause="Stored Procedure valid_to_refined failed"),
             errors=["States.ALL"]
         )
 
@@ -144,7 +144,7 @@ class FtTransformLayerStack(Stack):
             interval=Duration.seconds(5),
             backoff_rate=2.0
         ).add_catch(
-            sfn.Fail(self, "Stored Procedure ft_ds_admin.historical_metric_sf_contact_counts_by_chapter failed", error="Stored Procedure ft_ds_admin.historical_metric_sf_contact_counts_by_chapter failed", cause="Stored Procedure ft_ds_admin.historical_metric_sf_contact_counts_by_chapter failed"),
+            sfn.Fail(self, "Stored Procedure historical_metrics failed", error="Stored Procedure historical_metrics failed", cause="Stored Procedure historical_metrics failed"),
             errors=["States.ALL"]
         )
 
