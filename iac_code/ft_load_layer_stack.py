@@ -62,6 +62,7 @@ class FtLoadLayerStack(Stack):
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
+            layers=[psycopg2_layer],
             function_name="ft-" + env + "-generate-timestamp",
             runtime=lambda_.Runtime.PYTHON_3_8,
             code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/GenerateTimestamp'),
