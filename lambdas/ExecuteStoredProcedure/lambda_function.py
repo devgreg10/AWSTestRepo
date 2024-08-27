@@ -1,6 +1,4 @@
-import boto3
 import psycopg2
-import os
 import json
 import logging
 
@@ -9,13 +7,17 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     try:
-        session = boto3.session.Session()
         
         # Extract necessary information from the event
-        procedure_name = event['procedure_name']  # Default to a procedure if not provided
+        procedure_name = event['procedure_name'] 
+        logging.info(f"Stored Procedure name {procedure_name} passed to Lambda")
         params = event.get('params', ())  # Parameters for the stored procedure, if any
         secret = event['secret']  # Secret containing DB credentials
         
+        # If the secret is a string, parse it into a dictionary
+        if isinstance(secret, str):
+            secret = json.loads(secret)
+
         # Connect to the database
         conn = psycopg2.connect(
             host=secret['host'],

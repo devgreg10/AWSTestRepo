@@ -99,7 +99,7 @@ class FtTransformLayerStack(Stack):
             lambda_function=lambda_execute_stored_procedure,
             payload=sfn.TaskInput.from_object({
                 "procedure_name": "ft_ds_admin.raw_to_valid_sf_contact",
-                "secret": "$.secret.Payload.secret"
+                "secret": sfn.JsonPath.object_at("$.secret.Payload.secret")
             }),
             result_path="$.raw_to_valid_result"
         ).add_retry(
@@ -118,7 +118,7 @@ class FtTransformLayerStack(Stack):
             lambda_function=lambda_execute_stored_procedure,
             payload=sfn.TaskInput.from_object({
                 "procedure_name": "ft_ds_admin.valid_to_refined_sf_contact",
-                "secret": "$.secret.Payload.secret"
+                "secret": sfn.JsonPath.object_at("$.secret.Payload.secret")
             }),
             result_path="$.valid_to_refined_result"
         ).add_retry(
@@ -136,7 +136,7 @@ class FtTransformLayerStack(Stack):
             lambda_function=lambda_execute_stored_procedure,
             payload=sfn.TaskInput.from_object({
                 "procedure_name": "ft_ds_admin.historical_metric_sf_contact_counts_by_chapter",
-                "secret": "$.secret.Payload.secret"
+                "secret": sfn.JsonPath.object_at("$.secret.Payload.secret")
             }),
             result_path="$.historical_metrics_result"
         ).add_retry(
