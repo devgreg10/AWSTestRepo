@@ -11,6 +11,7 @@ from iac_code.ft_public_data_warehouse_aurora import FtPublicDataWarehouseAurora
 from iac_code.ft_create_secret import FtCreateSecretsStack
 from iac_code.ft_s3_to_aurora_load import FtS3ToAuroraLoadStack
 from iac_code.ft_load_layer_stack import FtLoadLayerStack
+from iac_code.ft_transform_layer_stack import FtTransformLayerStack
 
 from dotenv import load_dotenv
 
@@ -33,13 +34,11 @@ else:
 # FtPublicDataWarehouseAuroraStack(app, "FirstTee-CDK-Public-Data-Warehouse-Aurora-{0}".format(env), env)
 # FtCreateSecretsStack(app, "AuroraSecretsStack")
 # FtS3ToAuroraLoadStack(app, "FtS3ToAuroraLoadStack",
-FtLoadLayerStack(app, "FtLoadLayerStack",
+#FtLoadLayerStack(app, "FtLoadLayerStack",
+FtTransformLayerStack(app, "FtTransformLayerStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
-    secret_region=os.getenv('db_connection_secret_region'),
-    bucket_name=os.getenv('load_s3_bucket_name'),
-    bucket_prefix=os.getenv('load_s3_bucket_prefix'),
-    num_files=5  # Process the first 5 files
+    secret_region=os.getenv('db_connection_secret_region')
 )
 
 cdk.Tags.of(app).add("Project", "First Tee Decision Support")

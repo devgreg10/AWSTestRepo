@@ -61,7 +61,7 @@ class FtLoadLayerStack(Stack):
             layers=[psycopg2_layer],
             function_name="ft-" + env + "-generate-timestamp",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/GenerateTimestamp'),
+            code=lambda_.Code.from_asset('lambdas/GenerateTimestamp'),
             handler='lambda_function.lambda_handler',
             timeout=Duration.seconds(10)
         )
@@ -75,7 +75,7 @@ class FtLoadLayerStack(Stack):
             #    subnets=public_subnets
             #),
             timeout=Duration.seconds(30),
-            code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/ListS3Files'),
+            code=lambda_.Code.from_asset('lambdas/ListS3Files'),
             handler='lambda_function.lambda_handler',
             environment={
                 "BUCKET_NAME": bucket_name,
@@ -96,7 +96,7 @@ class FtLoadLayerStack(Stack):
             #    subnets=public_subnets
             #),
             timeout=Duration.seconds(30),
-            code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/RetrieveSecrets'),
+            code=lambda_.Code.from_asset('lambdas/RetrieveSecrets'),
             handler='lambda_function.lambda_handler',
             environment={
                 "DB_SECRET_ARN": secret_arn,
@@ -121,7 +121,7 @@ class FtLoadLayerStack(Stack):
             #    subnets=public_subnets
             #),
             timeout=Duration.seconds(120),
-            code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/ProcessFiles'),
+            code=lambda_.Code.from_asset('lambdas/LoadLayerProcessFiles'),
             handler='lambda_function.lambda_handler',
             environment={
                 "BUCKET_NAME": bucket_name
