@@ -56,10 +56,23 @@ class FtLoadLayerStack(Stack):
         )
 
         # Define Lambda functions
+        lambda_generate_timestamp = lambda_.Function(
+            self, "LambdaGenerateTimestamp",
+            #vpc=datawarehouse_vpc,
+            #vpc_subnets=ec2.SubnetSelection(
+            #    subnets=public_subnets
+            #),
+            function_name="ft-" + env + "-generate-timestamp",
+            runtime=lambda_.Runtime.PYTHON_3_8,
+            code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/GenerateTimestamp'),
+            handler='lambda_function.lambda_handler',
+            timeout=Duration.seconds(10)
+        )
+
+        
         lambda_list_s3_files = lambda_.Function(self, "LambdaListS3Files",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name="ft-" + env + "-s3-list-files",
-            #layers=[psycopg2_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
@@ -114,17 +127,20 @@ class FtLoadLayerStack(Stack):
             code=lambda_.Code.from_asset('lambdas/FTDecisionSupportLoadLayer/ProcessFiles'),
             handler='lambda_function.lambda_handler',
             environment={
-                "DB_SECRET_ARN": secret_arn,
-                "DB_SECRET_REGION": secret_region,
-                "BUCKET_NAME": bucket_name,
-                "BUCKET_PREFIX": bucket_prefix,
-                "NUM_FILES": str(num_files)  # Convert to string for Lambda environment variable
+                "BUCKET_NAME": bucket_name
             }
         )
          # Grant the Lambda function permissions to read from S3 
         bucket.grant_read_write(lambda_process_files)
 
         # Create Tasks for State Machine
+
+        # Step 0: GenerateTimestamp
+        generate_timestamp_task = tasks.LambdaInvoke(
+            self, "Generate Timestamp",
+            lambda_function=lambda_generate_timestamp,
+            result_path="$.timestamp"  # Store the generated timestamp in $.timestamp
+        )
 
         # Step 1: Retrieve Secrets
         retrieve_secrets_task = tasks.LambdaInvoke(
@@ -144,7 +160,6 @@ class FtLoadLayerStack(Stack):
         list_s3_files_task = tasks.LambdaInvoke(
             self, "List S3 Files",
             lambda_function=lambda_list_s3_files,
-            input_path="$.secret.Payload",  # Pass the secret along to this step
             result_path="$.files"
         ).add_retry(
             max_attempts=3,
@@ -163,7 +178,8 @@ class FtLoadLayerStack(Stack):
             items_path="$.files.Payload.files",  # This assumes that the list of files is passed from the previous steps
             parameters={
                 "file.$": "$$.Map.Item.Value",  # Each file in the list
-                 "secret.$": "$.secret.Payload.secret"  # Pass the secret to each iteration
+                "secret.$": "$.secret.Payload.secret",  # Pass the secret to each iteration
+                "timestamp.$": "$.timestamp.Payload.timestamp"  # Pass the timestamp to each iteration
             }
         )
 
@@ -182,7 +198,7 @@ class FtLoadLayerStack(Stack):
         )
 
          # Define the state machine workflow
-        definition = retrieve_secrets_task.next(list_s3_files_task).next(process_files_task)
+        definition = generate_timestamp_task.next(retrieve_secrets_task).next(list_s3_files_task).next(process_files_task)
 
         # Create the state machine
         state_machine = sfn.StateMachine(
