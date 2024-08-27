@@ -24,23 +24,29 @@ def lambda_handler(event, context):
             password=secret['password']
         )
 
-        with conn.cursor() as cursor:
-            logging.info(f"Executing stored procedure: {procedure_name} with params: {params}")
-            cursor.callproc(procedure_name, params)
-            result = cursor.fetchall()  # Fetch the result if the stored procedure returns data
-            conn.commit()
+        try:
+            with conn.cursor() as cursor:
+                logging.info(f"Executing stored procedure: {procedure_name} with params: {params}")
+                cursor.callproc(procedure_name, params)
+                result = cursor.fetchall()  # Fetch the result if the stored procedure returns data
+                conn.commit()
 
-        logging.info(f"Stored procedure executed successfully, result: {result}")
+            logging.info(f"Stored procedure executed successfully, result: {result}")
 
-        return {
-            'statusCode': 200,
-            'body': result
-        }
+            return {
+                'statusCode': 200,
+                'body': result
+            }
 
-    except Exception as e:
-        logging.error(f"Error executing stored procedure {procedure_name}: {e}")
-        raise e
-
-    finally:
-        if conn:
+        except Exception as e:
+            logging.error(f"DB Error occurred: {e}")
+            conn.rollback()
+            raise e
+        
+        finally:
             conn.close()
+        
+        
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        raise e
