@@ -52,16 +52,8 @@ class FtTransformLayerStack(Stack):
             description="A layer for psycopg2",
         )
 
-        lambda_retrieve_secrets = lambda_.Function(self, "LambdaRetrieveSecrets",
-            runtime=lambda_.Runtime.PYTHON_3_8,
+        lambda_retrieve_secrets = lambda_.Function.from_function_name(self, "LambdaRetrieveSecrets",
             function_name="ft-" + env + "-retrieve-secrets",
-            timeout=Duration.seconds(30),
-            code=lambda_.Code.from_asset('lambdas/RetrieveSecrets'),
-            handler='lambda_function.lambda_handler',
-            environment={
-                "DB_SECRET_ARN": secret_arn,
-                "DB_SECRET_REGION": secret_region,
-            }
         )
 
         # Grant the Lambda function permissions to read from Secrets 
