@@ -58,10 +58,6 @@ class FtLoadLayerStack(Stack):
         # Define Lambda functions
         lambda_generate_timestamp = lambda_.Function(
             self, "LambdaGenerateTimestamp",
-            #vpc=datawarehouse_vpc,
-            #vpc_subnets=ec2.SubnetSelection(
-            #    subnets=public_subnets
-            #),
             layers=[psycopg2_layer],
             function_name="ft-" + env + "-generate-timestamp",
             runtime=lambda_.Runtime.PYTHON_3_8,
