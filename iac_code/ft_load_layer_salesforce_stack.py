@@ -122,9 +122,12 @@ class FtLoadLayerSalesforceStack(Stack):
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
-            timeout=Duration.minutes(5),
+            timeout=Duration.minutes(2),
             code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce'),
-            handler='lambda_function.lambda_handler'
+            handler='lambda_function.lambda_handler',
+            environment={
+                "BUCKET_NAME": bucket_name
+            }
         )
          # Grant the Lambda function permissions to read from S3 
         bucket.grant_read_write(lambda_process_files)

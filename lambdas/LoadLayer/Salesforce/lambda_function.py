@@ -13,9 +13,9 @@ def lambda_handler(event, context):
 
         session = boto3.session.Session()
 
+        file_key = event['file']
         secret = event['secret']
         formatted_timestamp = event['timestamp']
-        file_key = event['file_key']
 
         # Connect to Aurora PostgreSQL
         conn = psycopg2.connect(
@@ -32,11 +32,11 @@ def lambda_handler(event, context):
         
         bucket_name = os.environ['BUCKET_NAME']
         
+        logging.info(f"Processing file: {file_key} from bucket: {bucket_name}")
+        
         try:
             with conn.cursor() as cursor:
-
-                logging.info(f"Processing file: {file_key} from bucket: {bucket_name}")
-
+                    
                 # Get the JSON file from S3
                 response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
 
@@ -58,7 +58,7 @@ def lambda_handler(event, context):
             conn.commit()
 
             # Move the file to the "Complete" folder
-            destination_key = f'Salesforce/Ingeress/Complete/{os.path.basename(file_key)}'
+            destination_key = f'Complete/{os.path.basename(file_key)}'
             if not destination_key.endswith('.json'):
                 destination_key += '.json'
             s3_client.copy_object(Bucket=bucket_name, CopySource={'Bucket': bucket_name, 'Key': file_key}, Key=destination_key)
