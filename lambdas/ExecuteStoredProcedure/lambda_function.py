@@ -28,18 +28,24 @@ def lambda_handler(event, context):
 
         try:
             with conn.cursor() as cursor:
-                logging.info(f"Executing stored procedure: {procedure_name} with params: {params}")
-                cursor.callproc(procedure_name, params)
-                result = cursor.fetchall()  # Fetch the result if the stored procedure returns data
+                # Construct the CALL statement
+                if params:
+                    # If there are parameters, construct the call with them
+                    placeholders = ', '.join(['%s'] * len(params))
+                    call_statement = f"CALL {procedure_name}({placeholders})"
+                    logging.info(f"Executing: {call_statement} with params: {params}")
+                    cursor.execute(call_statement, params)
+                else:
+                    # If there are no parameters, construct a simple CALL
+                    call_statement = f"CALL {procedure_name}()"
+                    logging.info(f"Executing: {call_statement}")
+                    cursor.execute(call_statement)
+
                 conn.commit()
-
-            logging.info(f"Stored procedure executed successfully, result: {result}")
-
-            return {
-                'statusCode': 200,
-                'body': result
-            }
-
+                
+                logging.info(f"Successfully called procedure: {procedure_name}")
+                return {'result': f"Procedure {procedure_name} executed successfully"}
+            
         except Exception as e:
             logging.error(f"DB Error occurred: {e}")
             conn.rollback()

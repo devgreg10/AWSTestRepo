@@ -12,7 +12,7 @@ CREATE SCHEMA IF NOT EXISTS ft_ds_admin;
 --     OtherStreet,
 --     OtherCity,
 --     OtherState,
---     OtherPostalCode,
+--     MailingPostalCode,
 --     OtherCountry,
 --     OtherLatitude,
 --     OtherLongitude,
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact (
     PRIMARY KEY (snapshot_date, Id),
     snapshot_date TIMESTAMPTZ,
     Id TEXT,
-    OtherPostalCode TEXT,
+    MailingPostalCode TEXT,
     Chapter_Affiliation__c TEXT,
     ChapterID_CONTACT__c TEXT,
     CASESAFEID__c TEXT,
@@ -589,11 +589,11 @@ BEGIN
         snapshot_date AS snapshot_date,
         Id AS contact_id_18,
         Chapter_Affiliation__c AS chapter_id,
-        CAST(Age__c AS INTEGER) AS age,
+        CAST(CAST(Age__c AS NUMERIC) AS INTEGER) AS age,
         Gender__c AS gender,
         Ethnicity__c AS ethnicity,
         Grade__c AS grade,
-        OtherPostalCode AS mailing_zip_postal_code,
+        MailingPostalCode AS mailing_zip_postal_code,
         Participation_Status__c AS participation_status,
         Contact_Type__c AS contact_type
     FROM ft_ds_raw.sf_contact
@@ -655,11 +655,11 @@ CREATE OR REPLACE PROCEDURE ft_ds_admin.historical_metric_sf_contact_counts_by_c
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    INSERT INTO ft_ds_refined.sf_contact
+    INSERT INTO ft_ds_refined.sf_metric_historical_active_participants_counts
     SELECT
         snapshot_date,
         chapter_id,
-        COUNT(Id) AS participant_count
+        COUNT(contact_id_18) AS participant_count
     FROM ft_ds_refined.sf_contact
     GROUP BY
     snapshot_date,

@@ -14,7 +14,7 @@ from constructs import Construct
 from dotenv import load_dotenv
 import os
 
-class FtLoadLayerStack(Stack):
+class FtLoadLayerSalesforceStack(Stack):
 
     def __init__(self, scope: Construct, id: str, env: str, secret_arn: str, secret_region: str, bucket_name: str, bucket_prefix: str, num_files: int, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -66,7 +66,7 @@ class FtLoadLayerStack(Stack):
             timeout=Duration.seconds(10)
         )
 
-        
+        '''
         lambda_list_s3_files = lambda_.Function(self, "LambdaListS3Files",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name="ft-" + env + "-s3-list-files",
@@ -83,9 +83,11 @@ class FtLoadLayerStack(Stack):
                 "NUM_FILES": str(num_files)  # Convert to string for Lambda environment variable
             }
         )
+        
 
         # Grant the Lambda function permissions to read from S3 
         bucket.grant_read_write(lambda_list_s3_files)
+        '''
 
         lambda_retrieve_secrets = lambda_.Function(self, "LambdaRetrieveSecrets",
             runtime=lambda_.Runtime.PYTHON_3_8,
@@ -114,17 +116,19 @@ class FtLoadLayerStack(Stack):
 
         lambda_process_files = lambda_.Function(self, "LambdaProcessLoadLayerFiles",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name="ft-" + env + "-load-process-files",
+            function_name="ft-" + env + "-salesforce-load-files",
             layers=[psycopg2_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
             timeout=Duration.seconds(120),
-            code=lambda_.Code.from_asset('lambdas/LoadLayerProcessFiles'),
+            code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce'),
             handler='lambda_function.lambda_handler',
             environment={
-                "BUCKET_NAME": bucket_name
+                "BUCKET_NAME": bucket_name,
+                "BUCKET_PREFIX": bucket_prefix,
+                "NUM_FILES": num_files
             }
         )
          # Grant the Lambda function permissions to read from S3 
@@ -153,6 +157,7 @@ class FtLoadLayerStack(Stack):
             errors=["States.ALL"]
         )
 
+        '''
         #Step 2: List S3 Files
         list_s3_files_task = tasks.LambdaInvoke(
             self, "List S3 Files",
@@ -193,14 +198,29 @@ class FtLoadLayerStack(Stack):
             sfn.Fail(self, "ProcessFilesFailed", error="ProcessFilesFailed", cause="Failed to process files"),
             errors=["States.ALL"]
         )
+        '''
+
+         #Step 2: Load Files
+        process_files_task = tasks.LambdaInvoke(
+            self, "Process S3 Files",
+            lambda_function=lambda_process_files,
+            result_path="$.result" 
+        ).add_retry(
+            max_attempts=3,
+            interval=Duration.seconds(5),
+            backoff_rate=2.0
+        ).add_catch(
+            sfn.Fail(self, "ProcessFilesFailed", error="ProcessFilesFailed", cause="Failed to process files"),
+            errors=["States.ALL"]
+        )
 
          # Define the state machine workflow
-        definition = generate_timestamp_task.next(retrieve_secrets_task).next(list_s3_files_task).next(process_files_task)
+        definition = generate_timestamp_task.next(retrieve_secrets_task).next(process_files_task)
 
         # Create the state machine
         state_machine = sfn.StateMachine(
             self, "FtLoadStateMachine",
-            state_machine_name="ft-" + env + "-load-layer",
+            state_machine_name="ft-" + env + "-salesforce-load-layer",
             definition=definition,
             timeout=Duration.minutes(15)
         )
