@@ -122,7 +122,7 @@ class FtLoadLayerSalesforceStack(Stack):
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
-            timeout=Duration.seconds(120),
+            timeout=Duration.minutes(15),
             code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce'),
             handler='lambda_function.lambda_handler',
             environment={
@@ -204,7 +204,11 @@ class FtLoadLayerSalesforceStack(Stack):
         process_files_task = tasks.LambdaInvoke(
             self, "Process S3 Files",
             lambda_function=lambda_process_files,
-            result_path="$.result" 
+            result_path="$.result",
+            payload=sfn.TaskInput.from_object({
+                "timestamp": sfn.JsonPath.object_at("$.timestamp.Payload.timestamp"), 
+                "secret": sfn.JsonPath.object_at("$.secret.Payload.secret")
+            }),
         ).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),

@@ -12,6 +12,12 @@ def lambda_handler(event, context):
     try:
 
         session = boto3.session.Session()
+
+        s3_client=session.client(
+            service_name="s3",
+            region_name="us-east-1"
+        )
+
         secret = event['secret']
         formatted_timestamp = event['timestamp']
 
