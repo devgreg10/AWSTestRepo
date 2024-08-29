@@ -223,8 +223,7 @@ class FtLoadLayerSalesforceStack(Stack):
         state_machine = sfn.StateMachine(
             self, "FtLoadStateMachine",
             state_machine_name="ft-" + env + "-salesforce-load-layer",
-            definition=definition,
-            timeout=Duration.minutes(15)
+            definition=definition
         )
 
         

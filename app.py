@@ -41,7 +41,7 @@ FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
     secret_region=os.getenv('db_connection_secret_region'),
     bucket_name=os.getenv('load_layer_s3_bucket_name'),
     bucket_prefix=os.getenv('load_layer_salesforce_s3_bucket_prefix'),
-    num_files='5'
+    num_files='0'
 )
 
 '''
