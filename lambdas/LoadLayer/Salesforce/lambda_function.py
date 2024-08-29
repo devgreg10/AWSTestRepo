@@ -66,14 +66,10 @@ def lambda_handler(event, context):
                     # Get the JSON file from S3
                     response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
 
-                        # Read the content
-                    body = response['Body'].read().decode('utf-8')
-
                     # Process each JSON object separately
-                    for line in body.splitlines():
+                    for line in response['Body'].iter_lines():
                         if line.strip():  # Skip empty lines
                             record = json.loads(line)
-                            logger.info(f"Processing record: {record}")
                             cursor.execute(
                                 "INSERT INTO ft_ds_raw.sf_contact " \
                                 "(snapshot_date, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c) " \

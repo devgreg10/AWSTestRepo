@@ -617,7 +617,7 @@ BEGIN
         AND Participation_Status__c = 'Active'
         AND Contact_Type__c = 'Participant'
         AND snapshot_date = (
-            SELECT MIN(snapshot_date) FROM ft_ds_raw.sf_contact
+            SELECT MAX(snapshot_date) FROM ft_ds_raw.sf_contact
         )
     ;
 END;

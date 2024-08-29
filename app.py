@@ -11,7 +11,7 @@ from iac_code.ft_public_data_warehouse_aurora import FtPublicDataWarehouseAurora
 from iac_code.ft_create_secret import FtCreateSecretsStack
 from iac_code.ft_s3_to_aurora_load import FtS3ToAuroraLoadStack
 from iac_code.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
-from iac_code.ft_transform_layer_stack import FtTransformLayerStack
+from iac_code.ft_transform_layer_salesforce_stack import FtTransformLayerSalesforceStack
 
 from dotenv import load_dotenv
 
@@ -34,6 +34,7 @@ else:
 # FtPublicDataWarehouseAuroraStack(app, "FirstTee-CDK-Public-Data-Warehouse-Aurora-{0}".format(env), env)
 # FtCreateSecretsStack(app, "AuroraSecretsStack")
 # FtS3ToAuroraLoadStack(app, "FtS3ToAuroraLoadStack",
+'''
 FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
@@ -44,12 +45,12 @@ FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
 )
 
 '''
-FtTransformLayerStack(app, "FtTransformLayerStack",
+FtTransformLayerSalesforceStack(app, "FtTransformLayerSalesforceStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
     secret_region=os.getenv('db_connection_secret_region')
 )
-'''
+
 
 
 cdk.Tags.of(app).add("Project", "First Tee Decision Support")
