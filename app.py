@@ -34,14 +34,14 @@ else:
 # FtPublicDataWarehouseAuroraStack(app, "FirstTee-CDK-Public-Data-Warehouse-Aurora-{0}".format(env), env)
 # FtCreateSecretsStack(app, "AuroraSecretsStack")
 # FtS3ToAuroraLoadStack(app, "FtS3ToAuroraLoadStack",
-'''
+
 FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
     secret_region=os.getenv('db_connection_secret_region'),
     bucket_name=os.getenv('load_layer_s3_bucket_name'),
     bucket_prefix=os.getenv('load_layer_salesforce_s3_bucket_prefix'),
-    num_files='0'
+    num_files='5'
 )
 
 '''
@@ -51,7 +51,7 @@ FtTransformLayerSalesforceStack(app, "FtTransformLayerSalesforceStack",
     secret_region=os.getenv('db_connection_secret_region')
 )
 
-
+'''
 
 cdk.Tags.of(app).add("Project", "First Tee Decision Support")
 cdk.Tags.of(app).add("Deployment", "CDK")

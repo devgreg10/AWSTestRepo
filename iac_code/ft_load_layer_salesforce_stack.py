@@ -66,7 +66,7 @@ class FtLoadLayerSalesforceStack(Stack):
             timeout=Duration.seconds(10)
         )
 
-        '''
+        
         lambda_list_s3_files = lambda_.Function(self, "LambdaListS3Files",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name="ft-" + env + "-s3-list-files",
@@ -87,7 +87,7 @@ class FtLoadLayerSalesforceStack(Stack):
 
         # Grant the Lambda function permissions to read from S3 
         bucket.grant_read_write(lambda_list_s3_files)
-        '''
+        
 
         lambda_retrieve_secrets = lambda_.Function(self, "LambdaRetrieveSecrets",
             runtime=lambda_.Runtime.PYTHON_3_8,
@@ -122,14 +122,9 @@ class FtLoadLayerSalesforceStack(Stack):
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
-            timeout=Duration.minutes(15),
+            timeout=Duration.minutes(5),
             code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce'),
-            handler='lambda_function.lambda_handler',
-            environment={
-                "BUCKET_NAME": bucket_name,
-                "BUCKET_PREFIX": bucket_prefix,
-                "NUM_FILES": num_files
-            }
+            handler='lambda_function.lambda_handler'
         )
          # Grant the Lambda function permissions to read from S3 
         bucket.grant_read_write(lambda_process_files)
@@ -157,7 +152,6 @@ class FtLoadLayerSalesforceStack(Stack):
             errors=["States.ALL"]
         )
 
-        '''
         #Step 2: List S3 Files
         list_s3_files_task = tasks.LambdaInvoke(
             self, "List S3 Files",
@@ -198,8 +192,8 @@ class FtLoadLayerSalesforceStack(Stack):
             sfn.Fail(self, "ProcessFilesFailed", error="ProcessFilesFailed", cause="Failed to process files"),
             errors=["States.ALL"]
         )
+        
         '''
-
          #Step 2: Load Files
         process_files_task = tasks.LambdaInvoke(
             self, "Process S3 Files",
@@ -217,9 +211,10 @@ class FtLoadLayerSalesforceStack(Stack):
             sfn.Fail(self, "ProcessFilesFailed", error="ProcessFilesFailed", cause="Failed to process files"),
             errors=["States.ALL"]
         )
+        '''
 
          # Define the state machine workflow
-        definition = generate_timestamp_task.next(retrieve_secrets_task).next(process_files_task)
+        definition = generate_timestamp_task.next(retrieve_secrets_task).next(list_s3_files_task).next(process_files_task)
 
         # Create the state machine
         state_machine = sfn.StateMachine(
