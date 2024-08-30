@@ -93,7 +93,7 @@ class FtAppflowS3ToS3IngestionStack(Stack):
             source_connector_properties=appflow.CfnFlow.SourceConnectorPropertiesProperty(
                 s3=appflow.CfnFlow.S3SourcePropertiesProperty(
                     bucket_name=source_bucket.bucket_name,
-                    bucket_prefix="ingestion-source/"
+                    bucket_folder="ingestion-source/"
                 )
             )
         )
@@ -104,7 +104,7 @@ class FtAppflowS3ToS3IngestionStack(Stack):
             destination_connector_properties=appflow.CfnFlow.DestinationConnectorPropertiesProperty(
                 s3=appflow.CfnFlow.S3DestinationPropertiesProperty(
                     bucket_name=destination_bucket.bucket_name,
-                    # bucket_prefix="ingress/",  
+                    # bucket_folder="ingress/",  
                     s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
                         file_type="CSV",  # or JSON, CSV, Parquet etc.
                         prefix_config=appflow.CfnFlow.PrefixConfigProperty(

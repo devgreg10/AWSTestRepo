@@ -17,21 +17,21 @@ def lambda_handler(event, context):
         )
         
         bucket_name = os.environ['BUCKET_NAME']
-        bucket_prefix = os.environ['BUCKET_PREFIX']
+        bucket_folder = os.environ['BUCKET_FOLDER']
         # default batch size to 1 if not provided
         file_batch_size = int(os.getenv('FILE_BATCH_SIZE',"1"))
         
         logging.info("Bucket Name: " + bucket_name)
-        logging.info("Bucket Prefix: " + bucket_prefix)
+        logging.info("Bucket Folder: " + bucket_folder)
         logging.info("File Batch Size: " + str(file_batch_size))
         
-        # read all files
-        all_files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_prefix)
+        # read all files, but do not recurse beyond the Prefix provided
+        all_files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_folder, Delimiter='/')
         logging.info("Have response from s3.listobjects")
 
         files = all_files.get('Contents', [])
         # Filter out the root bucket (if present)
-        filtered_files = [obj for obj in files if obj['Key'] != bucket_prefix]
+        filtered_files = [obj for obj in files if obj['Key'] != bucket_folder]
 
         logging.info(f"Found {len(filtered_files)} files in the bucket to process")
         

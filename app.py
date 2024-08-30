@@ -40,7 +40,7 @@ FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
     secret_arn=os.getenv('db_connection_secret_arn'),
     secret_region=os.getenv('db_connection_secret_region'),
     bucket_name=os.getenv('load_layer_s3_bucket_name'),
-    bucket_prefix=os.getenv('load_layer_salesforce_s3_bucket_prefix'),
+    bucket_folder=os.getenv('load_layer_salesforce_s3_bucket_folder'),
     file_batch_size=os.getenv('load_layer_salesforce_file_batch_size'),
     concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambda')
 )

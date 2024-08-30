@@ -31,7 +31,7 @@ def lambda_handler(event, context):
         )
         
         bucket_name = os.environ['BUCKET_NAME']
-        bucket_prefix = os.environ['BUCKET_PREFIX']
+        bucket_folder = os.environ['BUCKET_FOLDER']
         
         logging.info(f"Processing files: {batched_file_names} from bucket: {bucket_name}")
         
@@ -58,7 +58,7 @@ def lambda_handler(event, context):
                             )
 
                     # Move the file to the "Complete" folder
-                    destination_key = f'{bucket_prefix}complete/{os.path.basename(file_name)}'
+                    destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
                     if not destination_key.endswith('.json'):
                         destination_key += '.json'
                     s3_client.copy_object(Bucket=bucket_name, 

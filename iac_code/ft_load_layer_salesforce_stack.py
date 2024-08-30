@@ -23,7 +23,7 @@ class FtLoadLayerSalesforceStack(Stack):
                  secret_arn: str, 
                  secret_region: str, 
                  bucket_name: str, 
-                 bucket_prefix: str, 
+                 bucket_folder: str, 
                  file_batch_size: int,
                  concurrent_lambdas: int, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -88,7 +88,7 @@ class FtLoadLayerSalesforceStack(Stack):
             handler='lambda_function.lambda_handler',
             environment={
                 "BUCKET_NAME": bucket_name,
-                "BUCKET_PREFIX": bucket_prefix,
+                "BUCKET_FOLDER": bucket_folder,
                 "FILE_BATCH_SIZE": str(file_batch_size)  # Convert to string for Lambda environment variable
             }
         )
@@ -136,7 +136,7 @@ class FtLoadLayerSalesforceStack(Stack):
             handler='lambda_function.lambda_handler',
             environment={
                 "BUCKET_NAME": bucket_name,
-                "BUCKET_PREFIX": bucket_prefix
+                "BUCKET_FOLDER": bucket_folder
             }
         )
          # Grant the Lambda function permissions to read from S3 

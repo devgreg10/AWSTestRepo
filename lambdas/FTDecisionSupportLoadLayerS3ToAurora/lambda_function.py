@@ -35,14 +35,14 @@ def lambda_handler(event, context):
         )
         
         bucket_name = os.environ['BUCKET_NAME']
-        bucket_prefix = os.environ['BUCKET_PREFIX']
+        bucket_folder = os.environ['BUCKET_FOLDER']
         num_files = int(os.environ['NUM_FILES'])
         
         logging.info("Bucket Name: " + bucket_name)
-        logging.info("Bucket Prefix: " + bucket_prefix)
+        logging.info("Bucket Folder: " + bucket_folder)
         
         # List the first N JSON files in the bucket
-        response = s3_client.list_objects_v2(Bucket=bucket_name, MaxKeys=num_files, Prefix=bucket_prefix)  # Add prefix if needed
+        response = s3_client.list_objects_v2(Bucket=bucket_name, MaxKeys=num_files, Prefix=bucket_folder)  # Add prefix if needed
         logging.info("Have response from s3.listobjects")
         files = response.get('Contents', [])
         logging.info(f"Found {len(files)} files in the bucket to process")
