@@ -50,7 +50,6 @@ def lambda_handler(event, context):
                     for line in body.splitlines():
                         if line.strip():  # Skip empty lines
                             record = json.loads(line)
-                            logger.info(f"Processing record: {record}")
                             cursor.execute(
                                 "INSERT INTO ft_ds_raw.sf_contact " \
                                 "(snapshot_date, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c) " \
@@ -59,10 +58,12 @@ def lambda_handler(event, context):
                             )
 
                     # Move the file to the "Complete" folder
-                    destination_key = f'{bucket_name}/{bucket_prefix}complete/{os.path.basename(file_name)}'
+                    destination_key = f'{bucket_prefix}complete/{os.path.basename(file_name)}'
                     if not destination_key.endswith('.json'):
                         destination_key += '.json'
-                    s3_client.copy_object(Bucket=bucket_name, CopySource={'Bucket': bucket_name, 'Key': file_name}, Key=destination_key)
+                    s3_client.copy_object(Bucket=bucket_name, 
+                                          CopySource={'Bucket': bucket_name, 'Key': file_name}, 
+                                          Key=destination_key)
                     s3_client.delete_object(Bucket=bucket_name, Key=file_name)
                     #logging.info(f"File moved to 'Complete' folder: {destination_key}")
 
@@ -78,8 +79,7 @@ def lambda_handler(event, context):
             conn.close()
         
         return {
-            'statusCode': 200,
-            'body': json.dumps(f'File {file_key} processed successfully')
+            'statusCode': 200
         }
     except Exception as e:
         logger.error(f"Error occurred: {e}")

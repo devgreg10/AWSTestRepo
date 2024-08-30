@@ -89,7 +89,7 @@ class FtLoadLayerSalesforceStack(Stack):
             environment={
                 "BUCKET_NAME": bucket_name,
                 "BUCKET_PREFIX": bucket_prefix,
-                "FILE_BATCHES": str(file_batch_size)  # Convert to string for Lambda environment variable
+                "FILE_BATCH_SIZE": str(file_batch_size)  # Convert to string for Lambda environment variable
             }
         )
         
