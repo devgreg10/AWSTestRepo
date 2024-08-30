@@ -16,7 +16,16 @@ import os
 
 class FtLoadLayerSalesforceStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, env: str, secret_arn: str, secret_region: str, bucket_name: str, bucket_prefix: str, num_files: int, **kwargs) -> None:
+    def __init__(self, 
+                 scope: Construct, 
+                 id: str, 
+                 env: str, 
+                 secret_arn: str, 
+                 secret_region: str, 
+                 bucket_name: str, 
+                 bucket_prefix: str, 
+                 file_batch_size: int,
+                 concurrent_lambdas: int, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -80,7 +89,7 @@ class FtLoadLayerSalesforceStack(Stack):
             environment={
                 "BUCKET_NAME": bucket_name,
                 "BUCKET_PREFIX": bucket_prefix,
-                "NUM_FILES": str(num_files)  # Convert to string for Lambda environment variable
+                "FILE_BATCHES": str(file_batch_size)  # Convert to string for Lambda environment variable
             }
         )
         
@@ -126,7 +135,8 @@ class FtLoadLayerSalesforceStack(Stack):
             code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce'),
             handler='lambda_function.lambda_handler',
             environment={
-                "BUCKET_NAME": bucket_name
+                "BUCKET_NAME": bucket_name,
+                "BUCKET_PREFIX": bucket_prefix
             }
         )
          # Grant the Lambda function permissions to read from S3 
@@ -157,7 +167,7 @@ class FtLoadLayerSalesforceStack(Stack):
 
         #Step 2: List S3 Files
         list_s3_files_task = tasks.LambdaInvoke(
-            self, "List S3 Files",
+            self, "List S3 Files in batch size of " + str(file_batch_size),
             lambda_function=lambda_list_s3_files,
             result_path="$.files"
         ).add_retry(
@@ -172,11 +182,11 @@ class FtLoadLayerSalesforceStack(Stack):
 
         # Step 3: Process Files in Batch
         process_files_task = sfn.Map(
-            self, "Process Files in Batch",
-            max_concurrency=5,
-            items_path="$.files.Payload.files",  # This assumes that the list of files is passed from the previous steps
+            self, "Process Files",
+            max_concurrency=concurrent_lambdas,
+            items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
-                "file.$": "$$.Map.Item.Value",  # Each file in the list
+                "batched_files.$": "$$.Map.Item.Value",
                 "secret.$": "$.secret.Payload.secret",  # Pass the secret to each iteration
                 "timestamp.$": "$.timestamp.Payload.timestamp"  # Pass the timestamp to each iteration
             }
@@ -185,8 +195,7 @@ class FtLoadLayerSalesforceStack(Stack):
         # Add Lambda invocation within the Map state
         process_files_task.iterator(tasks.LambdaInvoke(
             self, "Process File",
-            lambda_function=lambda_process_files,
-            result_path="$.result"  # Store the result of each iteration
+            lambda_function=lambda_process_files
         )).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),
@@ -196,26 +205,6 @@ class FtLoadLayerSalesforceStack(Stack):
             errors=["States.ALL"]
         )
         
-        '''
-         #Step 2: Load Files
-        process_files_task = tasks.LambdaInvoke(
-            self, "Process S3 Files",
-            lambda_function=lambda_process_files,
-            result_path="$.result",
-            payload=sfn.TaskInput.from_object({
-                "timestamp": sfn.JsonPath.object_at("$.timestamp.Payload.timestamp"), 
-                "secret": sfn.JsonPath.object_at("$.secret.Payload.secret")
-            }),
-        ).add_retry(
-            max_attempts=3,
-            interval=Duration.seconds(5),
-            backoff_rate=2.0
-        ).add_catch(
-            sfn.Fail(self, "ProcessFilesFailed", error="ProcessFilesFailed", cause="Failed to process files"),
-            errors=["States.ALL"]
-        )
-        '''
-
          # Define the state machine workflow
         definition = generate_timestamp_task.next(retrieve_secrets_task).next(list_s3_files_task).next(process_files_task)
 

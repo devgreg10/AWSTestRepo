@@ -18,26 +18,28 @@ def lambda_handler(event, context):
         
         bucket_name = os.environ['BUCKET_NAME']
         bucket_prefix = os.environ['BUCKET_PREFIX']
-        num_files = int(os.environ.get('NUM_FILES',0))
+        # default batch size to 1 if not provided
+        file_batch_size = os.getenv('FILE_BATCH_SIZE',"1")
         
         logging.info("Bucket Name: " + bucket_name)
         logging.info("Bucket Prefix: " + bucket_prefix)
+        logging.info("File Batch Size: " + file_batch_size)
         
-        # List the first N JSON files in the bucket
-        if(num_files):
-            response = s3_client.list_objects_v2(Bucket=bucket_name, MaxKeys=num_files, Prefix=bucket_prefix)  # Add prefix if needed
-        else:
-            response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_prefix)  # Add prefix if needed
-        
+        # read all files
+        all_files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_prefix)
         logging.info("Have response from s3.listobjects")
-        files = response.get('Contents', [])
+
+        files = all_files.get('Contents', [])
         logging.info(f"Found {len(files)} files in the bucket to process")
         
         file_keys = [file['Key'] for file in files]
         logging.info(f"Found files: {file_keys}")
 
+        # create dictionary of file names in batches, even if it's a batch of 1
+        response = [file_keys[i:i + file_batch_size] for i in range(0, len(file_keys), file_batch_size)]
+
         return {
-            'files': file_keys
+            'files': response
         }
 
     except Exception as e:
