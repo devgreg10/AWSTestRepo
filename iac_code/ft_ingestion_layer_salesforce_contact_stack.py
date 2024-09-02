@@ -65,7 +65,8 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     salesforce=appflow.CfnFlow.SalesforceSourcePropertiesProperty(
                         object="Contact",
                         enable_dynamic_field_update=False,
-                        include_deleted_records=False
+                        include_deleted_records=False,
+                        data_transfer_api="AUTOMATIC"
                     )
                 )
             ),
@@ -300,6 +301,5 @@ class FtSalesforceContactIngestionLayerStack(Stack):
             ],
             trigger_config=appflow.CfnFlow.TriggerConfigProperty(
                 trigger_type="OnDemand"
-            ),
-            flow_status="Active"
+            )
         )
