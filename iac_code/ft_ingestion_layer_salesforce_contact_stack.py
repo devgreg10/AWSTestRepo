@@ -40,7 +40,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         salesforce_connection = appflow.CfnConnectorProfile(
             self, "SalesforceConnectorProfile",
             connector_profile_name=os.getenv('salesforce_connection_name'),
-            connection_mode="PUBLIC",
+            connection_mode="Public",
             connector_type="Salesforce"
         )
 
