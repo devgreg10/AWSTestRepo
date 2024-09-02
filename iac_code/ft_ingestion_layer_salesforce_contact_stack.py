@@ -91,36 +91,215 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 )
             )],
             tasks=[
+                # Task 1: Filter task on Participation_Status__c
                 appflow.CfnFlow.TaskProperty(
-                    connector_operator={"Salesforce": "PROJECTION"},
-                    source_fields=[
-                        'Id', 
-                        'MailingPostalCode', 
-                        'Chapter_Affiliation__c', 
-                        'ChapterID_CONTACT__c', 
-                        'CASESAFEID__c', 
-                        'Contact_Type__c', 
-                        'Age__c', 
-                        'Ethnicity__c', 
-                        'Gender__c', 
-                        'Grade__c', 
-                        'Participation_Status__c'
-                    ],
+                    source_fields=["Participation_Status__c"],
                     task_type="Filter",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NOT_EQUAL_TO"
+                    ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", 
-                            value="string"
+                            key="DATA_TYPE", value="picklist"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", 
-                            value="string"
+                            key="VALUE", value="Previous"
                         )
+                    ]
+                ),
+                # Task 2: Projection of specific fields
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=[
+                        "Id", "Chapter_Affiliation__c", "ChapterID_CONTACT__c", 
+                        "CASESAFEID__c", "Contact_Type__c", "Age__c", 
+                        "Ethnicity__c", "Gender__c", "Grade__c", 
+                        "Participation_Status__c", "MailingPostalCode"
                     ],
-                    destination_field="S3"
-                )
+                    task_type="Filter",  # Although this is a projection, use "Filter" with projection operator
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="PROJECTION"
+                    )
+                ),
+                # Mapping Tasks
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Id"],
+                    task_type="Map",
+                    destination_field="Id",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="id"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="id"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Chapter_Affiliation__c"],
+                    task_type="Map",
+                    destination_field="Chapter_Affiliation__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="reference"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="reference"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["ChapterID_CONTACT__c"],
+                    task_type="Map",
+                    destination_field="ChapterID_CONTACT__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="string"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["CASESAFEID__c"],
+                    task_type="Map",
+                    destination_field="CASESAFEID__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="string"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Contact_Type__c"],
+                    task_type="Map",
+                    destination_field="Contact_Type__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="multipicklist"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="multipicklist"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Age__c"],
+                    task_type="Map",
+                    destination_field="Age__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="double"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="double"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Ethnicity__c"],
+                    task_type="Map",
+                    destination_field="Ethnicity__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="picklist"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="picklist"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Gender__c"],
+                    task_type="Map",
+                    destination_field="Gender__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="picklist"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="picklist"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Grade__c"],
+                    task_type="Map",
+                    destination_field="Grade__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="picklist"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="picklist"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["Participation_Status__c"],
+                    task_type="Map",
+                    destination_field="Participation_Status__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="picklist"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="picklist"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["MailingPostalCode"],
+                    task_type="Map",
+                    destination_field="MailingPostalCode",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="string"
+                        )
+                    ]
+                ),
             ],
             trigger_config=appflow.CfnFlow.TriggerConfigProperty(
                 trigger_type="OnDemand"
-            )
+            ),
+            flow_status="Active"
         )
