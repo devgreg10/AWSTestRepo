@@ -48,11 +48,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         # IAM role for the AppFlow
         appflow_role = iam.Role(
             self, "AppFlowServiceRole",
-            assumed_by=iam.ServicePrincipal("appflow.amazonaws.com"),
-            managed_policies=[
-                iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSAppFlowServiceRole"),
-                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess")
-            ]
+            assumed_by=iam.ServicePrincipal("appflow.amazonaws.com")
         )
 
         # Attach the necessary policies to the role
@@ -109,7 +105,17 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                         'Grade__c', 
                         'Participation_Status__c'
                     ],
-                    task_type="Filter",
+                    task_type="Map",
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", 
+                            value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", 
+                            value="string"
+                        )
+                    ],
                     destination_field="S3"
                 )
             ],
