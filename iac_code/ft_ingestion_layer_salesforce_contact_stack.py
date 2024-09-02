@@ -104,7 +104,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                         'Grade__c', 
                         'Participation_Status__c'
                     ],
-                    task_type="Map_all",
+                    task_type="Map",
                     destination_field="S3"
                 )
             ],
