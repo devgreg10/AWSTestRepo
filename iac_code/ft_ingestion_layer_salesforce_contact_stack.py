@@ -92,6 +92,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
             )],
             tasks=[
                 appflow.CfnFlow.TaskProperty(
+                    connector_operator={"Salesforce": "PROJECTION"},
                     source_fields=[
                         'Id', 
                         'MailingPostalCode', 
@@ -105,7 +106,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                         'Grade__c', 
                         'Participation_Status__c'
                     ],
-                    task_type="Map",
+                    task_type="Filter",
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
                             key="SOURCE_DATA_TYPE", 
