@@ -35,7 +35,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                                        versioned=True,
                                        removal_policy=RemovalPolicy.DESTROY)
 
-
+        '''
         # Reference the existing Salesforce connection
         salesforce_connection = appflow.CfnConnectorProfile(
             self, "SalesforceConnectorProfile",
@@ -43,11 +43,16 @@ class FtSalesforceContactIngestionLayerStack(Stack):
             connection_mode="Public",
             connector_type="Salesforce"
         )
+        '''
 
         # IAM role for the AppFlow
         appflow_role = iam.Role(
             self, "AppFlowServiceRole",
-            assumed_by=iam.ServicePrincipal("appflow.amazonaws.com")
+            assumed_by=iam.ServicePrincipal("appflow.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSAppFlowServiceRole"),
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess")
+            ]
         )
 
         # Attach the necessary policies to the role
@@ -57,6 +62,17 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         flow = appflow.CfnFlow(
             self, "SalesforceToS3Flow",
             flow_name="ft-" + env + "-ingestion-layer-salesforce-contact",
+            source_flow_config=appflow.CfnFlow.SourceFlowConfigProperty(
+                connector_type="Salesforce",
+                connector_profile_name=os.getenv('salesforce_connection_name'),
+                source_connector_properties=appflow.CfnFlow.SourceConnectorPropertiesProperty(
+                    salesforce=appflow.CfnFlow.SalesforceSourcePropertiesProperty(
+                        object="Contact",
+                        enable_dynamic_field_update=False,
+                        include_deleted_records=False
+                    )
+                )
+            ),
             destination_flow_config_list=[appflow.CfnFlow.DestinationFlowConfigProperty(
                 connector_type="S3",
                 destination_connector_properties=appflow.CfnFlow.DestinationConnectorPropertiesProperty(
@@ -78,17 +94,6 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     )
                 )
             )],
-            source_flow_config=appflow.CfnFlow.SourceFlowConfigProperty(
-                connector_type="Salesforce",
-                source_connector_properties=appflow.CfnFlow.SourceConnectorPropertiesProperty(
-                    salesforce=appflow.CfnFlow.SalesforceSourcePropertiesProperty(
-                        object="Contact",
-                        enable_dynamic_field_update=False,
-                        include_deleted_records=False
-                    )
-                ),
-                connector_profile_name=salesforce_connection.connector_profile_name
-            ),
             tasks=[
                 appflow.CfnFlow.TaskProperty(
                     source_fields=[
@@ -104,7 +109,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                         'Grade__c', 
                         'Participation_Status__c'
                     ],
-                    task_type="Map",
+                    task_type="Filter",
                     destination_field="S3"
                 )
             ],
