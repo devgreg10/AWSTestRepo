@@ -84,7 +84,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                             file_type="JSON",
                             prefix_config=appflow.CfnFlow.PrefixConfigProperty(
                                 prefix_format="MINUTE", # Determines the level of granularity for the date and time that's included in the prefix.
-                                prefix_type="PATH" # Determines the format of the prefix, and whether it applies to the file name, file path, or both.
+                                prefix_type="FILENAME" # Determines the format of the prefix, and whether it applies to the file name, file path, or both.
                             ),
                             preserve_source_data_typing=False # all source data converted into strings
                         )
@@ -92,7 +92,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 )
             )],
             tasks=[
-                # Task 1: Filter task on Participation_Status__c
+                # Task 1: Filter on Participation_Status__c
                 appflow.CfnFlow.TaskProperty(
                     source_fields=["Participation_Status__c"],
                     task_type="Filter",
@@ -116,12 +116,12 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                         "Ethnicity__c", "Gender__c", "Grade__c", 
                         "Participation_Status__c", "MailingPostalCode"
                     ],
-                    task_type="Filter",  # Although this is a projection, use "Filter" with projection operator
+                    task_type="Filter",
                     connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                         salesforce="PROJECTION"
                     )
                 ),
-                # Mapping Tasks
+                # Task 3-12: Mapping fields
                 appflow.CfnFlow.TaskProperty(
                     source_fields=["Id"],
                     task_type="Map",
@@ -131,10 +131,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="id"
+                            key="DESTINATION_DATA_TYPE", value="id"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="id"
+                            key="SOURCE_DATA_TYPE", value="id"
                         )
                     ]
                 ),
@@ -147,10 +147,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="reference"
+                            key="DESTINATION_DATA_TYPE", value="reference"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="reference"
+                            key="SOURCE_DATA_TYPE", value="reference"
                         )
                     ]
                 ),
@@ -163,10 +163,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="string"
+                            key="DESTINATION_DATA_TYPE", value="string"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="string"
+                            key="SOURCE_DATA_TYPE", value="string"
                         )
                     ]
                 ),
@@ -179,10 +179,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="string"
+                            key="DESTINATION_DATA_TYPE", value="string"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="string"
+                            key="SOURCE_DATA_TYPE", value="string"
                         )
                     ]
                 ),
@@ -195,10 +195,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="multipicklist"
+                            key="DESTINATION_DATA_TYPE", value="multipicklist"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="multipicklist"
+                            key="SOURCE_DATA_TYPE", value="multipicklist"
                         )
                     ]
                 ),
@@ -211,10 +211,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="double"
+                            key="DESTINATION_DATA_TYPE", value="double"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="double"
+                            key="SOURCE_DATA_TYPE", value="double"
                         )
                     ]
                 ),
@@ -227,10 +227,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="picklist"
+                            key="DESTINATION_DATA_TYPE", value="picklist"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="picklist"
+                            key="SOURCE_DATA_TYPE", value="picklist"
                         )
                     ]
                 ),
@@ -243,10 +243,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="picklist"
+                            key="DESTINATION_DATA_TYPE", value="picklist"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="picklist"
+                            key="SOURCE_DATA_TYPE", value="picklist"
                         )
                     ]
                 ),
@@ -259,10 +259,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="picklist"
+                            key="DESTINATION_DATA_TYPE", value="picklist"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="picklist"
+                            key="SOURCE_DATA_TYPE", value="picklist"
                         )
                     ]
                 ),
@@ -275,10 +275,10 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="picklist"
+                            key="DESTINATION_DATA_TYPE", value="picklist"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="picklist"
+                            key="SOURCE_DATA_TYPE", value="picklist"
                         )
                     ]
                 ),
@@ -291,15 +291,15 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     ),
                     task_properties=[
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="SOURCE_DATA_TYPE", value="string"
+                            key="DESTINATION_DATA_TYPE", value="string"
                         ),
                         appflow.CfnFlow.TaskPropertiesObjectProperty(
-                            key="DESTINATION_DATA_TYPE", value="string"
+                            key="SOURCE_DATA_TYPE", value="string"
                         )
                     ]
                 ),
             ],
             trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-                trigger_type="OnDemand"
-            )
+            trigger_type="OnDemand"
         )
+    )
