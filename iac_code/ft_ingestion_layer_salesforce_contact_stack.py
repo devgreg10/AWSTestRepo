@@ -84,7 +84,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                             file_type="JSON",
                             prefix_config=appflow.CfnFlow.PrefixConfigProperty(
                                 prefix_format="MINUTE", # Determines the level of granularity for the date and time that's included in the prefix.
-                                prefix_type="FILENAME" # Determines the format of the prefix, and whether it applies to the file name, file path, or both.
+                                prefix_type="PATH" # Determines the format of the prefix, and whether it applies to the file name, file path, or both.
                             ),
                             preserve_source_data_typing=False # all source data converted into strings
                         )
