@@ -36,7 +36,7 @@ else:
 # FtCreateSecretsStack(app, "AuroraSecretsStack")
 # FtS3ToAuroraLoadStack(app, "FtS3ToAuroraLoadStack",
     
-FtSalesforceContactIngestionLayerStack(app, "FtSalesforceContactIngestionLayerStack", env)
+FtSalesforceContactIngestionLayerStack(app, "ft-" + env + "-ingestion-layer-salesforce-contact-stack", env)
 
 '''
 FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
