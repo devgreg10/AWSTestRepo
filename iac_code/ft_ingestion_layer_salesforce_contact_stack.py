@@ -114,14 +114,16 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                         "Id", "Chapter_Affiliation__c", "ChapterID_CONTACT__c", 
                         "CASESAFEID__c", "Contact_Type__c", "Age__c", 
                         "Ethnicity__c", "Gender__c", "Grade__c", 
-                        "Participation_Status__c", "MailingPostalCode"
+                        "Participation_Status__c", "MailingPostalCode",
+                        "MailingStreet", "MailingCity", "MailingState", 
+                        "School_Name__c", "School_Name_Other__c"
                     ],
                     task_type="Filter",
                     connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                         salesforce="PROJECTION"
                     )
                 ),
-                # Task 3-12: Mapping fields
+                # Task 3-17: Mapping fields
                 appflow.CfnFlow.TaskProperty(
                     source_fields=["Id"],
                     task_type="Map",
@@ -286,6 +288,86 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     source_fields=["MailingPostalCode"],
                     task_type="Map",
                     destination_field="MailingPostalCode",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="string"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["MailingStreet"],
+                    task_type="Map",
+                    destination_field="MailingStreet",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="textarea"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="textarea"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["MailingCity"],
+                    task_type="Map",
+                    destination_field="MailingCity",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="string"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["MailingState"],
+                    task_type="Map",
+                    destination_field="MailingState",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="string"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["School_Name__c"],
+                    task_type="Map",
+                    destination_field="School_Name__c",
+                    connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                        salesforce="NO_OP"
+                    ),
+                    task_properties=[
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="DESTINATION_DATA_TYPE", value="string"
+                        ),
+                        appflow.CfnFlow.TaskPropertiesObjectProperty(
+                            key="SOURCE_DATA_TYPE", value="string"
+                        )
+                    ]
+                ),
+                appflow.CfnFlow.TaskProperty(
+                    source_fields=["School_Name_Other__c"],
+                    task_type="Map",
+                    destination_field="School_Name_Other__c",
                     connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                         salesforce="NO_OP"
                     ),
