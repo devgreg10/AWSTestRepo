@@ -12,6 +12,7 @@ from iac_code.ft_create_secret import FtCreateSecretsStack
 from iac_code.ft_s3_to_aurora_load import FtS3ToAuroraLoadStack
 from iac_code.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
 from iac_code.ft_transform_layer_salesforce_stack import FtTransformLayerSalesforceStack
+from iac_code.ft_ingestion_layer_salesforce_contact_stack import FtSalesforceContactIngestionLayerStack
 
 from dotenv import load_dotenv
 
@@ -34,7 +35,10 @@ else:
 # FtPublicDataWarehouseAuroraStack(app, "FirstTee-CDK-Public-Data-Warehouse-Aurora-{0}".format(env), env)
 # FtCreateSecretsStack(app, "AuroraSecretsStack")
 # FtS3ToAuroraLoadStack(app, "FtS3ToAuroraLoadStack",
+    
+FtSalesforceContactIngestionLayerStack(app, "FtSalesforceContactIngestionLayerStack", env)
 
+'''
 FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
@@ -45,7 +49,7 @@ FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
     concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambda')
 )
 
-'''
+
 FtTransformLayerSalesforceStack(app, "FtTransformLayerSalesforceStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
