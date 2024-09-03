@@ -26,12 +26,12 @@ def lambda_handler(event, context):
         logging.info("File Batch Size: " + str(file_batch_size))
         
         # read all files, but do not recurse beyond the Prefix provided
-        all_files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_folder, Delimiter='/')
+        all_files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_folder)
         logging.info("Have response from s3.listobjects")
 
         files = all_files.get('Contents', [])
         # Filter out the root bucket (if present)
-        filtered_files = [obj for obj in files if obj['Key'] != bucket_folder]
+        filtered_files = [obj for obj in files if obj['Key'] != bucket_folder and not obj['Key'].startswith('salesforce/ingress/complete')]
 
         logging.info(f"Found {len(filtered_files)} files in the bucket to process")
         

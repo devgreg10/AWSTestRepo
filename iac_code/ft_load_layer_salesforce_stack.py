@@ -14,7 +14,7 @@ from constructs import Construct
 from dotenv import load_dotenv
 import os
 
-class FtLoadLayerSalesforceStack(Stack):
+class FtLoadLayerSalesforceContactStack(Stack):
 
     def __init__(self, 
                  scope: Construct, 
