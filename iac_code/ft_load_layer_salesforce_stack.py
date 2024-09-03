@@ -25,7 +25,8 @@ class FtLoadLayerSalesforceContactStack(Stack):
                  bucket_name: str, 
                  bucket_folder: str, 
                  file_batch_size: int,
-                 concurrent_lambdas: int, **kwargs) -> None:
+                 concurrent_lambdas: int, 
+                 commit_interval: int, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -131,12 +132,13 @@ class FtLoadLayerSalesforceContactStack(Stack):
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
-            timeout=Duration.minutes(2),
+            timeout=Duration.minutes(15),
             code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce'),
             handler='lambda_function.lambda_handler',
             environment={
                 "BUCKET_NAME": bucket_name,
-                "BUCKET_FOLDER": bucket_folder
+                "BUCKET_FOLDER": bucket_folder,
+                "COMMIT_INTERVAL": commit_interval
             }
         )
          # Grant the Lambda function permissions to read from S3 

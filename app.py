@@ -36,20 +36,21 @@ else:
 # FtCreateSecretsStack(app, "AuroraSecretsStack")
 # FtS3ToAuroraLoadStack(app, "FtS3ToAuroraLoadStack",
     
-FtSalesforceContactIngestionLayerStack(app, "ft-" + env + "-ingestion-layer-salesforce-contact-stack", env)
+# FtSalesforceContactIngestionLayerStack(app, "ft-" + env + "-ingestion-layer-salesforce-contact-stack", env)
 
-'''
-FtLoadLayerSalesforceStack(app, "FtLoadLayerSalesforceStack",
+
+FtLoadLayerSalesforceContactStack(app, "ft-" + env + "-load-layer-salesforce-contact-stack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
     secret_region=os.getenv('db_connection_secret_region'),
     bucket_name=os.getenv('load_layer_s3_bucket_name'),
     bucket_folder=os.getenv('load_layer_salesforce_s3_bucket_folder'),
     file_batch_size=os.getenv('load_layer_salesforce_file_batch_size'),
-    concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambda')
+    concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambda'),
+    commit_interval=os.getenv('load_layer_commit_interval')
 )
 
-
+'''
 FtTransformLayerSalesforceStack(app, "FtTransformLayerSalesforceStack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
