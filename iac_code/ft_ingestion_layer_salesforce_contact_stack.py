@@ -93,6 +93,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     schedule_offset=0
                 )
             ),
+            flow_status="Active",
             tasks=[
                 appflow.CfnFlow.TaskProperty(
                     source_fields=["Participation_Status__c"],
