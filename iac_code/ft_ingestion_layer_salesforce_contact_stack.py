@@ -54,9 +54,12 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     salesforce=appflow.CfnFlow.SalesforceSourcePropertiesProperty(
                         object="Contact",
                         enable_dynamic_field_update=False,
-                        include_deleted_records=False,
+                        include_deleted_records=True,
                         data_transfer_api="AUTOMATIC"
                     )
+                ),
+                incremental_pull_config=appflow.CfnFlow.IncrementalPullConfigProperty(
+                    datetime_type_field_name="LastModifiedDate"
                 )
             ),
             destination_flow_config_list=[appflow.CfnFlow.DestinationFlowConfigProperty(
@@ -80,6 +83,16 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     )
                 )
             )],
+            trigger_config=appflow.CfnFlow.TriggerConfigProperty(
+                trigger_type="Scheduled",
+                trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
+                    schedule_expression="rate(1 days)",
+                    data_pull_mode="Incremental",
+                    schedule_start_time=1725436800, # https://www.unixtimestamp.com/
+                    time_zone="America/New_York",
+                    schedule_offset=0
+                )
+            ),
             tasks=[
                 appflow.CfnFlow.TaskProperty(
                     source_fields=["Participation_Status__c"],
@@ -431,8 +444,5 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                         )
                     ]
                 ),
-            ],
-            trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-            trigger_type="OnDemand"
+            ]
         )
-    )
