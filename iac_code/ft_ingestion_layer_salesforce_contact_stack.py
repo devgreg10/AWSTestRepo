@@ -14,7 +14,7 @@ import os
 
 class FtSalesforceContactIngestionLayerStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, env: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, env: str, datalake_bucket_name: str, datalake_bucket_folder: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -23,7 +23,6 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         else:
             load_dotenv(os.path.join(BASEDIR,"../.env.non_prod"))
 
-        datalake_bucket_name = "ft-" + env + "-data-lake"
         # Destination S3 bucket
         try:
             destination_bucket = s3.Bucket.from_bucket_name(self, "ExistingBucket", datalake_bucket_name)
@@ -65,7 +64,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 destination_connector_properties=appflow.CfnFlow.DestinationConnectorPropertiesProperty(
                     s3=appflow.CfnFlow.S3DestinationPropertiesProperty(
                         bucket_name=destination_bucket.bucket_name,
-                        bucket_prefix="salesforce/ingress",
+                        bucket_prefix="salesforce/contact/ingress",
                         s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
                             aggregation_config=appflow.CfnFlow.AggregationConfigProperty(
                                 aggregation_type="None",

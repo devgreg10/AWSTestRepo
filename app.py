@@ -26,14 +26,17 @@ else:
 BEGIN - Salesforce Contact Entity
 '''
     
-ingestion_layer_salesforce_contact_stack = FtSalesforceContactIngestionLayerStack(app, "ft-" + env + "-ingestion-layer-salesforce-contact-stack", env)
+ingestion_layer_salesforce_contact_stack = FtSalesforceContactIngestionLayerStack(app, "ft-" + env + "-ingestion-layer-salesforce-contact-stack", 
+    env=env,
+    datalake_bucket_name=os.getenv('load_layer_s3_bucket_name'),
+    datalake_bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'))
 
 load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, "ft-" + env + "-load-layer-salesforce-contact-stack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
     secret_region=os.getenv('db_connection_secret_region'),
     bucket_name=os.getenv('load_layer_s3_bucket_name'),
-    bucket_folder=os.getenv('load_layer_salesforce_s3_bucket_folder'),
+    bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'),
     file_batch_size=os.getenv('load_layer_salesforce_file_batch_size'),
     concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambda'),
     commit_interval=os.getenv('load_layer_commit_interval')
