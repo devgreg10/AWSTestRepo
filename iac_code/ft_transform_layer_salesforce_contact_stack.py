@@ -14,7 +14,7 @@ from constructs import Construct
 from dotenv import load_dotenv
 import os
 
-class FtTransformLayerSalesforceStack(Stack):
+class FtTransformLayerSalesforceContactStack(Stack):
 
     def __init__(self, scope: Construct, id: str, env: str, secret_arn: str, secret_region: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -155,9 +155,9 @@ class FtTransformLayerSalesforceStack(Stack):
         # Create the state machine
         state_machine = sfn.StateMachine(
             self, "FtTransformStateMachine",
-            state_machine_name="ft-" + env + "-salesforce-transform-layer",
+            state_machine_name="ft-" + env + "-transform-layer-salesforce-contact",
             definition=definition,
-            timeout=Duration.minutes(15)
+            timeout=Duration.minutes(60)
         )
 
         

@@ -126,14 +126,14 @@ class FtLoadLayerSalesforceContactStack(Stack):
 
         lambda_process_files = lambda_.Function(self, "LambdaProcessLoadLayerFiles",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name="ft-" + env + "-salesforce-load-files",
+            function_name="ft-" + env + "-salesforce-contact-load-files",
             layers=[psycopg2_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
             #),
             timeout=Duration.minutes(15),
-            code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce'),
+            code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce/Contact'),
             handler='lambda_function.lambda_handler',
             environment={
                 "BUCKET_NAME": bucket_name,
@@ -213,7 +213,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Create the state machine
         state_machine = sfn.StateMachine(
             self, "FtLoadStateMachine",
-            state_machine_name="ft-" + env + "-salesforce-load-layer",
+            state_machine_name="ft-" + env + "-load-layer-salesforce-contact",
             definition=definition
         )
 

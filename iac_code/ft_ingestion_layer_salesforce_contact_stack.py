@@ -35,16 +35,6 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                                        versioned=True,
                                        removal_policy=RemovalPolicy.DESTROY)
 
-        '''
-        # Reference the existing Salesforce connection
-        salesforce_connection = appflow.CfnConnectorProfile(
-            self, "SalesforceConnectorProfile",
-            connector_profile_name=os.getenv('salesforce_connection_name'),
-            connection_mode="Public",
-            connector_type="Salesforce"
-        )
-        '''
-
         # IAM role for the AppFlow
         appflow_role = iam.Role(
             self, "AppFlowServiceRole",
