@@ -31,7 +31,7 @@ def lambda_handler(event, context):
 
         files = all_files.get('Contents', [])
         # Filter out the root bucket (if present)
-        filtered_files = [obj for obj in files if obj['Key'] != bucket_folder and not obj['Key'].startswith('salesforce/ingress/complete')]
+        filtered_files = [obj for obj in files if obj['Key'] != bucket_folder and not 'complete' in obj['Key']]
 
         logging.info(f"Found {len(filtered_files)} files in the bucket to process")
         

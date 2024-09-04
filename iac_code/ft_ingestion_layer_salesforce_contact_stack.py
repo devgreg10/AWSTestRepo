@@ -67,12 +67,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 destination_connector_properties=appflow.CfnFlow.DestinationConnectorPropertiesProperty(
                     s3=appflow.CfnFlow.S3DestinationPropertiesProperty(
                         bucket_name=destination_bucket.bucket_name,
-                        bucket_prefix="salesforce/contact/ingress",
-                        s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
-                            aggregation_config=appflow.CfnFlow.AggregationConfigProperty(
-                                aggregation_type="None",
-                                target_file_size=128
-                            ),
+                        bucket_prefix="f({datalake_bucket_folder}ingress)",
                             file_type="JSON",
                             prefix_config=appflow.CfnFlow.PrefixConfigProperty(
                                 prefix_format="MINUTE", # Determines the level of granularity for the date and time that's included in the prefix.
