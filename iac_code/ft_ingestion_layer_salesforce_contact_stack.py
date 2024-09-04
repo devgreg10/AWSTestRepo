@@ -43,6 +43,15 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         # Attach the necessary policies to the role
         destination_bucket.grant_read_write(appflow_role)
 
+        destination_bucket.add_to_resource_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                principals=[iam.ServicePrincipal("appflow.amazonaws.com")],
+                actions=["s3:PutObject", "s3:GetBucketAcl", "s3:PutObjectAcl"],
+                resources=[destination_bucket.bucket_arn, f"{destination_bucket.bucket_arn}/*"]
+            )
+        )
+
         # Create the AppFlow flow
         ingestion_flow = appflow.CfnFlow(
             self, "SalesforceToS3Flow",
@@ -88,7 +97,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
                     schedule_expression="rate(60minutes)",
                     data_pull_mode="Incremental",
-                    schedule_start_time=1725481800, # https://www.unixtimestamp.com/
+                    schedule_start_time=1725482100, # https://www.unixtimestamp.com/
                     time_zone="America/New_York",
                     schedule_offset=0
                 )
