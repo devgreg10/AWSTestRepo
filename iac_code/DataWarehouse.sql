@@ -291,7 +291,10 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact (
     Ethnicity__c TEXT,
     Gender__c TEXT,
     Grade__c TEXT,
-    Participation_Status__c TEXT
+    Participation_Status__c TEXT,
+    IsDeleted TEXT,
+    LastModifiedDate TEXT,
+    CreatedDate TEXT
 );
 
 --based on whole field list
