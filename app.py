@@ -39,7 +39,8 @@ load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, "ft
     bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'),
     file_batch_size=os.getenv('load_layer_salesforce_file_batch_size'),
     concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambda'),
-    commit_interval=os.getenv('load_layer_commit_interval')
+    commit_interval=os.getenv('load_layer_commit_interval'),
+    ingestion_layer_stack=ingestion_layer_salesforce_contact_stack
 )
 
 tranform_layer_salesforce_contact_stack = FtTransformLayerSalesforceContactStack(app, "ft-" + env + "-tranform-layer-salesforce-contact-stack",

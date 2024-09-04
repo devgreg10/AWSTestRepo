@@ -44,7 +44,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         destination_bucket.grant_read_write(appflow_role)
 
         # Create the AppFlow flow
-        flow = appflow.CfnFlow(
+        ingestion_flow = appflow.CfnFlow(
             self, "SalesforceToS3Flow",
             flow_name="ft-" + env + "-ingestion-layer-salesforce-contact",
             source_flow_config=appflow.CfnFlow.SourceFlowConfigProperty(
@@ -88,7 +88,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
                     schedule_expression="rate(60minutes)",
                     data_pull_mode="Incremental",
-                    schedule_start_time=1725480000, # https://www.unixtimestamp.com/
+                    schedule_start_time=1725480900, # https://www.unixtimestamp.com/
                     time_zone="America/New_York",
                     schedule_offset=0
                 )

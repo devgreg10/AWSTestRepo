@@ -5,9 +5,13 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
+    aws_events as events,
+    aws_events_targets as targets,
     Stack,
     Duration
 )
+
+from iac_code.ft_ingestion_layer_salesforce_contact_stack import FtSalesforceContactIngestionLayerStack
 
 from constructs import Construct
 
@@ -26,7 +30,8 @@ class FtLoadLayerSalesforceContactStack(Stack):
                  bucket_folder: str, 
                  file_batch_size: int,
                  concurrent_lambdas: int, 
-                 commit_interval: int, **kwargs) -> None:
+                 commit_interval: int, 
+                 ingestion_layer_stack: FtSalesforceContactIngestionLayerStack, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -216,5 +221,23 @@ class FtLoadLayerSalesforceContactStack(Stack):
             state_machine_name="ft-" + env + "-load-layer-salesforce-contact",
             definition=definition
         )
+
+        
+        # Create an EventBridge rule to capture the AppFlow run complete event
+        appflow_event_rule = events.Rule(
+            self, "AppFlowRunCompleteRule",
+            rule_name="ft-" + env + "-ingestion-layer-complete",
+            event_pattern= events.EventPattern(
+                source=["aws.appflow"],
+                detail_type=["AppFlow Flow Execution Status"],
+                detail={
+                    "status": ["SUCCEEDED"],  # This matches successful flow executions
+                    "flow-name": ["ft-" + env + "-ingestion-layer-salesforce-contact"]  # ZZZ - replace when the stack is passed in correctly
+                }
+            )
+        ) 
+
+        # Set the target of the rule to the Step Functions state machine
+        appflow_event_rule.add_target(targets.SfnStateMachine(state_machine))
 
         
