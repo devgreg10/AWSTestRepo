@@ -83,17 +83,20 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     )
                 )
             )],
+            #trigger_config=appflow.CfnFlow.TriggerConfigProperty(
+            #    trigger_type="Scheduled",
+            #    trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
+            #        schedule_expression="rate(1 days)",
+            #        data_pull_mode="Incremental",
+            #        schedule_start_time=1725436800, # https://www.unixtimestamp.com/
+            #        time_zone="America/New_York",
+            #        schedule_offset=0
+            #    )
+            #),
+            #flow_status="Active",
             trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-                trigger_type="Scheduled",
-                trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
-                    schedule_expression="rate(1 days)",
-                    data_pull_mode="Incremental",
-                    schedule_start_time=1725436800, # https://www.unixtimestamp.com/
-                    time_zone="America/New_York",
-                    schedule_offset=0
-                )
+                trigger_type="OnDemand"
             ),
-            flow_status="Active",
             tasks=[
                 appflow.CfnFlow.TaskProperty(
                     source_fields=["Participation_Status__c"],
