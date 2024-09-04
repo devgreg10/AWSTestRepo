@@ -97,7 +97,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
                     schedule_expression="rate(60minutes)",
                     data_pull_mode="Incremental",
-                    schedule_start_time=1725482100, # https://www.unixtimestamp.com/
+                    schedule_start_time=1725482700, # https://www.unixtimestamp.com/
                     time_zone="America/New_York",
                     schedule_offset=0
                 )
