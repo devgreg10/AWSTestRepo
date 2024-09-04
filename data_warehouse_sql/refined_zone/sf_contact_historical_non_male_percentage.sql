@@ -1,0 +1,34 @@
+-- -- sf_metric_historical_non_male_percentage various data models
+-- --
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_non_male_percentage (
+--     snapshot_date TIMESTAMPTZ,
+--     non_male_percentage NUMERIC
+-- );
+
+-- --this can also be string to keep it more flexible
+-- CREATE TYPE gender_dtype as ENUM (
+--     'Female',
+--     'Male',
+--     'Non-Binary',
+--     'The options listed do not reflect me',
+--     'Prefer not to respond'
+-- );
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
+--     snapshot_date TIMESTAMPTZ,
+--     gender VARCHAR(100),
+--     non_male BOOLEAN,
+--     participant_count INTEGER
+-- );
+
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_gender_breakdown (
+--     snapshot_date TIMESTAMPTZ,
+--     female_count INTEGER,
+--     male_count INTEGER,
+--     multi_racial_count INTEGER,
+--     non_binary_count INTEGER,
+--     no_reflection_count INTEGER,
+--     prefer_not_to_respond_count INTEGER,
+--     --can also just be these two
+--     non_male_count INTEGER,
+--     total_count INTEGER
+-- )

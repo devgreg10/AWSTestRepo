@@ -1,0 +1,25 @@
+-- -- sf_metric_historical_age_breakdown various data models
+-- --
+-- CREATE TYPE age_group_dtype as ENUM (
+--     '< 7',
+--     '7 - 9',
+--     '10 - 11',
+--     '12 -13',
+--     '14+'
+-- );
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_age_breakdown (
+--     PRIMARY KEY ()
+--     snapshot_date TIMESTAMPTZ,
+--     age_group VARCHAR(100),
+--     -- maybe a teen flag?
+--     participant_count INTEGER
+-- );
+
+-- CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_age_breakdown (
+--     snapshot_date TIMESTAMPTZ,
+--     count_under7 INTEGER,
+--     count_7to9 INTEGER,
+--     count_10to11 INTEGER,
+--     count_12to13 INTEGER,
+--     count14up INTEGER
+-- );
