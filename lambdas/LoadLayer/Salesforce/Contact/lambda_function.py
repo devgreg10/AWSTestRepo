@@ -12,6 +12,7 @@ def lambda_handler(event, context):
     try:
         session = boto3.session.Session()
 
+        batched_file_names = event['batched_files']
         secret = event['secret']
         formatted_timestamp = event['timestamp']
 
@@ -33,23 +34,11 @@ def lambda_handler(event, context):
         commit_interval = int(os.environ.get('COMMIT_INTERVAL', 1000))  
         error_records = []  # List to store records that fail to process
 
-         # read all files, but do not recurse beyond the Prefix provided
-        all_files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_folder)
-        
-        files = all_files.get('Contents', [])
-        # Filter out the root bucket (if present)
-        filtered_files = [obj for obj in files if obj['Key'] != bucket_folder and not 'complete' in obj['Key']]
-
-        logging.info(f"Found {len(filtered_files)} files in the bucket to process")
-        
-        file_keys = [file['Key'] for file in filtered_files]
-        #logging.info(f"Found files: {file_keys}")
-
         try:
             with conn.cursor() as cursor:
                 record_count = 0
 
-                for file_name in file_keys:
+                for file_name in batched_file_names:
 
                     logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
 
@@ -62,11 +51,9 @@ def lambda_handler(event, context):
                             try:
                                 record = json.loads(line)
                                 cursor.execute(
-                                    "INSERT INTO ft_ds_raw.sf_contact " \
-                                    "(snapshot_date, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c, isdeleted, lastmodifieddate, createddate) " \
-                                    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                    "SELECT ft_ds_admin.write_sf_contact_s3_to_raw(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                                     (formatted_timestamp, record['Id'], record['MailingPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'], record['IsDeleted'], record['LastModifiedDate'], record['CreatedDate'])
-                                )
+                                )                                
 
                                 record_count += 1
 

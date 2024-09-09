@@ -2,6 +2,7 @@ import os
 
 import aws_cdk as cdk
 
+from iac_code.ft_create_secret import FtCreateSecretsStack
 from iac_code.ft_load_layer_salesforce_contact_stack import FtLoadLayerSalesforceContactStack
 from iac_code.ft_transform_layer_salesforce_contact_stack import FtTransformLayerSalesforceContactStack
 from iac_code.ft_ingestion_layer_salesforce_contact_stack import FtSalesforceContactIngestionLayerStack
@@ -23,15 +24,20 @@ else:
         load_dotenv(".env.dev")
 
 '''
+ZZZ - Temporary Secret for DB
+'''
+create_secret_stack = FtCreateSecretsStack(app, f"ft-{env}-create-db-secret")
+
+'''
 BEGIN - Salesforce Contact Entity
 '''
     
-ingestion_layer_salesforce_contact_stack = FtSalesforceContactIngestionLayerStack(app, "ft-" + env + "-ingestion-layer-salesforce-contact-stack", 
+ingestion_layer_salesforce_contact_stack = FtSalesforceContactIngestionLayerStack(app, f"ft-{env}-ingestion-layer-salesforce-contact-stack", 
     env=env,
     datalake_bucket_name=os.getenv('load_layer_s3_bucket_name'),
     datalake_bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'))
 
-load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, "ft-" + env + "-load-layer-salesforce-contact-stack",
+load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, f"ft-{env}-load-layer-salesforce-contact-stack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
     secret_region=os.getenv('db_connection_secret_region'),
@@ -43,12 +49,13 @@ load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, "ft
     ingestion_layer_stack=ingestion_layer_salesforce_contact_stack
 )
 
-tranform_layer_salesforce_contact_stack = FtTransformLayerSalesforceContactStack(app, "ft-" + env + "-tranform-layer-salesforce-contact-stack",
+tranform_layer_salesforce_contact_stack = FtTransformLayerSalesforceContactStack(app, f"ft-{env}-tranform-layer-salesforce-contact-stack",
     env=env,
     secret_arn=os.getenv('db_connection_secret_arn'),
     secret_region=os.getenv('db_connection_secret_region')
 )
 
+ingestion_layer_salesforce_contact_stack.add_dependency(create_secret_stack)
 load_layer_salesforce_contact_stack.add_dependency(ingestion_layer_salesforce_contact_stack)
 tranform_layer_salesforce_contact_stack.add_dependency(load_layer_salesforce_contact_stack)
 
