@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_stepfunctions_tasks as tasks,
     aws_events as events,
     aws_events_targets as targets,
+    aws_secretsmanager as secretsmanager,
     Stack,
     Duration
 )
@@ -121,13 +122,9 @@ class FtLoadLayerSalesforceContactStack(Stack):
             }
         )
 
-        # Grant the Lambda function permissions to read from Secrets 
-        lambda_retrieve_secrets.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=["secretsmanager:GetSecretValue"],
-                resources=[secret_arn],
-            )
-        )
+        # Grant the Lambda function permission to retrieve the DB secret
+        secret = secretsmanager.Secret.from_secret_complete_arn(self, "AuroraSecret", secret_arn)
+        secret.grant_read(lambda_retrieve_secrets)
 
         lambda_process_files = lambda_.Function(self, "LambdaProcessLoadLayerFiles",
             runtime=lambda_.Runtime.PYTHON_3_8,

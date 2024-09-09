@@ -56,14 +56,6 @@ class FtTransformLayerSalesforceContactStack(Stack):
             function_name="ft-" + env + "-retrieve-secrets",
         )
 
-        # Grant the Lambda function permissions to read from Secrets 
-        lambda_retrieve_secrets.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=["secretsmanager:GetSecretValue"],
-                resources=[secret_arn],
-            )
-        )
-
         lambda_execute_stored_procedure = lambda_.Function(self, "LambdaExecuteStoredProcedure",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name="ft-" + env + "-execute-stored-procedure",
