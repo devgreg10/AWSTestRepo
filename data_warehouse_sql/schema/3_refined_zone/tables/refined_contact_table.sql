@@ -30,8 +30,7 @@
 -- );
 
 CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_contact (
-    PRIMARY KEY (snapshot_date, contact_id_18),
-	snapshot_date TIMESTAMPTZ,
+    PRIMARY KEY (contact_id_18),
     contact_id_18 CHAR(18),
     chapter_id CHAR(18),
     age INTEGER,
@@ -40,33 +39,8 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_contact (
     grade VARCHAR(100),
     mailing_zip_postal_code VARCHAR(20),
     participation_status VARCHAR(100),
-    contact_type VARCHAR(100)
+    contact_type VARCHAR(100),
+    sf_last_modified_timestamp TIMESTAMPTZ,
+    created_date TIMESTAMPTZ,
+    dss_last_modified_timestamp TIMESTAMPTZ
 );
-
--- CREATE OR REPLACE PROCEDURE ft_ds_admin.ft_ds_admin.valid_to_refined_sf_contact ()
--- LANGUAGE plpgsql
--- AS $$
--- BEGIN
---     TRUNCATE ft_ds_refined.sf_contact;
-
---     INSERT INTO ft_ds_refined.sf_contact
---     SELECT
---         *
---     FROM ft_ds_valid.sf_contact
---     ;
--- END;
--- $$;
-
-CREATE OR REPLACE PROCEDURE ft_ds_admin.valid_to_refined_sf_contact ()
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    TRUNCATE ft_ds_refined.sf_contact;
-
-    INSERT INTO ft_ds_refined.sf_contact
-    SELECT
-        *
-    FROM ft_ds_valid.sf_contact
-    ;
-END;
-$$;

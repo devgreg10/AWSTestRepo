@@ -274,8 +274,7 @@
 -- );
 
 CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact (
-    PRIMARY KEY (snapshot_date, Id),
-    snapshot_date TIMESTAMPTZ,
+    PRIMARY KEY (LastModifiedDate, Id),
     Id TEXT,
     MailingPostalCode TEXT,
     Chapter_Affiliation__c TEXT,
@@ -289,5 +288,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact (
     Participation_Status__c TEXT,
     IsDeleted TEXT,
     LastModifiedDate TEXT,
-    CreatedDate TEXT
+    CreatedDate TEXT,
+    dss_last_modified_timestamp TIMESTAMPTZ
 );

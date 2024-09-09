@@ -1,0 +1,47 @@
+--based on whole field list
+-- CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact (
+--     contact_id_18,
+--     chapter_id,
+--     household_id,
+--     first_name,
+--     last_name,
+--     birthdate,
+--     age,
+--     gender,
+--     ethnicity,
+--     grade,
+--     mailing_street,
+--     mailing_city,
+--     mailing_state,
+--     mailing_zip_postal_code,
+--     primary_contacts_email,
+--     participant_email,
+--     participation_status,
+--     school_name,
+--     school_name_other,
+--     contact_type,
+--     emergency_contact_email,
+--     emergency_contact_name,
+--     emergency_contact_number,
+--     primary_contacts_mobile,
+--     primary_contacts_name,
+--     program_level,
+--     snapshot_date
+-- );
+
+CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact (
+    PRIMARY KEY (contact_id_18),
+    contact_id_18 CHAR(18),
+    chapter_id CHAR(18),
+    age INTEGER,
+    gender VARCHAR(100),
+    ethnicity VARCHAR(100),
+    grade VARCHAR(100),
+    mailing_zip_postal_code VARCHAR(20),
+    participation_status VARCHAR(100),
+    contact_type VARCHAR(100),
+    last_modified_date TIMESTAMPTZ,
+    created_date TIMESTAMPTZ,
+    is_deleted BOOLEAN,
+    dss_last_modified_timestamp TIMESTAMPTZ
+);

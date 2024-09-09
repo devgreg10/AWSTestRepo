@@ -1,47 +1,3 @@
---based on whole field list
--- CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact (
---     contact_id_18,
---     chapter_id,
---     household_id,
---     first_name,
---     last_name,
---     birthdate,
---     age,
---     gender,
---     ethnicity,
---     grade,
---     mailing_street,
---     mailing_city,
---     mailing_state,
---     mailing_zip_postal_code,
---     primary_contacts_email,
---     participant_email,
---     participation_status,
---     school_name,
---     school_name_other,
---     contact_type,
---     emergency_contact_email,
---     emergency_contact_name,
---     emergency_contact_number,
---     primary_contacts_mobile,
---     primary_contacts_name,
---     program_level,
---     snapshot_date
--- );
-
-CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact (
-    PRIMARY KEY (snapshot_date, contact_id_18),
-	snapshot_date TIMESTAMPTZ,
-    contact_id_18 CHAR(18),
-    chapter_id CHAR(18),
-    age INTEGER,
-    gender VARCHAR(100),
-    ethnicity VARCHAR(100),
-    grade VARCHAR(100),
-    mailing_zip_postal_code VARCHAR(20),
-    participation_status VARCHAR(100),
-    contact_type VARCHAR(100)
-);
 
 -- based on whole field list
 -- CREATE OR REPLACE PROCEDURE ft_ds_admin.raw_to_valid_sf_contact ()
@@ -108,47 +64,55 @@ CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact (
 -- END;
 -- $$;
 
-CREATE OR REPLACE PROCEDURE ft_ds_admin.raw_to_valid_sf_contact ()
+CREATE OR REPLACE FUNCTION ft_ds_admin.write_sf_contact_raw_to_valid ()
+RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    TRUNCATE ft_ds_valid.sf_contact;
-
     INSERT INTO ft_ds_valid.sf_contact
-    SELECT
-        snapshot_date AS snapshot_date,
-        Id AS contact_id_18,
-        Chapter_Affiliation__c AS chapter_id,
-        CAST(CAST(Age__c AS NUMERIC) AS INTEGER) AS age,
-        Gender__c AS gender,
-        Ethnicity__c AS ethnicity,
-        Grade__c AS grade,
-        MailingPostalCode AS mailing_zip_postal_code,
-        Participation_Status__c AS participation_status,
-        Contact_Type__c AS contact_type
-    FROM ft_ds_raw.sf_contact
-    WHERE
-        Chapter_Affiliation__c NOT IN (
-            '0011R00002oM2hNQAS',
-            '0013600000xOm3cAAC'
-        )
-        AND Chapter_Affiliation__c IS NOT NULL
-        AND Chapter_Affiliation__c <> ''
-        AND Age__c IS NOT NULL
-        AND Age__c <> ''
-        AND Gender__c IS NOT NULL
-        AND Gender__c <> ''
-        AND Ethnicity__c IS NOT NULL
-        AND Ethnicity__c <> ''
-        AND MailingPostalCode IS NOT NULL
-        AND MailingPostalCode <> ''
-        AND Chapter_Affiliation__c IS NOT NULL
-        AND Chapter_Affiliation__c <> ''
-        AND Participation_Status__c = 'Active'
-        AND Contact_Type__c = 'Participant'
-        AND snapshot_date = (
-            SELECT MAX(snapshot_date) FROM ft_ds_raw.sf_contact
-        )
+    SELECT all_values.* FROM
+        (SELECT
+            Id AS contact_id_18,
+            Chapter_Affiliation__c AS chapter_id,
+            CAST(CAST(Age__c AS NUMERIC) AS INTEGER) AS age,
+            Gender__c AS gender,
+            Ethnicity__c AS ethnicity,
+            Grade__c AS grade,
+            MailingPostalCode AS mailing_zip_postal_code,
+            Participation_Status__c AS participation_status,
+            Contact_Type__c AS contact_type,
+            CAST(LastModifiedDate AS TIMESTAMPTZ) AS sf_last_modified_date,
+            CAST(CreatedDate AS TIMESTAMPTZ) AS created_date,
+            CAST(IsDeleted AS BOOLEAN) AS is_deleted,
+            dss_last_modified_timestamp AS dss_last_modified_timestamp
+        FROM ft_ds_raw.sf_contact
+        WHERE
+            Chapter_Affiliation__c NOT IN (
+                '0011R00002oM2hNQAS',
+                '0013600000xOm3cAAC'
+            )
+        ) all_values
+    JOIN
+        (SELECT
+        Id,
+        CAST(MIN(LastModifiedDate) AS TIMESTAMPTZ) AS min_date
+        FROM ft_ds_raw
+        GROUP BY Id
+        ) min_dates
+    ON all_values.sf_last_modified_date = min_dates.min_date
+    ON CONFLICT (contact_id_18) DO UPDATE SET
+        chapter_id = EXCLUDED.chapter_id,
+        age = EXCLUDED.age,
+        gender = EXCLUDED.gender,
+        ethnicity = EXCLUDED.ethnicity,
+        grade = EXCLUDED.grade,
+        mailing_zip_postal_code = EXCLUDED.mailing_zip_postal_code,
+        participation_status = EXCLUDED.participation_status,
+        contact_type = EXCLUDED.contact_type,
+        sf_last_modified_date = EXCLUDED.sf_last_modified_date,
+        created_date = EXCLUDED.created_date,
+        is_deleted = EXCLUDED.is_deleted,
+        dss_last_modified_timestamp = EXCLUDED.dss_last_modified_timestamp
     ;
 END;
 $$;

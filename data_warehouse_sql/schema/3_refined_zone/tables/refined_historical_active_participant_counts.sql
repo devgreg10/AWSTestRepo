@@ -11,8 +11,8 @@
 --     'Domestic'
 -- );
 CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_active_participants_counts (
-    PRIMARY KEY(snapshot_date, chapter_id),
-    snapshot_date TIMESTAMPTZ,
+    PRIMARY KEY(metric_calc_date, chapter_id),
+    metric_calc_date TIMESTAMPTZ,
     chapter_id CHAR(18),
     participant_count INTEGER
 );
@@ -29,12 +29,11 @@ AS $$
 BEGIN
     INSERT INTO ft_ds_refined.sf_metric_historical_active_participants_counts
     SELECT
-        snapshot_date,
+        NOW() as metric_calc_date,
         chapter_id,
         COUNT(contact_id_18) AS participant_count
     FROM ft_ds_refined.sf_contact
     GROUP BY
-    snapshot_date,
     chapter_id
     ;
 END;
