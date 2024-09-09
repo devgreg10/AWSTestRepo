@@ -19,3 +19,4 @@ cdk.out
 
 **/.DS_Store
 lambda_layers/python/psycopg2/*
+iac_code/definitions/*

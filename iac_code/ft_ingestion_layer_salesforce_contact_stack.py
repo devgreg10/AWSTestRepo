@@ -7,10 +7,16 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_iam as iam
 )
+
+from datetime import datetime, timedelta, timezone
+
 from constructs import Construct
 
 from dotenv import load_dotenv
 import os
+
+# Global Variables
+data_lake_bucket = None
 
 class FtSalesforceContactIngestionLayerStack(Stack):
 
@@ -24,7 +30,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
             load_dotenv(os.path.join(BASEDIR,"../.env.non_prod"))
 
          # Create S3 bucket
-        destination_bucket = s3.Bucket(self, 
+        data_lake_bucket = s3.Bucket(self, 
             "FTDevDataLakeBucket",
             bucket_name=f"ft-{env}-data-lake"
         )
@@ -39,13 +45,13 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 "s3:PutObjectAcl"
             ],
             resources=[
-                destination_bucket.bucket_arn,  # Bucket itself
-                f"{destination_bucket.bucket_arn}/*"  # All objects in the bucket
+                data_lake_bucket.bucket_arn,  # Bucket itself
+                f"{data_lake_bucket.bucket_arn}/*"  # All objects in the bucket
             ]
         )
 
         # Attach AppFlow policy to the bucket
-        destination_bucket.add_to_resource_policy(appflow_policy_statement)
+        data_lake_bucket.add_to_resource_policy(appflow_policy_statement)
 
         # Define bucket policy for AWS Management Console users to move files
         move_files_policy_statement = iam.PolicyStatement(
@@ -58,15 +64,23 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 "s3:DeleteObject"   # Delete objects (needed for move)
             ],
             resources=[
-                destination_bucket.bucket_arn,        # Required for s3:ListBucket
-                f"{destination_bucket.bucket_arn}/*"  # All objects in the bucket
+                data_lake_bucket.bucket_arn,        # Required for s3:ListBucket
+                f"{data_lake_bucket.bucket_arn}/*"  # All objects in the bucket
             ]
         )
 
         # Attach the move files policy to the bucket
-        destination_bucket.add_to_resource_policy(move_files_policy_statement)
+        data_lake_bucket.add_to_resource_policy(move_files_policy_statement)
 
+        # AppFlow will be scheduled to start 15 min from now, so get the current time in UTC
+        now = datetime.now(timezone.utc)
 
+        # Add 15 minutes to the current time
+        future_time = now + timedelta(minutes=15)
+
+        # Convert the future time to a UNIX timestamp
+        unix_timestamp = int(future_time.timestamp())
+       
         # Create the AppFlow flow
         ingestion_flow = appflow.CfnFlow(
             self, "SalesforceToS3Flow",
@@ -90,7 +104,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 connector_type="S3",
                 destination_connector_properties=appflow.CfnFlow.DestinationConnectorPropertiesProperty(
                     s3=appflow.CfnFlow.S3DestinationPropertiesProperty(
-                        bucket_name=destination_bucket.bucket_name,
+                        bucket_name=data_lake_bucket.bucket_name,
                         bucket_prefix=f"{datalake_bucket_folder}ingress",
                         s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
                             aggregation_config=appflow.CfnFlow.AggregationConfigProperty(
@@ -107,20 +121,20 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     )
                 )
             )],
-            #trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-            #    trigger_type="Scheduled",
-            #    trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
-            #        schedule_expression="rate(60minutes)",
-            #        data_pull_mode="Incremental",
-            #        schedule_start_time=1725482700, # https://www.unixtimestamp.com/
-            #        time_zone="America/New_York",
-            #        schedule_offset=0
-            #    )
-            #),
-            #flow_status="Active",
             trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-                trigger_type="OnDemand"
+                trigger_type="Scheduled",
+                trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
+                    schedule_expression="rate(60minutes)",
+                    data_pull_mode="Incremental",
+                    schedule_start_time=unix_timestamp,
+                    time_zone="America/New_York",
+                    schedule_offset=0
+                )
             ),
+            flow_status="Active",
+            #trigger_config=appflow.CfnFlow.TriggerConfigProperty(
+            #    trigger_type="OnDemand"
+            #),
             tasks = [
                 appflow.CfnFlow.TaskProperty(
                     source_fields=[

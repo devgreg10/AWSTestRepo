@@ -7,6 +7,9 @@ from aws_cdk import (
 
 from constructs import Construct
 
+# Global Variables
+db_secret = None
+
 class FtCreateSecretsStack(Stack):
 
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
