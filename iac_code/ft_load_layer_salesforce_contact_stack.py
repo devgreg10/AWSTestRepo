@@ -172,7 +172,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
             errors=["States.ALL"]
         )
 
-        '''
+        
         #Step 2: List S3 Files
         list_s3_files_task = tasks.LambdaInvoke(
             self, "List S3 Files in batch size of " + str(file_batch_size),
@@ -186,15 +186,15 @@ class FtLoadLayerSalesforceContactStack(Stack):
             sfn.Fail(self, "ListS3FilesFailed", error="ListS3FilesFailed", cause="Failed to list files from S3"),
             errors=["States.ALL"]
         )
-        '''
+        
 
         # Step 3: Process Files in Batch
         process_files_task = sfn.Map(
             self, "Process Files",
             max_concurrency=concurrent_lambdas,
-            #items_path="$.files.Payload.files",  # list of files from previous step
+            items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
-                #"batched_files.$": "$$.Map.Item.Value",
+                "batched_files.$": "$$.Map.Item.Value",
                 "secret.$": "$.secret.Payload.secret",  # Pass the secret to each iteration
                 "timestamp.$": "$.timestamp.Payload.timestamp"  # Pass the timestamp to each iteration
             }
@@ -214,7 +214,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         )
         
          # Define the state machine workflow
-        definition = generate_timestamp_task.next(retrieve_secrets_task).next(process_files_task)
+        definition = generate_timestamp_task.next(retrieve_secrets_task).next(list_s3_files_task).next(process_files_task)
 
         # Create the state machine
         state_machine = sfn.StateMachine(
