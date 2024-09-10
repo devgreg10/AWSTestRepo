@@ -100,6 +100,7 @@ BEGIN
         GROUP BY Id
         ) min_dates
     ON all_values.sf_last_modified_date = min_dates.min_date
+    AND all_values.contact_id_18 = min_dates.Id
     ON CONFLICT (contact_id_18) DO UPDATE SET
         chapter_id = EXCLUDED.chapter_id,
         age = EXCLUDED.age,
