@@ -31,7 +31,7 @@ def lambda_handler(event, context):
 
         bucket_name = os.environ['BUCKET_NAME']
         bucket_folder = os.environ['BUCKET_FOLDER']
-        commit_interval = int(os.environ.get('COMMIT_INTERVAL', 1000))  
+        commit_batch_size = int(os.environ.get('COMMIT_BATCH_SIZE', 1000))  
         error_records = []  # List to store records that fail to process
 
         try:
@@ -60,7 +60,7 @@ def lambda_handler(event, context):
                                 record_count += 1
 
                                 # Commit after every 'n' records
-                                if record_count >= commit_interval:
+                                if record_count >= commit_batch_size:
                                     conn.commit()
                                     logging.info(f"Committed {record_count} records to the database.")
                                     record_count = 0  # Reset the counter

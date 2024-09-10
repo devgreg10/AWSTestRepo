@@ -56,7 +56,7 @@ class FtS3ToAuroraLoadStack(Stack):
         # Define the Lambda function
         lambda_function = lambda_.Function(self, "LambdaJsonToAurora",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name="ft-" + env + "-load-json-s3-to-aurora",
+            function_name=f"ft-{env}-load-json-s3-to-aurora",
             layers=[psycopg2_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(

@@ -53,7 +53,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
         # Create a security group for the Aurora DB Cluster
         public_db_security_group = ec2.SecurityGroup(
                                         self, 
-                                        "ft-" + env + "-public-db-security-group",
+                                        f"ft-{env}-public-db-security-group",
                                         vpc=datawarehouse_vpc,
                                         description="Allow public access to Aurora DB Cluster",
                                         allow_all_outbound=True
@@ -72,7 +72,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
         
         database_credential_secret = secrets.Secret(
             self,
-            "ft-" + env + "-public-database-credentials-secret",
+            f"ft-{env}-public-database-credentials-secret",
             generate_secret_string=secrets.SecretStringGenerator(
                 secret_string_template=json.dumps({"username": database_username}),
                 exclude_punctuation=True,
@@ -86,7 +86,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
         # Create Aurora Serverless DB Cluster
         db_cluster = rds.DatabaseCluster(
             self,
-            "ft-" + env + "-public-aurora-db-cluster",
+            f"ft-{env}-public-aurora-db-cluster",
             vpc=datawarehouse_vpc,
             vpc_subnets=ec2.SubnetSelection(
                 # subnets=private_subnets
@@ -102,7 +102,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
             ),
             default_database_name="decision_support",
             writer=rds.ClusterInstance.serverless_v2(
-                "ft-" + env + "-public-writer-instance",
+                f"ft-{env}-public-writer-instance",
                 enable_performance_insights=True,
                 publicly_accessible=True
             ),
@@ -115,7 +115,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
          # Define a security group for the RDS Proxy
         rds_proxy_sg = ec2.SecurityGroup(
             self, 
-            "ft-" + env + "-public-rds-proxy-security-group",
+            f"ft-{env}-public-rds-proxy-security-group",
             vpc=datawarehouse_vpc,
             description="Security group for RDS Proxy",
             allow_all_outbound=True
@@ -131,7 +131,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
         
         # Create an RDS Proxy for the Aurora DB
         rds_proxy = db_cluster.add_proxy(
-            "ft-" + env + "-rds-proxy",
+            f"ft-{env}-rds-proxy",
             vpc=datawarehouse_vpc,
             vpc_subnets=ec2.SubnetSelection(
                 subnets=public_subnets
@@ -144,7 +144,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
 # Create a security group for the bastion host
         bastion_sg = ec2.SecurityGroup(
             self, 
-            "ft-" + env + "-bastion-security-group",
+            f"ft-{env}-bastion-security-group",
             vpc=datawarehouse_vpc,
             description="Security group for Bastion Host",
             allow_all_outbound=True)
@@ -166,7 +166,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
         # Launch an EC2 instance as the bastion host
         bastion_host = ec2.Instance(
             self, 
-            "ft-" + env + "-bastion-host",
+            f"ft-{env}-bastion-host",
             instance_type=ec2.InstanceType("t2.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux(),
             vpc=datawarehouse_vpc,
@@ -180,7 +180,7 @@ class FtPublicDataWarehouseAuroraStack(Stack):
 
         bastion_host = ec2.BastionHostLinux(
             self, 
-            "ft-" + env + "-bastion-host",
+            f"ft-{env}-bastion-host",
             vpc=datawarehouse_vpc,
             security_group=bastion_sg,
             subnet_selection=ec2.SubnetSelection(

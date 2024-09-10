@@ -20,17 +20,19 @@ data_lake_bucket = None
 
 class FtSalesforceContactIngestionLayerStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, env: str, datalake_bucket_name: str, datalake_bucket_folder: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, env: str, datalake_bucket_folder: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
         if (env=='prod'):
             load_dotenv(os.path.join(BASEDIR, "../.env.prod"))
+        elif (env=='uat'):
+            load_dotenv(os.path.join(BASEDIR,"../.env.uat"))
         else:
-            load_dotenv(os.path.join(BASEDIR,"../.env.non_prod"))
+            load_dotenv(os.path.join(BASEDIR,"../.env.dev"))
 
          # Create S3 bucket
-        data_lake_bucket = s3.Bucket(self, 
+        self.data_lake_bucket = s3.Bucket(self, 
             "FTDevDataLakeBucket",
             bucket_name=f"ft-{env}-data-lake"
         )
@@ -45,13 +47,13 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 "s3:PutObjectAcl"
             ],
             resources=[
-                data_lake_bucket.bucket_arn,  # Bucket itself
-                f"{data_lake_bucket.bucket_arn}/*"  # All objects in the bucket
+                self.data_lake_bucket.bucket_arn,  # Bucket itself
+                f"{self.data_lake_bucket.bucket_arn}/*"  # All objects in the bucket
             ]
         )
 
         # Attach AppFlow policy to the bucket
-        data_lake_bucket.add_to_resource_policy(appflow_policy_statement)
+        self.data_lake_bucket.add_to_resource_policy(appflow_policy_statement)
 
         # Define bucket policy for AWS Management Console users to move files
         move_files_policy_statement = iam.PolicyStatement(
@@ -64,14 +66,15 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 "s3:DeleteObject"   # Delete objects (needed for move)
             ],
             resources=[
-                data_lake_bucket.bucket_arn,        # Required for s3:ListBucket
-                f"{data_lake_bucket.bucket_arn}/*"  # All objects in the bucket
+                self.data_lake_bucket.bucket_arn,        # Required for s3:ListBucket
+                f"{self.data_lake_bucket.bucket_arn}/*"  # All objects in the bucket
             ]
         )
 
         # Attach the move files policy to the bucket
-        data_lake_bucket.add_to_resource_policy(move_files_policy_statement)
+        self.data_lake_bucket.add_to_resource_policy(move_files_policy_statement)
 
+        
         # AppFlow will be scheduled to start 15 min from now, so get the current time in UTC
         now = datetime.now(timezone.utc)
 
@@ -84,7 +87,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         # Create the AppFlow flow
         ingestion_flow = appflow.CfnFlow(
             self, "SalesforceToS3Flow",
-            flow_name="ft-" + env + "-ingestion-layer-salesforce-contact",
+            flow_name=f"ft-{env}-ingestion-layer-salesforce-contact",
             source_flow_config=appflow.CfnFlow.SourceFlowConfigProperty(
                 connector_type="Salesforce",
                 connector_profile_name=os.getenv('salesforce_connection_name'),
@@ -104,7 +107,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                 connector_type="S3",
                 destination_connector_properties=appflow.CfnFlow.DestinationConnectorPropertiesProperty(
                     s3=appflow.CfnFlow.S3DestinationPropertiesProperty(
-                        bucket_name=data_lake_bucket.bucket_name,
+                        bucket_name=self.data_lake_bucket.bucket_name,
                         bucket_prefix=f"{datalake_bucket_folder}ingress",
                         s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
                             aggregation_config=appflow.CfnFlow.AggregationConfigProperty(
@@ -131,7 +134,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
                     schedule_offset=0
                 )
             ),
-            flow_status="Active",
+            flow_status="Suspended",
             #trigger_config=appflow.CfnFlow.TriggerConfigProperty(
             #    trigger_type="OnDemand"
             #),

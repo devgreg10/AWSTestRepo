@@ -23,7 +23,7 @@ class FtAppflowS3ToS3IngestionStack(Stack):
 
         # Source S3 bucket
         source_bucket = s3.Bucket(self, "SourceBucket",
-                                  bucket_name="ft-" + env + "-ingestion-source-bucket", #source-bucket-name (ft-ingestion-source-bucket)
+                                  bucket_name=f"ft-{env}-ingestion-source-bucket", #source-bucket-name (ft-ingestion-source-bucket)
                                   versioned=True,
                                   removal_policy=RemovalPolicy.DESTROY)
         
@@ -35,12 +35,12 @@ class FtAppflowS3ToS3IngestionStack(Stack):
 
         # Destination S3 bucket
         destination_bucket = s3.Bucket(self, "DestinationBucket",
-                                       bucket_name="ft-" + env + "-data-lake", 
+                                       bucket_name=f"ft-{env}-data-lake", 
                                        #destination-bucket-name (ft-ingestion-destination-bucket)
                                        versioned=True,
                                        removal_policy=RemovalPolicy.DESTROY)
         # AppFlow role
-        appflow_role = iam.Role(self, "ft-" + env + "-ingestion-appflow-role",
+        appflow_role = iam.Role(self, f"ft-{env}-ingestion-appflow-role",
             assumed_by=iam.ServicePrincipal("appflow.amazonaws.com"),
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
@@ -119,7 +119,7 @@ class FtAppflowS3ToS3IngestionStack(Stack):
         # AppFlow Flow
         flow = appflow.CfnFlow(
             self, "AppFlowIngestFlow",
-            flow_name = "ft-" + env + "-s3-to-s3-ingestion-flow",
+            flow_name = f"ft-{env}-s3-to-s3-ingestion-flow",
             source_flow_config = source_config,
             destination_flow_config_list = [destination_config],
             trigger_config = appflow.CfnFlow.TriggerConfigProperty(trigger_type="OnDemand"),

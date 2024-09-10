@@ -50,7 +50,7 @@ class FtDataWarehouseAuroraStack(Stack):
         )
         '''
         # Create a new EC2 key name pair
-        new_key_pair_name = "ft-" + env + "-key-pair"
+        new_key_pair_name = f"ft-{env}-key-pair"
          
         new_key_pair = ec2.CfnKeyPair(
              self,
@@ -60,21 +60,21 @@ class FtDataWarehouseAuroraStack(Stack):
 
         # add interface endpoint for secret manager
         datawarehouse_vpc.add_interface_endpoint(
-            "ft-" + env + "-secret-manager-endpoint",
+            f"ft-{env}-secret-manager-endpoint",
             service=ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
         )
 
         # create security group to allow other services to connect to RDS Proxy 
         rds_proxy_connection_security_group = ec2.SecurityGroup(
             self,
-            "ft-" + env + "-rds-proxy-connection-security-group",
+            f"ft-{env}-rds-proxy-connection-security-group",
             vpc=datawarehouse_vpc
         )
 
         # create security group to allow Proxy to connect to DB
         rds_db_connection_security_group = ec2.SecurityGroup(
             self,
-            "ft-" + env + "-db-connection-security-group",
+            f"ft-{env}-db-connection-security-group",
             vpc=datawarehouse_vpc
         )
 
@@ -96,7 +96,7 @@ class FtDataWarehouseAuroraStack(Stack):
 
         database_credential_secret = secrets.Secret(
             self,
-            "ft-" + env + "-database-credentials-secret",
+            f"ft-{env}-database-credentials-secret",
             generate_secret_string=secrets.SecretStringGenerator(
                 secret_string_template=json.dumps({"username": database_username}),
                 exclude_punctuation=True,
@@ -110,7 +110,7 @@ class FtDataWarehouseAuroraStack(Stack):
         ssm.StringParameter(
             self,
             "DBCredentialsArn",
-            parameter_name="ft-" + env + "-rds-credentials-arn",
+            parameter_name=f"ft-{env}-rds-credentials-arn",
             string_value=database_credential_secret.secret_arn
         )
         '''
@@ -119,7 +119,7 @@ class FtDataWarehouseAuroraStack(Stack):
         # Create Aurora Serverless DB Cluster
         db_cluster = rds.DatabaseCluster(
             self,
-            "ft-" + env + "-aurora-db-cluster",
+            f"ft-{env}-aurora-db-cluster",
             vpc=datawarehouse_vpc,
             vpc_subnets=ec2.SubnetSelection(
                 subnets=private_subnets
@@ -131,17 +131,17 @@ class FtDataWarehouseAuroraStack(Stack):
             default_database_name="decision_support",
             readers=[
                 rds.ClusterInstance.serverless_v2(
-                    "ft-" + env + "-reader-instance-1", 
+                    f"ft-{env}-reader-instance-1", 
                     scale_with_writer=True,
                     enable_performance_insights=True
                 ),
                 rds.ClusterInstance.serverless_v2(
-                    "ft-" + env + "-reader-instance-2",
+                    f"ft-{env}-reader-instance-2",
                     enable_performance_insights=True
                 )
             ],
             writer=rds.ClusterInstance.serverless_v2(
-                "ft-" + env + "-writer-instance",
+                f"ft-{env}-writer-instance",
                 enable_performance_insights=True
             ),
             serverless_v2_min_capacity=0.5,
@@ -154,7 +154,7 @@ class FtDataWarehouseAuroraStack(Stack):
         # ServerlessCluster creates an Aurora Serverless v1 Cluster!!!
         serverless_cluster = rds.ServerlessCluster(
             self,
-            "ft-" + env + "-aurora-serverless-cluster",
+            f"ft-{env}-aurora-serverless-cluster",
             vpc=datawarehouse_vpc,
             credentials=rds.Credentials.from_secret(database_credential_secret),
             engine=rds.DatabaseClusterEngine.aurora_postgres(
@@ -173,7 +173,7 @@ class FtDataWarehouseAuroraStack(Stack):
          # Define a security group for the RDS Proxy
         rds_proxy_sg = ec2.SecurityGroup(
             self, 
-            "ft-" + env + "-rds-proxy-security-group",
+            f"ft-{env}-rds-proxy-security-group",
             vpc=datawarehouse_vpc,
             description="Security group for RDS Proxy",
             allow_all_outbound=True
@@ -189,7 +189,7 @@ class FtDataWarehouseAuroraStack(Stack):
         
         # Create an RDS Proxy for the Aurora DB
         rds_proxy = db_cluster.add_proxy(
-            "ft-" + env + "-rds-proxy",
+            f"ft-{env}-rds-proxy",
             secrets=[database_credential_secret],
             vpc=datawarehouse_vpc,
             vpc_subnets=ec2.SubnetSelection(
@@ -202,7 +202,7 @@ class FtDataWarehouseAuroraStack(Stack):
         '''
         rds_proxy = rds.DatabaseProxy(
             self, 
-            "ft-" + env + "-rds-database-proxy",
+            f"ft-{env}-rds-database-proxy",
             proxy_target=rds.ProxyTarget.from_cluster(serverless_cluster),
             secrets=[database_credential_secret],
             vpc=datawarehouse_vpc,
@@ -217,7 +217,7 @@ class FtDataWarehouseAuroraStack(Stack):
         # Create a security group for the bastion host
         bastion_sg = ec2.SecurityGroup(
             self, 
-            "ft-" + env + "-bastion-security-group",
+            f"ft-{env}-bastion-security-group",
             vpc=datawarehouse_vpc,
             description="Security group for Bastion Host",
             allow_all_outbound=True)
@@ -239,7 +239,7 @@ class FtDataWarehouseAuroraStack(Stack):
         # Launch an EC2 instance as the bastion host
         bastion_host = ec2.Instance(
             self, 
-            "ft-" + env + "-bastion-host",
+            f"ft-{env}-bastion-host",
             instance_type=ec2.InstanceType("t2.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux(),
             vpc=datawarehouse_vpc,
@@ -253,7 +253,7 @@ class FtDataWarehouseAuroraStack(Stack):
 
         bastion_host = ec2.BastionHostLinux(
             self, 
-            "ft-" + env + "-bastion-host",
+            f"ft-{env}-bastion-host",
             vpc=datawarehouse_vpc,
             security_group=bastion_sg,
             subnet_selection=ec2.SubnetSelection(

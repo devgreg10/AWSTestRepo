@@ -11,19 +11,23 @@ from aws_cdk import (
 
 from constructs import Construct
 
+from iac_code.ft_load_layer_salesforce_contact_stack import FtLoadLayerSalesforceContactStack
+
 from dotenv import load_dotenv
 import os
 
 class FtTransformLayerSalesforceContactStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, env: str, secret_arn: str, secret_region: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, env: str, load_layer_stack: FtLoadLayerSalesforceContactStack, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
         if (env=='prod'):
             load_dotenv(os.path.join(BASEDIR, "../.env.prod"))
+        elif (env=='uat'):
+            load_dotenv(os.path.join(BASEDIR,"../.env.uat"))
         else:
-            load_dotenv(os.path.join(BASEDIR,"../.env.non_prod"))
+            load_dotenv(os.path.join(BASEDIR,"../.env.dev"))
 
         vpc_name = os.getenv('vpc_name')
         vpc_id = os.getenv('vpc_id')
@@ -52,13 +56,9 @@ class FtTransformLayerSalesforceContactStack(Stack):
             description="A layer for psycopg2",
         )
 
-        lambda_retrieve_secrets = lambda_.Function.from_function_name(self, "LambdaRetrieveSecrets",
-            function_name="ft-" + env + "-retrieve-secrets",
-        )
-
         lambda_execute_stored_procedure = lambda_.Function(self, "LambdaExecuteStoredProcedure",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name="ft-" + env + "-execute-stored-procedure",
+            function_name=f"ft-{env}-execute-stored-procedure",
             layers=[psycopg2_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
@@ -74,7 +74,7 @@ class FtTransformLayerSalesforceContactStack(Stack):
         # Step 1: Retrieve Secrets
         retrieve_secrets_task = tasks.LambdaInvoke(
             self, "Retrieve Secrets",
-            lambda_function=lambda_retrieve_secrets,
+            lambda_function=load_layer_stack.lambda_retrieve_secrets,
             result_path="$.secret"
         ).add_retry(
             max_attempts=3,
@@ -147,7 +147,7 @@ class FtTransformLayerSalesforceContactStack(Stack):
         # Create the state machine
         state_machine = sfn.StateMachine(
             self, "FtTransformStateMachine",
-            state_machine_name="ft-" + env + "-transform-layer-salesforce-contact",
+            state_machine_name=f"ft-{env}-transform-layer-salesforce-contact",
             definition=definition,
             timeout=Duration.minutes(60)
         )

@@ -13,6 +13,7 @@ from aws_cdk import (
 )
 
 from iac_code.ft_ingestion_layer_salesforce_contact_stack import FtSalesforceContactIngestionLayerStack
+from iac_code.ft_create_secret import FtCreateSecretsStack
 
 from constructs import Construct
 
@@ -25,21 +26,21 @@ class FtLoadLayerSalesforceContactStack(Stack):
                  scope: Construct, 
                  id: str, 
                  env: str, 
-                 secret_arn: str, 
-                 secret_region: str, 
-                 bucket_name: str, 
-                 bucket_folder: str, 
-                 file_batch_size: int,
+                 bucket_folder: str,
                  concurrent_lambdas: int, 
-                 commit_interval: int, 
+                 commit_batch_size: int, 
+                 secret_region: str,
+                 secret_layer_stack: FtCreateSecretsStack,
                  ingestion_layer_stack: FtSalesforceContactIngestionLayerStack, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
         if (env=='prod'):
             load_dotenv(os.path.join(BASEDIR, "../.env.prod"))
+        elif (env=='uat'):
+            load_dotenv(os.path.join(BASEDIR,"../.env.uat"))
         else:
-            load_dotenv(os.path.join(BASEDIR,"../.env.non_prod"))
+            load_dotenv(os.path.join(BASEDIR,"../.env.dev"))
 
         vpc_name = os.getenv('vpc_name')
         vpc_id = os.getenv('vpc_id')
@@ -60,9 +61,6 @@ class FtLoadLayerSalesforceContactStack(Stack):
             availability_zones=["us-east-1a"]
         )
 
-        # Define the S3 bucket where the JSON files are stored
-        bucket = s3.Bucket.from_bucket_name(self, "MyBucket", bucket_name)
-
         # Define a Lambda Layer for the psycopg2 library
         psycopg2_layer = lambda_.LayerVersion(
             self, 'Psycopg2Layer',
@@ -75,7 +73,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         lambda_generate_timestamp = lambda_.Function(
             self, "LambdaGenerateTimestamp",
             layers=[psycopg2_layer],
-            function_name="ft-" + env + "-generate-timestamp",
+            function_name=f"ft-{env}-generate-timestamp",
             runtime=lambda_.Runtime.PYTHON_3_8,
             code=lambda_.Code.from_asset('lambdas/GenerateTimestamp'),
             handler='lambda_function.lambda_handler',
@@ -85,7 +83,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         
         lambda_list_s3_files = lambda_.Function(self, "LambdaListS3Files",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name="ft-" + env + "-s3-list-files",
+            function_name=f"ft-{env}-s3-list-files",
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
@@ -94,20 +92,17 @@ class FtLoadLayerSalesforceContactStack(Stack):
             code=lambda_.Code.from_asset('lambdas/ListS3Files'),
             handler='lambda_function.lambda_handler',
             environment={
-                "BUCKET_NAME": bucket_name,
-                "BUCKET_FOLDER": bucket_folder,
-                "FILE_BATCH_SIZE": str(file_batch_size)  # Convert to string for Lambda environment variable
+                "BUCKET_NAME": ingestion_layer_stack.data_lake_bucket.bucket_name,
+                "BUCKET_FOLDER": bucket_folder
             }
         )
-        
 
-        # Grant the Lambda function permissions to read from S3 
-        bucket.grant_read_write(lambda_list_s3_files)
+        # Grant the Lambda function permissions to read from the Data Lake bucket 
+        ingestion_layer_stack.data_lake_bucket.grant_read_write(lambda_list_s3_files)
         
-
-        lambda_retrieve_secrets = lambda_.Function(self, "LambdaRetrieveSecrets",
+        self.lambda_retrieve_secrets = lambda_.Function(self, "LambdaRetrieveSecrets",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name="ft-" + env + "-retrieve-secrets",
+            function_name=f"ft-{env}-retrieve-secrets",
             #layers=[psycopg2_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
@@ -117,18 +112,17 @@ class FtLoadLayerSalesforceContactStack(Stack):
             code=lambda_.Code.from_asset('lambdas/RetrieveSecrets'),
             handler='lambda_function.lambda_handler',
             environment={
-                "DB_SECRET_ARN": secret_arn,
+                "DB_SECRET_ARN": secret_layer_stack.db_secret.secret_arn,
                 "DB_SECRET_REGION": secret_region,
             }
         )
 
         # Grant the Lambda function permission to retrieve the DB secret
-        secret = secretsmanager.Secret.from_secret_complete_arn(self, "AuroraSecret", secret_arn)
-        secret.grant_read(lambda_retrieve_secrets)
+        secret_layer_stack.db_secret.grant_read(self.lambda_retrieve_secrets)
 
         lambda_process_files = lambda_.Function(self, "LambdaProcessLoadLayerFiles",
             runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name="ft-" + env + "-salesforce-contact-load-files",
+            function_name=f"ft-{env}-salesforce-contact-load-files",
             layers=[psycopg2_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
@@ -138,13 +132,13 @@ class FtLoadLayerSalesforceContactStack(Stack):
             code=lambda_.Code.from_asset('lambdas/LoadLayer/Salesforce/Contact'),
             handler='lambda_function.lambda_handler',
             environment={
-                "BUCKET_NAME": bucket_name,
+                "BUCKET_NAME": ingestion_layer_stack.data_lake_bucket.bucket_name,
                 "BUCKET_FOLDER": bucket_folder,
-                "COMMIT_INTERVAL": commit_interval
+                "COMMIT_BATCH_SIZE": commit_batch_size
             }
         )
-         # Grant the Lambda function permissions to read from S3 
-        bucket.grant_read_write(lambda_process_files)
+         # Grant the Lambda function permissions to read from and write to the S3 data lake
+        ingestion_layer_stack.data_lake_bucket.grant_read_write(lambda_process_files)
 
         # Create Tasks for State Machine
 
@@ -158,7 +152,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Step 1: Retrieve Secrets
         retrieve_secrets_task = tasks.LambdaInvoke(
             self, "Retrieve Secrets",
-            lambda_function=lambda_retrieve_secrets,
+            lambda_function=self.lambda_retrieve_secrets,
             result_path="$.secret"
         ).add_retry(
             max_attempts=3,
@@ -172,7 +166,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         
         #Step 2: List S3 Files
         list_s3_files_task = tasks.LambdaInvoke(
-            self, "List S3 Files in batch size of " + str(file_batch_size),
+            self, "List S3 Files available to ingest",
             lambda_function=lambda_list_s3_files,
             result_path="$.files"
         ).add_retry(
@@ -216,7 +210,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Create the state machine
         state_machine = sfn.StateMachine(
             self, "FtLoadStateMachine",
-            state_machine_name="ft-" + env + "-load-layer-salesforce-contact",
+            state_machine_name=f"ft-{env}-load-layer-salesforce-contact",
             definition=definition
         )
 
@@ -224,13 +218,13 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Create an EventBridge rule to capture the AppFlow run complete event
         appflow_event_rule = events.Rule(
             self, "AppFlowRunCompleteRule",
-            rule_name="ft-" + env + "-ingestion-layer-complete",
+            rule_name=f"ft-{env}-ingestion-layer-complete",
             event_pattern= events.EventPattern(
                 source=["aws.appflow"],
                 detail_type=["AppFlow Flow Execution Status"],
                 detail={
                     "status": ["SUCCEEDED"],  # This matches successful flow executions
-                    "flow-name": ["ft-" + env + "-ingestion-layer-salesforce-contact"]  # ZZZ - replace when the stack is passed in correctly
+                    "flow-name": [f"ft-{env}-ingestion-layer-salesforce-contact"]  # ZZZ - replace when the stack is passed in correctly
                 }
             )
         ) 

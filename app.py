@@ -16,12 +16,10 @@ app = cdk.App()
 
 if (env=='prod'):
     load_dotenv(".env.prod")
+elif(env=='uat'):
+    load_dotenv(".env.uat")
 else:
-    load_dotenv(".env.non-prod")
-    if (env=='uat'):
-        load_dotenv(".env.uat")
-    else:
-        load_dotenv(".env.dev")
+    load_dotenv(".env.dev")
 
 '''
 ZZZ - Temporary Secret for DB
@@ -34,30 +32,22 @@ BEGIN - Salesforce Contact Entity
     
 ingestion_layer_salesforce_contact_stack = FtSalesforceContactIngestionLayerStack(app, f"ft-{env}-ingestion-layer-salesforce-contact-stack", 
     env=env,
-    datalake_bucket_name=os.getenv('load_layer_s3_bucket_name'),
     datalake_bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'))
 
 load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, f"ft-{env}-load-layer-salesforce-contact-stack",
     env=env,
-    secret_arn=os.getenv('db_connection_secret_arn'),
-    secret_region=os.getenv('db_connection_secret_region'),
-    bucket_name=os.getenv('load_layer_s3_bucket_name'),
     bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'),
-    file_batch_size=os.getenv('load_layer_salesforce_file_batch_size'),
     concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambda'),
-    commit_interval=os.getenv('load_layer_commit_interval'),
+    commit_batch_size=os.getenv('load_layer_commit_batch_size'),
+    secret_region=os.getenv('db_connection_secret_region'),
+    secret_layer_stack=create_secret_stack,
     ingestion_layer_stack=ingestion_layer_salesforce_contact_stack
 )
 
 tranform_layer_salesforce_contact_stack = FtTransformLayerSalesforceContactStack(app, f"ft-{env}-tranform-layer-salesforce-contact-stack",
     env=env,
-    secret_arn=os.getenv('db_connection_secret_arn'),
-    secret_region=os.getenv('db_connection_secret_region')
+    load_layer_stack=load_layer_salesforce_contact_stack
 )
-
-ingestion_layer_salesforce_contact_stack.add_dependency(create_secret_stack)
-load_layer_salesforce_contact_stack.add_dependency(ingestion_layer_salesforce_contact_stack)
-tranform_layer_salesforce_contact_stack.add_dependency(load_layer_salesforce_contact_stack)
 
 '''
 END - Salesforce Contact Entity

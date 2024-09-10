@@ -18,12 +18,9 @@ def lambda_handler(event, context):
         
         bucket_name = os.environ['BUCKET_NAME']
         bucket_folder = os.environ['BUCKET_FOLDER']
-        # default batch size to 1 if not provided
-        file_batch_size = int(os.getenv('FILE_BATCH_SIZE',"1"))
         
         logging.info("Bucket Name: " + bucket_name)
         logging.info("Bucket Folder: " + bucket_folder)
-        logging.info("File Batch Size: " + str(file_batch_size))
         
         # read all files, but do not recurse beyond the Prefix provided
         all_files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=bucket_folder)
@@ -38,11 +35,8 @@ def lambda_handler(event, context):
         file_keys = [file['Key'] for file in filtered_files]
         logging.info(f"Found files: {file_keys}")
 
-        # create dictionary of file names in batches, even if it's a batch of 1
-        response = [file_keys[i:i + file_batch_size] for i in range(0, len(file_keys), file_batch_size)]
-
         return {
-            'files': response
+            'files': file_keys
         }
 
     except Exception as e:
