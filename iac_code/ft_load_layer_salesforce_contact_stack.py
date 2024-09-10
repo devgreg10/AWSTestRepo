@@ -185,7 +185,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
             max_concurrency=concurrent_lambdas,
             items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
-                "batched_files.$": "$$.Map.Item.Value",
+                "file_name.$": "$$.Map.Item.Value",
                 "secret.$": "$.secret.Payload.secret",  # Pass the secret to each iteration
                 "timestamp.$": "$.timestamp.Payload.timestamp"  # Pass the timestamp to each iteration
             }

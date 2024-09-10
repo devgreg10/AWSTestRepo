@@ -12,7 +12,7 @@ def lambda_handler(event, context):
     try:
         session = boto3.session.Session()
 
-        batched_file_names = event['batched_files']
+        file_name = event['file_name']
         secret = event['secret']
         formatted_timestamp = event['timestamp']
 
@@ -38,36 +38,34 @@ def lambda_handler(event, context):
             with conn.cursor() as cursor:
                 record_count = 0
 
-                for file_name in batched_file_names:
+                logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
 
-                    logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
+                # Get the JSON file from S3
+                response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
 
-                    # Get the JSON file from S3
-                    response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
+                # Stream and process each JSON object separately
+                for line in response['Body'].iter_lines():
+                    if line.strip():  # Skip empty lines
+                        try:
+                            record = json.loads(line)
+                            cursor.execute(
+                                    "INSERT INTO ft_ds_raw.sf_contact " \
+                                    "(snapshot_date, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c, isdeleted, lastmodifieddate, createddate) " \
+                                    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                (formatted_timestamp, record['Id'], record['MailingPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'], record['IsDeleted'], record['LastModifiedDate'], record['CreatedDate'])
+                            )                                
 
-                    # Stream and process each JSON object separately
-                    for line in response['Body'].iter_lines():
-                        if line.strip():  # Skip empty lines
-                            try:
-                                record = json.loads(line)
-                                cursor.execute(
-                                     "INSERT INTO ft_ds_raw.sf_contact " \
-                                     "(snapshot_date, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c, isdeleted, lastmodifieddate, createddate) " \
-                                     "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                                    (formatted_timestamp, record['Id'], record['MailingPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'], record['IsDeleted'], record['LastModifiedDate'], record['CreatedDate'])
-                                )                                
+                            record_count += 1
 
-                                record_count += 1
-
-                                # Commit after every 'n' records
-                                if record_count >= commit_batch_size:
-                                    conn.commit()
-                                    logging.info(f"Committed {record_count} records to the database.")
-                                    record_count = 0  # Reset the counter
-                            except Exception as record_error:
-                                # If there is an error processing the record, log the error with the file name
-                                logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
-                                error_records.append({'file_name': file_name, 'line': line})
+                            # Commit after every 'n' records
+                            if record_count >= commit_batch_size:
+                                conn.commit()
+                                logging.info(f"Committed {record_count} records to the database.")
+                                record_count = 0  # Reset the counter
+                        except Exception as record_error:
+                            # If there is an error processing the record, log the error with the file name
+                            logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
+                            error_records.append({'file_name': file_name, 'line': line})
 
                     # Move the file to the "Complete" folder
                     destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
