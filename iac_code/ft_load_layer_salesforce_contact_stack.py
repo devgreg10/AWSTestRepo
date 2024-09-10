@@ -218,13 +218,14 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Create an EventBridge rule to capture the AppFlow run complete event
         appflow_event_rule = events.Rule(
             self, "AppFlowRunCompleteRule",
-            rule_name=f"ft-{env}-ingestion-layer-complete",
+            rule_name=f"ft-{env}-ingestion-layer-salesforce-contact-success",
             event_pattern= events.EventPattern(
                 source=["aws.appflow"],
-                detail_type=["AppFlow Flow Execution Status"],
+                detail_type=["AppFlow End Flow Run Report"],
                 detail={
-                    "status": ["SUCCEEDED"],  # This matches successful flow executions
-                    "flow-name": [f"ft-{env}-ingestion-layer-salesforce-contact"]  # ZZZ - replace when the stack is passed in correctly
+                    "status": ["Success"],  # This matches successful flow executions
+                    "flow-name": [ingestion_layer_stack.ingestion_appflow.flow_name],
+                    "flow-arn": [ingestion_layer_stack.ingestion_appflow.attr_flow_arn]
                 }
             )
         ) 
@@ -232,4 +233,3 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Set the target of the rule to the Step Functions state machine
         appflow_event_rule.add_target(targets.SfnStateMachine(state_machine))
 
-        

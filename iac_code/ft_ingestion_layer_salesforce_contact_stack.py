@@ -85,7 +85,7 @@ class FtSalesforceContactIngestionLayerStack(Stack):
         unix_timestamp = int(future_time.timestamp())
        
         # Create the AppFlow flow
-        ingestion_flow = appflow.CfnFlow(
+        self.ingestion_appflow = appflow.CfnFlow(
             self, "SalesforceToS3Flow",
             flow_name=f"ft-{env}-ingestion-layer-salesforce-contact",
             source_flow_config=appflow.CfnFlow.SourceFlowConfigProperty(

@@ -49,10 +49,10 @@ def lambda_handler(event, context):
                         try:
                             record = json.loads(line)
                             cursor.execute(
-                                    "INSERT INTO ft_ds_raw.sf_contact " \
-                                    "(snapshot_date, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c, isdeleted, lastmodifieddate, createddate) " \
-                                    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                                (formatted_timestamp, record['Id'], record['MailingPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'], record['IsDeleted'], record['LastModifiedDate'], record['CreatedDate'])
+                                "INSERT INTO ft_ds_raw.sf_contact " \
+                                "(dss_last_modified_timestamp, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c, isdeleted, lastmodifieddate, createddate) " \
+                                "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                (datetime.now(), record['Id'], record['MailingPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'], record['IsDeleted'], record['LastModifiedDate'], record['CreatedDate'])
                             )                                
 
                             record_count += 1
@@ -60,30 +60,30 @@ def lambda_handler(event, context):
                             # Commit after every 'n' records
                             if record_count >= commit_batch_size:
                                 conn.commit()
-                                logging.info(f"Committed {record_count} records to the database.")
+                                #logging.info(f"Committed {record_count} records to the database.")
                                 record_count = 0  # Reset the counter
                         except Exception as record_error:
                             # If there is an error processing the record, log the error with the file name
                             logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
                             error_records.append({'file_name': file_name, 'line': line})
 
-                    # Move the file to the "Complete" folder
-                    destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
-                    if not destination_key.endswith('.json'):
-                        destination_key += '.json'
+                # Move the file to the "Complete" folder
+                destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
+                if not destination_key.endswith('.json'):
+                    destination_key += '.json'
 
-                    logging.info(f"Attempting to copy file | bucket_name: {bucket_name} | file_name: {file_name} | destination_key: {destination_key}")
+                logging.info(f"Attempting to copy file | bucket_name: {bucket_name} | file_name: {file_name} | destination_key: {destination_key}")
 
-                    s3_client.copy_object(Bucket=bucket_name, 
-                                          CopySource={'Bucket': bucket_name, 'Key': file_name}, 
-                                          Key=destination_key)
-                    s3_client.delete_object(Bucket=bucket_name, Key=file_name)
-                    logging.info(f"File moved to 'Complete' folder: {destination_key}")
+                s3_client.copy_object(Bucket=bucket_name, 
+                                        CopySource={'Bucket': bucket_name, 'Key': file_name}, 
+                                        Key=destination_key)
+                s3_client.delete_object(Bucket=bucket_name, Key=file_name)
+                logging.info(f"File moved to 'Complete' folder: {destination_key}")
 
-                # Commit any remaining records
-                if record_count > 0:
-                    conn.commit()
-                    logging.info(f"Committed remaining {record_count} records to the database.")
+            # Commit any remaining records
+            if record_count > 0:
+                conn.commit()
+                logging.info(f"Committed remaining {record_count} records to the database.")
 
         except Exception as e:
             logger.error(f"DB Error occurred: {e}")
