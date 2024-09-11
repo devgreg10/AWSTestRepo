@@ -194,7 +194,12 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Add Lambda invocation within the Map state
         process_files_task.iterator(tasks.LambdaInvoke(
             self, "Process File",
-            lambda_function=lambda_process_files
+            lambda_function=lambda_process_files,
+            payload=sfn.TaskInput.from_object({
+                "file_name.$": "$.file_name",  # Make sure each Lambda processes a unique file
+                "scret.$": "$.secret",  # Pass secret as is
+                "tiemestamp.$": "$.timestamp"  # Pass timestamp as is
+            })
         )).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),
@@ -223,9 +228,11 @@ class FtLoadLayerSalesforceContactStack(Stack):
                 source=["aws.appflow"],
                 detail_type=["AppFlow End Flow Run Report"],
                 detail={
-                    "status": ["Success"],  # This matches successful flow executions
+                    "status": ["Execution Successful"],  
                     "flow-name": [ingestion_layer_stack.ingestion_appflow.flow_name],
-                    "flow-arn": [ingestion_layer_stack.ingestion_appflow.attr_flow_arn]
+                    "num-of-records-processed": [{
+                        "anything-but": ["0"]
+                    }]
                 }
             )
         ) 
