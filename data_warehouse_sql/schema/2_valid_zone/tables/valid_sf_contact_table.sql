@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_contact (
     mailing_zip_postal_code VARCHAR(20),
     participation_status VARCHAR(100),
     contact_type VARCHAR(100),
-    last_modified_date TIMESTAMPTZ,
+    sf_last_modified_date TIMESTAMPTZ,
     created_date TIMESTAMPTZ,
     is_deleted BOOLEAN,
     dss_last_modified_timestamp TIMESTAMPTZ

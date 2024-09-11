@@ -70,7 +70,9 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     INSERT INTO ft_ds_valid.sf_contact
-    SELECT all_values.* FROM
+    SELECT
+    all_values.*
+    FROM
         (SELECT
             Id AS contact_id_18,
             Chapter_Affiliation__c AS chapter_id,
@@ -87,6 +89,7 @@ BEGIN
             dss_last_modified_timestamp AS dss_last_modified_timestamp
         FROM ft_ds_raw.sf_contact
         WHERE
+            --filter out testing chapters
             Chapter_Affiliation__c NOT IN (
                 '0011R00002oM2hNQAS',
                 '0013600000xOm3cAAC'
@@ -95,12 +98,12 @@ BEGIN
     JOIN
         (SELECT
         Id,
-        CAST(MIN(LastModifiedDate) AS TIMESTAMPTZ) AS min_date
-        FROM ft_ds_raw
+        CAST(MAX(LastModifiedDate) AS TIMESTAMPTZ) AS max_date
+        FROM ft_ds_raw.sf_contact
         GROUP BY Id
-        ) min_dates
-    ON all_values.sf_last_modified_date = min_dates.min_date
-    AND all_values.contact_id_18 = min_dates.Id
+        ) max_dates
+    ON all_values.sf_last_modified_date = max_dates.max_date
+    AND all_values.contact_id_18 = max_dates.Id
     ON CONFLICT (contact_id_18) DO UPDATE SET
         chapter_id = EXCLUDED.chapter_id,
         age = EXCLUDED.age,
