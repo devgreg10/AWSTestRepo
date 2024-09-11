@@ -182,7 +182,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Step 3: Process Files in Batch
         process_files_task = sfn.Map(
             self, "Process Files",
-            max_concurrency=concurrent_lambdas,
+            #max_concurrency=concurrent_lambdas,
             items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
                 "file_name.$": "$$.Map.Item.Value",
@@ -194,12 +194,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Add Lambda invocation within the Map state
         process_files_task.iterator(tasks.LambdaInvoke(
             self, "Process File",
-            lambda_function=lambda_process_files,
-            payload=sfn.TaskInput.from_object({
-                "file_name.$": "$.file_name",  # Make sure each Lambda processes a unique file
-                "scret.$": "$.secret",  # Pass secret as is
-                "tiemestamp.$": "$.timestamp"  # Pass timestamp as is
-            })
+            lambda_function=lambda_process_files
         )).add_retry(
             max_attempts=3,
             interval=Duration.seconds(5),
