@@ -44,10 +44,15 @@ load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, f"f
     ingestion_layer_stack=ingestion_layer_salesforce_contact_stack
 )
 
+load_layer_salesforce_contact_stack.add_dependency(create_secret_stack)
+load_layer_salesforce_contact_stack.add_dependency(ingestion_layer_salesforce_contact_stack)
+
 tranform_layer_salesforce_contact_stack = FtTransformLayerSalesforceContactStack(app, f"ft-{env}-tranform-layer-salesforce-contact-stack",
     env=env,
     load_layer_stack=load_layer_salesforce_contact_stack
 )
+
+tranform_layer_salesforce_contact_stack.add_dependency(load_layer_salesforce_contact_stack)
 
 '''
 END - Salesforce Contact Entity
