@@ -14,7 +14,6 @@ def lambda_handler(event, context):
 
         file_name = event['file_name']
         secret = event['secret']
-        formatted_timestamp = event['timestamp']
 
         # Connect to Aurora PostgreSQL
         conn = psycopg2.connect(

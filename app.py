@@ -38,21 +38,34 @@ decision_support_base_stack = FtDecisionSupportBaseStack(
 '''
 SALESFORCE
 '''
-#Contact
-entity_name="contact"
+# CONTACT
+entity_name = "contact"
+salesforce_object = "Contact"
 appflow_tasks = FtSalesforceContactAppFlowTasks(app, "SaleforceContactTasks")
 
 salesforce_contact_stack = FtSalesforceEntityStack(
     app, 
-    id=f"ft-{env}-salesforce-{entity_name}-stack",
-    env=env,
-    entity_name=entity_name,
-    salesforce_object="Contact",
-    app_flow_tasks=appflow_tasks.get_tasks(),
-    commit_batch_size=os.getenv('load_layer_commit_batch_size'),
-    concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambdas'),
-    ds_base_stack=decision_support_base_stack
+    id = f"ft-{env}-salesforce-{entity_name}-stack",
+    env = env,
+    entity_name = entity_name,
+    salesforce_object = salesforce_object,
+    app_flow_tasks = appflow_tasks.get_tasks(),
+    commit_batch_size = os.getenv('load_layer_commit_batch_size'),
+    concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
+    ds_base_stack = decision_support_base_stack
 )
+
+# LISTING
+entity_name = "listing"
+salesforce_object = "Listing__c"
+
+# LISTING SESSION
+entity_name = "listing_session"
+salesforce_object = "Listing_Session__c"
+
+# SESSION REGISTRATION
+entity_name = "session_registration"
+salesforce_object = "Session_Registration__c"
 
 
 

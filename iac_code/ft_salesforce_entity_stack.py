@@ -214,8 +214,7 @@ class FtSalesforceEntityStack(Stack):
             items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
                 "file_name.$": "$$.Map.Item.Value",
-                "secret.$": "$.secret.Payload.secret",  # Pass the secret to each iteration
-                "timestamp.$": "$.timestamp.Payload.timestamp"  # Pass the timestamp to each iteration
+                "secret.$": "$.secret.Payload.secret"  # Pass the secret to each iteration
             }
         )
 
