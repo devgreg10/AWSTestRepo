@@ -2,10 +2,16 @@ import os
 
 import aws_cdk as cdk
 
+'''
 from iac_code.ft_create_secret import FtCreateSecretsStack
 from iac_code.ft_load_layer_salesforce_contact_stack import FtLoadLayerSalesforceContactStack
 from iac_code.ft_transform_layer_salesforce_contact_stack import FtTransformLayerSalesforceContactStack
 from iac_code.ft_ingestion_layer_salesforce_contact_stack import FtSalesforceContactIngestionLayerStack
+'''
+from iac_code.ft_decision_support_base_stack import FtDecisionSupportBaseStack
+from iac_code.ft_salesforce_entity_stack import FtSalesforceEntityStack
+
+from iac_code.appflow.tasks.ft_salesforce_contact_tasks import FtSalesforceContactAppFlowTasks
 
 from dotenv import load_dotenv
 
@@ -21,15 +27,38 @@ elif(env=='uat'):
 else:
     load_dotenv(".env.dev")
 
+
+decision_support_base_stack = FtDecisionSupportBaseStack(
+    app, 
+    id=f"ft-{env}-decision-support-base-stack", 
+    env=env, 
+    secret_region=os.getenv('db_connection_secret_region')
+)
+
 '''
-ZZZ - Temporary Secret for DB
+SALESFORCE
+'''
+#Contact
+entity_name="contact"
+appflow_tasks = FtSalesforceContactAppFlowTasks(app, "SaleforceContactTasks")
+
+salesforce_contact_stack = FtSalesforceEntityStack(
+    app, 
+    id=f"ft-{env}-salesforce-{entity_name}-stack",
+    env=env,
+    entity_name=entity_name,
+    salesforce_object="Contact",
+    app_flow_tasks=appflow_tasks.get_tasks(),
+    commit_batch_size=os.getenv('load_layer_commit_batch_size'),
+    concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambdas'),
+    ds_base_stack=decision_support_base_stack
+)
+
+
+
 '''
 create_secret_stack = FtCreateSecretsStack(app, f"ft-{env}-create-db-secret")
 
-'''
-BEGIN - Salesforce Contact Entity
-'''
-    
 ingestion_layer_salesforce_contact_stack = FtSalesforceContactIngestionLayerStack(app, f"ft-{env}-ingestion-layer-salesforce-contact-stack", 
     env=env,
     datalake_bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'))
@@ -55,8 +84,7 @@ tranform_layer_salesforce_contact_stack = FtTransformLayerSalesforceContactStack
 tranform_layer_salesforce_contact_stack.add_dependency(load_layer_salesforce_contact_stack)
 
 '''
-END - Salesforce Contact Entity
-'''
+
 
 cdk.Tags.of(app).add("Project", "First Tee Decision Support")
 cdk.Tags.of(app).add("Deployment", "CDK")
