@@ -21,7 +21,7 @@ class FtDecisionSupportBaseStack(Stack):
         # Store the known Aurora PostgreSQL credentials in AWS Secrets Manager
         self.db_secret = secretsmanager.Secret(self, "AuroraDBSecret",
             description="Aurora PostgreSQL DB credentials",
-            secret_name="ft-aurora-postgres-connection-secret",
+            secret_name=f"ft-{env}-aurora-postgres-connection-secret",
             secret_string_value=SecretValue.plain_text(
                 '{"username":"ftdevpublicdbuser","password":"tempdbpassword_kirkcousinsqbatlantafalc0ns","dbname":"postgres","host":"firsttee-cdk-public-data-ftdevpublicauroradbclust-j3otj0e0ak2o.cluster-c5qwcaqekjc2.us-east-1.rds.amazonaws.com"}'
             )
