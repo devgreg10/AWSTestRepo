@@ -182,7 +182,7 @@ class FtLoadLayerSalesforceContactStack(Stack):
         # Step 3: Process Files in Batch
         process_files_task = sfn.Map(
             self, "Process Files",
-            max_concurrency=concurrent_lambdas,
+            max_concurrency=int(concurrent_lambdas),
             items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
                 "file_name.$": "$$.Map.Item.Value",
