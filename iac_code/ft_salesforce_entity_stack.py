@@ -256,7 +256,8 @@ class FtSalesforceEntityStack(Stack):
                         "anything-but": ["0"]
                     }]
                 }
-            )
+            ),
+            enabled=False # set this to be disabled initially
         ) 
 
         # Set the target of the rule to the Step Functions state machine

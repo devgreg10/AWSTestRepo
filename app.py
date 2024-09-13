@@ -12,6 +12,9 @@ from iac_code.ft_decision_support_base_stack import FtDecisionSupportBaseStack
 from iac_code.ft_salesforce_entity_stack import FtSalesforceEntityStack
 
 from iac_code.appflow.tasks.ft_salesforce_contact_tasks import FtSalesforceContactAppFlowTasks
+from iac_code.appflow.tasks.ft_salesforce_listing_session_tasks import FtSalesforceListingSessionAppFlowTasks
+from iac_code.appflow.tasks.ft_salesforce_listing_tasks import FtSalesforceListingAppFlowTasks
+from iac_code.appflow.tasks.ft_salesforce_session_registration_tasks import FtSalesforceSessionRegistrationAppFlowTasks
 
 from dotenv import load_dotenv
 
@@ -58,15 +61,54 @@ salesforce_contact_stack = FtSalesforceEntityStack(
 # LISTING
 entity_name = "listing"
 salesforce_object = "Listing__c"
+appflow_tasks = FtSalesforceListingAppFlowTasks(app, "SaleforceListingTasks")
+
+salesforce_listing_stack = FtSalesforceEntityStack(
+    app, 
+    id = f"ft-{env}-salesforce-{entity_name}-stack",
+    env = env,
+    entity_name = entity_name,
+    salesforce_object = salesforce_object,
+    app_flow_tasks = appflow_tasks.get_tasks(),
+    commit_batch_size = os.getenv('load_layer_commit_batch_size'),
+    concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
+    ds_base_stack = decision_support_base_stack
+)
+
 
 # LISTING SESSION
-entity_name = "listing_session"
+entity_name = "listing-session"
 salesforce_object = "Listing_Session__c"
+appflow_tasks = FtSalesforceListingSessionAppFlowTasks(app, "SaleforceListingSessionTasks")
+
+salesforce_listing_stack = FtSalesforceEntityStack(
+    app, 
+    id = f"ft-{env}-salesforce-{entity_name}-stack",
+    env = env,
+    entity_name = entity_name,
+    salesforce_object = salesforce_object,
+    app_flow_tasks = appflow_tasks.get_tasks(),
+    commit_batch_size = os.getenv('load_layer_commit_batch_size'),
+    concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
+    ds_base_stack = decision_support_base_stack
+)
 
 # SESSION REGISTRATION
-entity_name = "session_registration"
+entity_name = "session-registration"
 salesforce_object = "Session_Registration__c"
+appflow_tasks = FtSalesforceSessionRegistrationAppFlowTasks(app, "SaleforceSessionRegistrationTasks")
 
+salesforce_listing_stack = FtSalesforceEntityStack(
+    app, 
+    id = f"ft-{env}-salesforce-{entity_name}-stack",
+    env = env,
+    entity_name = entity_name,
+    salesforce_object = salesforce_object,
+    app_flow_tasks = appflow_tasks.get_tasks(),
+    commit_batch_size = os.getenv('load_layer_commit_batch_size'),
+    concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
+    ds_base_stack = decision_support_base_stack
+)
 
 
 '''
