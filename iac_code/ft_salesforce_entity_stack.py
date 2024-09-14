@@ -135,6 +135,15 @@ class FtSalesforceEntityStack(Stack):
             description="A layer for psycopg2",
         )
 
+        # Define a Lambda Layer for data_core
+        data_core_layer = lambda_.LayerVersion(
+            self, f'DataCoreLayer{salesforce_object}',
+            code=lambda_.Code.from_asset('data_core_layer'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
+            description="A layer for data_core",
+        )
+
+
         # Define a Lambda to list all files
         lambda_list_s3_files = lambda_.Function(self, f"LambdaListFilesSalesforce{salesforce_object}",
             runtime=lambda_.Runtime.PYTHON_3_8,
@@ -159,7 +168,7 @@ class FtSalesforceEntityStack(Stack):
         lambda_process_files = lambda_.Function(self, f"LambdaProcessLoadLayerFilesSalesforce{salesforce_object}",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name=f"ft-{env}-salesforce-{entity_name}-load-files",
-            layers=[psycopg2_layer],
+            layers=[psycopg2_layer, data_core_layer],
             #vpc=datawarehouse_vpc,
             #vpc_subnets=ec2.SubnetSelection(
             #    subnets=public_subnets
