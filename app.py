@@ -35,7 +35,8 @@ decision_support_base_stack = FtDecisionSupportBaseStack(
     app, 
     id=f"ft-{env}-decision-support-base-stack", 
     env=env, 
-    secret_region=os.getenv('db_connection_secret_region')
+    secret_region=os.getenv('default_region'),
+    version_number=os.getenv('version_number')
 )
 
 '''
@@ -50,6 +51,7 @@ salesforce_contact_stack = FtSalesforceEntityStack(
     app, 
     id = f"ft-{env}-salesforce-{entity_name}-stack",
     env = env,
+    region=os.getenv('default_region'),
     entity_name = entity_name,
     salesforce_object = salesforce_object,
     app_flow_tasks = appflow_tasks.get_tasks(),
@@ -58,6 +60,7 @@ salesforce_contact_stack = FtSalesforceEntityStack(
     ds_base_stack = decision_support_base_stack
 )
 
+'''
 # LISTING
 entity_name = "listing"
 salesforce_object = "Listing__c"
@@ -68,6 +71,7 @@ salesforce_listing_stack = FtSalesforceEntityStack(
     id = f"ft-{env}-salesforce-{entity_name}-stack",
     env = env,
     entity_name = entity_name,
+    region=os.getenv('default_region'),
     salesforce_object = salesforce_object,
     app_flow_tasks = appflow_tasks.get_tasks(),
     commit_batch_size = os.getenv('load_layer_commit_batch_size'),
@@ -86,6 +90,7 @@ salesforce_listing_stack = FtSalesforceEntityStack(
     id = f"ft-{env}-salesforce-{entity_name}-stack",
     env = env,
     entity_name = entity_name,
+    region=os.getenv('default_region'),
     salesforce_object = salesforce_object,
     app_flow_tasks = appflow_tasks.get_tasks(),
     commit_batch_size = os.getenv('load_layer_commit_batch_size'),
@@ -102,6 +107,7 @@ salesforce_listing_stack = FtSalesforceEntityStack(
     app, 
     id = f"ft-{env}-salesforce-{entity_name}-stack",
     env = env,
+    region=os.getenv('default_region'),
     entity_name = entity_name,
     salesforce_object = salesforce_object,
     app_flow_tasks = appflow_tasks.get_tasks(),
@@ -109,7 +115,7 @@ salesforce_listing_stack = FtSalesforceEntityStack(
     concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
     ds_base_stack = decision_support_base_stack
 )
-
+'''
 
 '''
 create_secret_stack = FtCreateSecretsStack(app, f"ft-{env}-create-db-secret")
@@ -123,7 +129,7 @@ load_layer_salesforce_contact_stack = FtLoadLayerSalesforceContactStack(app, f"f
     bucket_folder=os.getenv('load_layer_salesforce_contact_s3_bucket_folder'),
     concurrent_lambdas=os.getenv('load_layer_salesforce_concurrent_lambdas'),
     commit_batch_size=os.getenv('load_layer_commit_batch_size'),
-    secret_region=os.getenv('db_connection_secret_region'),
+    secret_region=os.getenv('default_region'),
     secret_layer_stack=create_secret_stack,
     ingestion_layer_stack=ingestion_layer_salesforce_contact_stack
 )

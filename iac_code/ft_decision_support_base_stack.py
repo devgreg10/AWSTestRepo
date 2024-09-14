@@ -12,7 +12,7 @@ from constructs import Construct
 
 class FtDecisionSupportBaseStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, env: str, secret_region: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, env: str, secret_region: str, version_number: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         '''
@@ -36,6 +36,7 @@ class FtDecisionSupportBaseStack(Stack):
             code=lambda_.Code.from_asset('lambda_layers/API_Layer'),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
             description="A layer for psycopg2",
+            layer_version_name=f'ft-{env}-aws-psycopg2-layer-{version_number.replace(".", "-")}'
         )
 
         # Define Lambda to retrieve secrets

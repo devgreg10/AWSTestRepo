@@ -38,7 +38,7 @@ def lambda_handler(event, context):
                 record_count = 0
 
                 logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
-
+                
                 # Get the JSON file from S3
                 response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
 

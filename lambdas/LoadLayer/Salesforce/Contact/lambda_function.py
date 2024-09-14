@@ -4,28 +4,28 @@ import psycopg2
 import os
 import logging
 from datetime import datetime
+from data_core.salesforce.contact.contact_db_helper import SalesforceContactDbHelper
+from data_core.salesforce.contact.contact_db_models import SfContactRawDbModel, CreateSfContactRawModel
+from data_core.util.db_execute_helper import DbExecutorHelper
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
+
+    db_connection = None
+
     try:
         session = boto3.session.Session()
 
-        file_name = event['file_name']
-        secret = event['secret']
+        secret_arn = event['secret_arn']
+        region = event['region']
 
-        # Connect to Aurora PostgreSQL
-        conn = psycopg2.connect(
-            host=secret['host'],
-            database=secret['dbname'],
-            user=secret['username'],
-            password=secret['password']
-        )
+        file_name = event['file_name']
 
         s3_client = session.client(
             service_name="s3",
-            region_name="us-east-1"
+            region_name=region
         )
 
         bucket_name = os.environ['BUCKET_NAME']
@@ -33,64 +33,73 @@ def lambda_handler(event, context):
         commit_batch_size = int(os.environ.get('COMMIT_BATCH_SIZE', 1000))  
         error_records = []  # List to store records that fail to process
 
+        db_connection = None
+
         try:
-            with conn.cursor() as cursor:
-                record_count = 0
 
-                logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
+            db_connection = DbExecutorHelper.get_db_connection_by_secret_arn(
+                secret_arn=secret_arn,
+                region=region
+            )
 
-                # Get the JSON file from S3
-                response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
+            record_count = 0
 
-                # Stream and process each JSON object separately
-                for line in response['Body'].iter_lines():
-                    if line.strip():  # Skip empty lines
-                        try:
-                            record = json.loads(line)
-                            cursor.execute(
-                                "INSERT INTO ft_ds_raw.sf_contact " \
-                                "(dss_last_modified_timestamp, id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, participation_status__c, isdeleted, lastmodifieddate, createddate) " \
-                                "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                                (datetime.now(), record['Id'], record['MailingPostalCode'], record['Chapter_Affiliation__c'], record['ChapterID_CONTACT__c'], record['CASESAFEID__c'], record['Contact_Type__c'], record['Age__c'], record['Ethnicity__c'], record['Gender__c'], record['Grade__c'], record['Participation_Status__c'], record['IsDeleted'], record['LastModifiedDate'], record['CreatedDate'])
-                            )                                
+            logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
 
-                            record_count += 1
+            # Get the JSON file from S3
+            response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
 
-                            # Commit after every 'n' records
-                            if record_count >= commit_batch_size:
-                                conn.commit()
-                                #logging.info(f"Committed {record_count} records to the database.")
-                                record_count = 0  # Reset the counter
-                        except Exception as record_error:
-                            # If there is an error processing the record, log the error with the file name
-                            logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
-                            error_records.append({'file_name': file_name, 'line': line})
+            # Stream and process each JSON object separately
+            for line in response['Body'].iter_lines():
+                if line.strip():  # Skip empty lines
+                    try:
+                        
+                        sf_raw_contact = SfContactRawDbModel.from_dict(json.loads(line))
+                        
+                        SalesforceContactDbHelper.insert_sf_raw_contact(
+                            db_connection=db_connection,
+                            new_raw_contact=sf_raw_contact,
+                            commit_changes= (record_count >= commit_batch_size),
+                            close_db_conn=False
+                        )
 
-                # Move the file to the "Complete" folder
-                destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
-                if not destination_key.endswith('.json'):
-                    destination_key += '.json'
+                        record_count += 1
 
-                logging.info(f"Attempting to copy file | bucket_name: {bucket_name} | file_name: {file_name} | destination_key: {destination_key}")
+                        # Commit after every 'n' records
+                        if record_count >= commit_batch_size:
+                            record_count = 0  # Reset the counter
 
-                s3_client.copy_object(Bucket=bucket_name, 
-                                        CopySource={'Bucket': bucket_name, 'Key': file_name}, 
-                                        Key=destination_key)
-                s3_client.delete_object(Bucket=bucket_name, Key=file_name)
-                logging.info(f"File moved to 'Complete' folder: {destination_key}")
+                    except Exception as record_error:
+                        # If there is an error processing the record, log the error with the file name
+                        logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
+                        error_records.append({'file_name': file_name, 'line': line})
 
-            # Commit any remaining records
-            if record_count > 0:
-                conn.commit()
-                logging.info(f"Committed remaining {record_count} records to the database.")
+            # Move the file to the "Complete" folder
+            destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
+            if not destination_key.endswith('.json'):
+                destination_key += '.json'
+
+            logging.info(f"Attempting to copy file | bucket_name: {bucket_name} | file_name: {file_name} | destination_key: {destination_key}")
+
+            s3_client.copy_object(Bucket=bucket_name, 
+                                    CopySource={'Bucket': bucket_name, 'Key': file_name}, 
+                                    Key=destination_key)
+            s3_client.delete_object(Bucket=bucket_name, Key=file_name)
+            logging.info(f"File moved to 'Complete' folder: {destination_key}")
+            
 
         except Exception as e:
             logger.error(f"DB Error occurred: {e}")
-            conn.rollback()
+            db_connection.rollback()
             raise e
         
         finally:
-            conn.close()
+            # Commit any remaining records
+            if record_count > 0:
+                db_connection.commit()
+                logging.info(f"Committed remaining {record_count} records to the database.")
+
+            db_connection.close()
 
         # If there are error records, write them to a new S3 file in the "error/" folder
         if error_records:

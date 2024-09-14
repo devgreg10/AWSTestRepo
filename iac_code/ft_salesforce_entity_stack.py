@@ -31,6 +31,7 @@ class FtSalesforceEntityStack(Stack):
                  scope: Construct, 
                  id: str, 
                  env: str, 
+                 region: str,
                  entity_name: str,
                  salesforce_object: str,
                  app_flow_tasks: List[appflow.CfnFlow.TaskProperty],
@@ -177,6 +178,7 @@ class FtSalesforceEntityStack(Stack):
 
         # Create Tasks for State Machine
 
+        '''
         # Step 1: Retrieve Secrets
         retrieve_secrets_task = tasks.LambdaInvoke(
             self, f"Retrieve Secrets for {salesforce_object}",
@@ -190,7 +192,7 @@ class FtSalesforceEntityStack(Stack):
             sfn.Fail(self, "RetrieveSecretsFailedLoadLayer", error="RetrieveSecretsFailed", cause="Failed to retrieve secrets"),
             errors=["States.ALL"]
         )
-
+        '''
         
         #Step 2: List S3 Files
         list_s3_files_task = tasks.LambdaInvoke(
@@ -213,8 +215,9 @@ class FtSalesforceEntityStack(Stack):
             max_concurrency=int(concurrent_lambdas),
             items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
+                "region.$": region,
                 "file_name.$": "$$.Map.Item.Value",
-                "secret.$": "$.secret.Payload.secret"  # Pass the secret to each iteration
+                "secret_arn.$": ds_base_stack.db_secret.secret_arn  # Pass the secret arn
             }
         )
 
@@ -232,7 +235,7 @@ class FtSalesforceEntityStack(Stack):
         )
         
          # Define the state machine workflow
-        definition = retrieve_secrets_task.next(list_s3_files_task).next(process_files_task)
+        definition = list_s3_files_task.next(process_files_task)
 
         # Create the state machine
         state_machine = sfn.StateMachine(
