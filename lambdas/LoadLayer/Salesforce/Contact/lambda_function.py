@@ -20,7 +20,6 @@ def lambda_handler(event, context):
 
         secret_arn = event['secret_arn']
         region = event['region']
-
         file_name = event['file_name']
 
         s3_client = session.client(
@@ -55,7 +54,7 @@ def lambda_handler(event, context):
                     try:
                         
                         sf_raw_contact = SfContactRawDbModel.from_dict(json.loads(line))
-                        
+
                         SalesforceContactDbHelper.insert_sf_raw_contact(
                             db_connection=db_connection,
                             new_raw_contact=sf_raw_contact,
