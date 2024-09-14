@@ -215,9 +215,9 @@ class FtSalesforceEntityStack(Stack):
             max_concurrency=int(concurrent_lambdas),
             items_path="$.files.Payload.files",  # list of files from previous step
             parameters={
-                "region.$": region,
+                "region": region,
                 "file_name.$": "$$.Map.Item.Value",
-                "secret_arn.$": ds_base_stack.db_secret.secret_arn  # Pass the secret arn
+                "secret_arn": ds_base_stack.db_secret.secret_arn  # Pass the secret arn
             }
         )
 
