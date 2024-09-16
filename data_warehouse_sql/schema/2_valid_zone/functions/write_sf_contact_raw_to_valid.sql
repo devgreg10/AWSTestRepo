@@ -64,46 +64,111 @@
 -- END;
 -- $$;
 
-CREATE OR REPLACE FUNCTION ft_ds_admin.write_sf_contact_raw_to_valid ()
+CREATE OR REPLACE FUNCTION ft_ds_admin.write_sf_contact_raw_to_valid (load_full_data_flag BOOLEAN)
 RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    INSERT INTO ft_ds_valid.sf_contact
+    CREATE TEMP TABLE IF NOT EXISTS temp_sf_contact_raw_to_valid (
+        PRIMARY KEY (contact_id_18),
+        contact_id_18 TEXT,
+        chapter_id TEXT,
+        age TEXT,
+        gender TEXT,
+        ethnicity TEXT,
+        grade TEXT,
+        mailing_zip_postal_code TEXT,
+        participation_status TEXT,
+        contact_type TEXT,
+        sf_last_modified_date TEXT,
+        created_date TEXT,
+        is_deleted TEXT,
+        dss_last_modified_timestamp TIMESTAMPTZ
+    );
+
+    TRUNCATE temp_sf_contact_raw_to_valid;
+
+    --this query gets the population correct for transitioning from raw to valid. It filters out records:
+    -- that should have been inserted last run
+    -- that belong to testing chapters
+    -- that accidentally have duplicates
+    INSERT INTO temp_sf_contact_raw_to_valid
     SELECT
     all_values.*
     FROM
         (SELECT
+            Id,
+            MAX(LastModifiedDate) AS max_date
+        FROM ft_ds_raw.sf_contact
+        GROUP BY Id
+        ) max_dates
+    JOIN
+        (SELECT
             Id AS contact_id_18,
             Chapter_Affiliation__c AS chapter_id,
-            CAST(CAST(Age__c AS NUMERIC) AS INTEGER) AS age,
+            Age__c AS age,
             Gender__c AS gender,
             Ethnicity__c AS ethnicity,
             Grade__c AS grade,
             MailingPostalCode AS mailing_zip_postal_code,
             Participation_Status__c AS participation_status,
             Contact_Type__c AS contact_type,
-            CAST(LastModifiedDate AS TIMESTAMPTZ) AS sf_last_modified_date,
-            CAST(CreatedDate AS TIMESTAMPTZ) AS created_date,
-            CAST(IsDeleted AS BOOLEAN) AS is_deleted,
-            dss_last_modified_timestamp AS dss_last_modified_timestamp
+            max(LastModifiedDate) AS sf_last_modified_date,
+            CreatedDate AS created_date,
+            IsDeleted AS is_deleted,
+            dss_last_modified_timestamp
         FROM ft_ds_raw.sf_contact
         WHERE
-            --filter out testing chapters
             Chapter_Affiliation__c NOT IN (
                 '0011R00002oM2hNQAS',
                 '0013600000xOm3cAAC'
             )
+            AND dss_last_modified_timestamp >
+            (SELECT CASE
+                WHEN load_full_data_flag THEN '1970-01-01T00:00:00.000Z'
+                ELSE (SELECT MAX(execution_timestamp) FROM ft_ds_valid.raw_to_valid_execution_log)
+            END)
+        GROUP BY
+            contact_id_18,
+            chapter_id,
+            age,
+            gender,
+            ethnicity,
+            grade,
+            mailing_zip_postal_code,
+            participation_status,
+            contact_type,
+            created_date,
+            is_deleted,
+            dss_last_modified_timestamp
         ) all_values
-    JOIN
-        (SELECT
-        Id,
-        CAST(MAX(LastModifiedDate) AS TIMESTAMPTZ) AS max_date
-        FROM ft_ds_raw.sf_contact
-        GROUP BY Id
-        ) max_dates
     ON all_values.sf_last_modified_date = max_dates.max_date
-    AND all_values.contact_id_18 = max_dates.Id
+    AND all_values.contact_id_18 = max_dates.id
+    ;
+
+    --this statement then cleans the data to get the values and dtypes correct
+    INSERT INTO ft_ds_valid.sf_contact
+    SELECT
+        contact_id_18,
+        chapter_id,
+        CASE
+            WHEN NULLIF(age, '') IS NULL THEN NULL
+            ELSE CAST(CAST(age AS NUMERIC) AS INTEGER)
+        END AS age,
+        CASE
+            WHEN gender LIKE 'INVALID%' THEN NULL
+            ELSE gender
+        END AS gender,
+        ethnicity,
+        grade,
+        mailing_zip_postal_code,
+        participation_status,
+        contact_type,
+        CAST(sf_last_modified_date AS TIMESTAMPTZ) AS sf_last_modified_date,
+        CAST(created_date AS TIMESTAMPTZ) AS created_date,
+        CAST(is_deleted AS BOOLEAN) AS is_deleted,
+        dss_last_modified_timestamp AS dss_last_modified_timestamp
+    FROM temp_sf_contact_raw_to_valid
     ON CONFLICT (contact_id_18) DO UPDATE SET
         chapter_id = EXCLUDED.chapter_id,
         age = EXCLUDED.age,
@@ -117,6 +182,12 @@ BEGIN
         created_date = EXCLUDED.created_date,
         is_deleted = EXCLUDED.is_deleted,
         dss_last_modified_timestamp = EXCLUDED.dss_last_modified_timestamp
+    ;
+
+    INSERT INTO ft_ds_valid.raw_to_valid_execution_log
+    SELECT
+    MAX(dss_last_modified_timestamp)
+    FROM ft_ds_valid.sf_contact
     ;
 END;
 $$;

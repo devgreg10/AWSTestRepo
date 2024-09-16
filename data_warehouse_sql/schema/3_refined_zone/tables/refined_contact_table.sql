@@ -29,7 +29,7 @@
 --     snapshot_date
 -- );
 
-CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_contact (
+CREATE TABLE IF NOT EXISTS ft_ds_refined.contact (
     PRIMARY KEY (contact_id_18),
     contact_id_18 CHAR(18),
     chapter_id CHAR(18),

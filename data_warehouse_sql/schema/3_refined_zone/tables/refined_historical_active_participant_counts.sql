@@ -32,7 +32,7 @@ BEGIN
         NOW() as metric_calc_date,
         chapter_id,
         COUNT(contact_id_18) AS participant_count
-    FROM ft_ds_refined.sf_contact
+    FROM ft_ds_refined.active_participants_view
     GROUP BY
     chapter_id
     ;

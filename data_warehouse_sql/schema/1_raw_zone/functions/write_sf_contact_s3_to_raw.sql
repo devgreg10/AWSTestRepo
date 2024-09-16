@@ -1,6 +1,5 @@
 --planning on removing this function. It will be stored in Python
 CREATE OR REPLACE FUNCTION ft_ds_admin.write_sf_contact_s3_to_raw (
-    snapshot_date ft_ds_raw.sf_contact.snapshot_date%TYPE,
     id ft_ds_raw.sf_contact.Id%TYPE,
     mailing_postal_code ft_ds_raw.sf_contact.MailingPostalCode%TYPE,
     chapter_affiliation ft_ds_raw.sf_contact.Chapter_Affiliation__c%TYPE,
@@ -14,7 +13,8 @@ CREATE OR REPLACE FUNCTION ft_ds_admin.write_sf_contact_s3_to_raw (
     participation_status ft_ds_raw.sf_contact.Participation_Status__c%TYPE,
     is_deleted ft_ds_raw.sf_contact.IsDeleted%TYPE,
     last_modified_date ft_ds_raw.sf_contact.LastModifiedDate%TYPE,
-    created_date ft_ds_raw.sf_contact.CreatedDate%TYPE
+    created_date ft_ds_raw.sf_contact.CreatedDate%TYPE,
+    dss_last_modified_timestamp ft_ds_raw.sf_contact.dss_last_modified_timestamp%TYPE
 )
 RETURNS void
 LANGUAGE plpgsql
@@ -22,7 +22,6 @@ AS $$
 BEGIN
     INSERT INTO ft_ds_raw.sf_contact
     VALUES (
-        snapshot_date,
         id,
         mailing_postal_code,
         chapter_affiliation, 
@@ -36,9 +35,10 @@ BEGIN
         participation_status, 
         is_deleted,
         last_modified_date,
-        created_date
+        created_date,
+        dss_last_modified_timestamp
     )
-    ON CONFLICT (Id, snapshot_date) DO UPDATE SET
+    ON CONFLICT (Id, LastModifiedDate) DO UPDATE SET
         MailingPostalCode = EXCLUDED.MailingPostalCode,
         Chapter_Affiliation__c = EXCLUDED.Chapter_Affiliation__c,
         ChapterID_CONTACT__c = EXCLUDED.ChapterID_CONTACT__c,
@@ -50,7 +50,8 @@ BEGIN
         Grade__c = EXCLUDED.Grade__c,
         Participation_Status__c = EXCLUDED.Participation_Status__c,
         IsDeleted = EXCLUDED.IsDeleted,
-        LastModifiedDate = EXCLUDED.LastModifiedDate,
-        CreatedDate = EXCLUDED.CreatedDate;
+        CreatedDate = EXCLUDED.CreatedDate,
+        dss_last_modified_timestamp = EXCLUDED.dss_last_modified_timestamp
+        ;
 END;
 $$;

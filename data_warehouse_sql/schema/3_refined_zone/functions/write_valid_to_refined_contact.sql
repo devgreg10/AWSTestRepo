@@ -17,7 +17,9 @@ RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    INSERT INTO ft_ds_refined.sf_contact
+    TRUNCATE ft_ds_refined.contact;
+
+    INSERT INTO ft_ds_refined.contact
     SELECT
         *
     FROM ft_ds_valid.sf_contact

@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW ft_ds_refined.refined_active_participants_view
+CREATE OR REPLACE VIEW ft_ds_refined.active_participants_view
 AS
 SELECT
 contact_id_18,
@@ -14,7 +14,7 @@ sf_last_modified_date,
 created_date,
 dss_last_modified_timestamp
 --just ommitted the is_deleted field
-FROM ft_ds_refined.sf_contact
+FROM ft_ds_refined.contact
 WHERE
     participation_status = 'Active'
     AND contact_type LIKE '%Participant%'
