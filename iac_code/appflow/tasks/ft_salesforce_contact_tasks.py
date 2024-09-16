@@ -18,7 +18,7 @@ class FtSalesforceContactAppFlowTasks(Construct):
                     "Participation_Status__c", "MailingPostalCode", "MailingStreet",
                     "MailingCity", "MailingState", "School_Name__c", "School_Name_Other__c",
                     "FirstName", "LastName", "Birthdate", "AccountId", "LastModifiedDate",
-                    "IsDeleted", "CreatedDate"
+                    "IsDeleted", "CreatedDate", "SystemModstamp"
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"
@@ -439,7 +439,7 @@ class FtSalesforceContactAppFlowTasks(Construct):
                         value="datetime"
                     ),
                 ]
-            ),
+            )
         ]
 
         return tasks

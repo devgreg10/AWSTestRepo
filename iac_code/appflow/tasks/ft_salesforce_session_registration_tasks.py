@@ -55,7 +55,8 @@ class FtSalesforceSessionRegistrationAppFlowTasks(Construct):
                     "New_Listing_Session__c",
                     "New_Session_Cost__c",
                     "Transferred__c",
-                    "current_session_registration_number__c"
+                    "current_session_registration_number__c",
+                    "SystemModstamp"
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"
@@ -749,6 +750,24 @@ class FtSalesforceSessionRegistrationAppFlowTasks(Construct):
                         key="SOURCE_DATA_TYPE",
                         value="reference"
                     )
+                ]
+            ),
+            appflow.CfnFlow.TaskProperty(
+                source_fields=["SystemModstamp"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                    salesforce="NO_OP"
+                ),
+                destination_field="SystemModstamp",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="DESTINATION_DATA_TYPE",
+                        value="datetime"
+                    ),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="SOURCE_DATA_TYPE",
+                        value="datetime"
+                    ),
                 ]
             )
         ]

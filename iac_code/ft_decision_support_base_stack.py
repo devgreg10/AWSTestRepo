@@ -28,7 +28,7 @@ class FtDecisionSupportBaseStack(Stack):
         )
 
         '''
-        LAMBDAs
+        LAMBDA LAYERS
         '''
         # Define a Lambda Layer for the psycopg2 library
         self.psycopg2_lambda_layer = lambda_.LayerVersion(
@@ -39,6 +39,17 @@ class FtDecisionSupportBaseStack(Stack):
             layer_version_name=f'ft-{env}-aws-psycopg2-layer-{version_number.replace(".", "-")}'
         )
 
+        # Define a Lambda Layer for data_core
+        self.data_core_lambda_layer = lambda_.LayerVersion(
+            self, f'DataCoreLayer',
+            code=lambda_.Code.from_asset('data_core_layer'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
+            description="A layer for data_core",
+        )
+
+        '''
+        LAMBDAS
+        '''
         # Define Lambda to retrieve secrets
         self.lambda_retrieve_secrets = lambda_.Function(self, "LambdaRetrieveSecrets",
             runtime=lambda_.Runtime.PYTHON_3_8,

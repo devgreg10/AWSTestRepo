@@ -50,7 +50,8 @@ class FtSalesforceListingAppFlowTasks(Construct):
                     "Start_Date__c",
                     "Total_Coaches__c",
                     "test__c",
-                    "Count_Listing__c"
+                    "Count_Listing__c",
+                    "SystemModstamp"
                  ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"
@@ -664,6 +665,24 @@ class FtSalesforceListingAppFlowTasks(Construct):
                         key="SOURCE_DATA_TYPE",
                         value="double"
                     )
+                ]
+            ),
+            appflow.CfnFlow.TaskProperty(
+                source_fields=["SystemModstamp"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                    salesforce="NO_OP"
+                ),
+                destination_field="SystemModstamp",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="DESTINATION_DATA_TYPE",
+                        value="datetime"
+                    ),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="SOURCE_DATA_TYPE",
+                        value="datetime"
+                    ),
                 ]
             )
         ]
