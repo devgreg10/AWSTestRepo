@@ -1,5 +1,6 @@
 import json
-from typing import Any
+
+from typing import Any, List
 from attrs import asdict, astuple, define, NOTHING
 
 
@@ -38,13 +39,13 @@ class DbModel:
         # TODO Should we add a datetime decoder here or is converting to a string by default valid
         return json.dumps(asdict(self, filter=lambda attr, value: (value != NOTHING) or include_all_fields), default=str)
 
-    def get_column_names(self, include_all_fields: bool = False) -> list[str]:
+    def get_column_names(self, include_all_fields: bool = False) -> List[str]:
         return list(self.as_dict(include_all_fields).keys())
 
     def get_column_names_as_tuple(self, include_all_fields: bool = False) -> tuple:
         return tuple(self.as_dict(include_all_fields).keys())
 
-    def get_column_values(self, include_all_fields: bool = False) -> list[Any]:
+    def get_column_values(self, include_all_fields: bool = False) -> List[Any]:
         return list(self.as_dict(include_all_fields).values())
 
     def get_column_values_as_tuple(self, include_all_fields: bool = False) -> tuple:
@@ -86,13 +87,13 @@ class DbModelDicted:
         # TODO Should we add a datetime decoder here or is converting to a string by default valid
         return json.dumps(asdict(self, filter=lambda attr, value: (value != NOTHING) or include_all_fields), default=str)
 
-    def get_column_names(self, include_all_fields: bool = False) -> list[str]:
+    def get_column_names(self, include_all_fields: bool = False) -> List[str]:
         return list(self.as_dict(include_all_fields).keys())
 
     def get_column_names_as_tuple(self, include_all_fields: bool = False) -> tuple:
         return tuple(self.as_dict(include_all_fields).keys())
 
-    def get_column_values(self, include_all_fields: bool = False) -> list[Any]:
+    def get_column_values(self, include_all_fields: bool = False) -> List[Any]:
         return list(self.as_dict(include_all_fields).values())
 
     def get_column_values_as_tuple(self, include_all_fields: bool = False) -> tuple:

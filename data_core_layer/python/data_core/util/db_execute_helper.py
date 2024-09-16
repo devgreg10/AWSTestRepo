@@ -55,7 +55,7 @@ class SortOption:
 class SortOptions:
     """A list of all the columns that should be sorted and how they should be sorted"""
     # Apply sorts following list order
-    sort_options: list[SortOption]
+    sort_options: List[SortOption]
 
 
 @define(kw_only=True)
@@ -91,9 +91,9 @@ class FilterOptions:
     """
     FilterOptions provides a way to connect one to many different filter statements. Each FilterOptions object can combine a number of filter statements (FilterOption) with a single MatchType. To use multiple match types utilize the nested filter options parameter to combine several FilterOptions classes into one. 
     """
-    filter_options: list[FilterOption]
+    filter_options: List[FilterOption]
     match_type: MatchType
-    nested_filter_options: list[FilterOptions] = None
+    nested_filter_options: List[FilterOptions] = None
 
     def generate_query_statement(self, filter_id: int = 0, alias: str = ""):
         values = {}
@@ -141,7 +141,7 @@ class ParameterGroup:
     """
     ParameterGroup provides a way to connect one to many different parameter placeholders. Each Parameter Group object can combine a number of parameter placeholder statements (Parameter) with a LIST MatchType.
     """
-    param_group: list[Parameter]
+    param_group: List[Parameter]
 
     def generate_param_query_statement(self, param_id: int = 0, alias: str = ""):
         values = {}
@@ -331,7 +331,7 @@ class DbExecutorHelper:
     # TODO: Write code to validate missing parameter pairs within this
     @staticmethod
     def execute_select_with_options(*, db_connection: connection, db_schema: str, db_table: str,
-                                    search_col_names: list[str], search_text: str, filter: dict,
+                                    search_col_names: List[str], search_text: str, filter: dict,
                                     limit: int, offset: int, sort_col_name: str,
                                     sort_type: SortType,
                                     close_db_conn: bool = True) -> List[dict]:
@@ -358,7 +358,7 @@ class DbExecutorHelper:
 
         **Returns**
 
-        list[dict] - This is a list of dict. Each dict represents an entity
+        List[dict] - This is a list of dict. Each dict represents an entity
 
         """
         db_cursor = None
@@ -483,7 +483,7 @@ class DbExecutorHelper:
 
         **Returns**
 
-        list[dict] - This is a list of dict. Each dict represents an entity
+        List[dict] - This is a list of dict. Each dict represents an entity
 
         """
         db_cursor = None
@@ -1405,7 +1405,7 @@ class DbExecutorHelper:
     @staticmethod
     def execute_function(*, db_connection: connection, db_schema: str, db_function: str,
                          input_parameters: dict = None,
-                         commit_changes: bool = True, close_db_conn: bool = True) -> list[dict]:
+                         commit_changes: bool = True, close_db_conn: bool = True) -> List[dict]:
         """
         **execute_function**
 
@@ -1466,7 +1466,7 @@ class DbExecutorHelper:
 
     @staticmethod
     def execute_function_read_by_ids(*, db_connection: connection, db_schema: str,
-                                     db_table_name: str, input_parameters: list[str],
+                                     db_table_name: str, input_parameters: List[str],
                                      parent_entity_id_name: str, parent_ids: tuple[int],
                                      function_name: str, state_as_of_ts: datetime,
                                      filter_options: FilterOptions = None,
@@ -1597,7 +1597,7 @@ class DbExecutorHelper:
                                              limit: int = None, offset: int = None, sort_options: SortOptions = None,
                                              filter_options: FilterOptions = None, db_model: DbModel = None,
                                              input_parameters: dict = None, commit_changes: bool = True,
-                                             close_db_conn: bool = True) -> list[dict]:
+                                             close_db_conn: bool = True) -> List[dict]:
         """
         **execute_function_with_filter_options**
 
