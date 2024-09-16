@@ -113,6 +113,8 @@ class FtLoadLayerSalesforceStack(Stack):
             )
             # Grant the Lambda function permissions to read from and write to the S3 data lake
             ds_base_stack.data_lake_bucket.grant_read_write(lambda_process_files)
+            # Grant the Lambda function permissions to read the DB Connection Secret
+            ds_base_stack.db_secret.grant_read(lambda_process_files)
 
             # Create Tasks for State Machine
             

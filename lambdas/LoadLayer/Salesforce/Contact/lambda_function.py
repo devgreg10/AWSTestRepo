@@ -5,7 +5,7 @@ import os
 import logging
 from datetime import datetime
 from data_core.salesforce.contact.contact_db_helper import SalesforceContactDbHelper
-from data_core.salesforce.contact.contact_db_models import SfContactRawDbModel, CreateSfContactRawModel
+from data_core.salesforce.contact.contact_db_models import SfContactRawDbModel
 from data_core.util.db_execute_helper import DbExecutorHelper
 
 logger = logging.getLogger()
@@ -34,14 +34,14 @@ def lambda_handler(event, context):
 
         db_connection = None
 
+        record_count = 0
+
         try:
 
             db_connection = DbExecutorHelper.get_db_connection_by_secret_arn(
                 secret_arn=secret_arn,
                 region=region
             )
-
-            record_count = 0
 
             logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
 
@@ -89,7 +89,8 @@ def lambda_handler(event, context):
 
         except Exception as e:
             logger.error(f"DB Error occurred: {e}")
-            db_connection.rollback()
+            if db_connection:
+                db_connection.rollback()
             raise e
         
         finally:
@@ -98,7 +99,8 @@ def lambda_handler(event, context):
                 db_connection.commit()
                 logging.info(f"Committed remaining {record_count} records to the database.")
 
-            db_connection.close()
+            if db_connection:
+                db_connection.close()
 
         # If there are error records, write them to a new S3 file in the "error/" folder
         if error_records:
