@@ -439,6 +439,24 @@ class FtSalesforceContactAppFlowTasks(Construct):
                         value="datetime"
                     ),
                 ]
+            ),
+            appflow.CfnFlow.TaskProperty(
+                source_fields=["SystemModstamp"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                    salesforce="NO_OP"
+                ),
+                destination_field="SystemModstamp",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="DESTINATION_DATA_TYPE",
+                        value="datetime"
+                    ),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="SOURCE_DATA_TYPE",
+                        value="datetime"
+                    ),
+                ]
             )
         ]
 

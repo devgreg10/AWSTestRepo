@@ -30,13 +30,13 @@ class FtDecisionSupportBaseStack(Stack):
         '''
         LAMBDA LAYERS
         '''
-        # Define a Lambda Layer for the psycopg2 library
+        # Define a Lambda Layer for the base libraries
         self.psycopg2_lambda_layer = lambda_.LayerVersion(
-            self, f'ft-{env}-lambda-layer-psycopg2',
+            self, f'ft-{env}-lambda-layer-decision-support-base',
             code=lambda_.Code.from_asset('lambda_layers/API_Layer'),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
-            description="A layer for psycopg2",
-            layer_version_name=f'ft-{env}-aws-psycopg2-layer-{version_number.replace(".", "-")}'
+            description="A layer for psycopg2, pytz, attrs, dataclasses_json",
+            layer_version_name=f'ft-{env}-aws-decision-support-lambda-layer-{version_number.replace(".", "-")}'
         )
 
         # Define a Lambda Layer for data_core

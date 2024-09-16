@@ -45,7 +45,7 @@ class FtSalesforceListingSessionAppFlowTasks(Construct):
                     "Session_Start_Date__c", "Session_Start_Time__c", "Age_Eligibility_Date__c", 
                     "Allow_Early_Registration__c", "Direct_Session_Link__c", "Private_Event__c", 
                     "Parent_Communication_French__c", "Parent_Communication_Spanish__c", 
-                    "Program_Type__c", "Lesson_Plan__c","SystemModstamp"
+                    "Program_Type__c", "Lesson_Plan__c"
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"
@@ -1571,24 +1571,6 @@ class FtSalesforceListingSessionAppFlowTasks(Construct):
                         key="SOURCE_DATA_TYPE",
                         value="url"
                     )
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["SystemModstamp"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="SystemModstamp",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="datetime"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="datetime"
-                    ),
                 ]
             )
         ]
