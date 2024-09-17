@@ -1,9 +1,7 @@
 from data_core.salesforce.contact.sf_contact_db_models import SfContactRawDbModel, SfContactSourceModel, map_sf_contact_sources_to_raws
-from data_core.util.db_execute_helper import DbExecutorHelper
 from psycopg2.extensions import connection
 from datetime import datetime
 
-import psycopg2
 from typing import List
 
 import logging

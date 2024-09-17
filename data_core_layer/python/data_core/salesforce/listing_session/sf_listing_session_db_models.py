@@ -3,8 +3,6 @@ from attrs import define
 from data_core.util.db_model import DbModel
 from typing import List
 
-import json
-
 @define(kw_only=True)
 class SfListingSessionSourceModel():
     """

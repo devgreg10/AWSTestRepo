@@ -1,9 +1,7 @@
 from data_core.salesforce.listing_session.sf_listing_session_db_models import SfListingSessionRawDbModel, SfListingSessionSourceModel, map_listing_session_sources_to_raws
-from data_core.util.db_execute_helper import DbExecutorHelper
 from psycopg2.extensions import connection
 from datetime import datetime
 
-import psycopg2
 from typing import List
 
 import logging
@@ -92,7 +90,7 @@ class SalesforceListingSessionDbHelper:
             %(session_end_date__c)s, %(session_end_time__c)s, %(session_start_date__c)s, 
             %(session_start_time__c)s, %(age_eligibility_date__c)s, %(allow_early_registration__c)s, 
             %(direct_session_link__c)s, %(private_event__c)s, %(parent_communication_french__c)s, 
-            %(parent_communication_spanish__c)s, %(program_type__c)s, %(lesson_plan__c)s, '{datetime.now()}'
+            %(parent_communication_spanish__c)s, %(program_type__c)s, %(lesson_plan__c)s, %(dss_ingestion_timestamp)s
         )
         ON CONFLICT (id, systemmodstamp) 
         DO UPDATE SET
@@ -189,7 +187,7 @@ class SalesforceListingSessionDbHelper:
             parent_communication_spanish__c = EXCLUDED.parent_communication_spanish__c,
             program_type__c = EXCLUDED.program_type__c,
             lesson_plan__c = EXCLUDED.lesson_plan__c,
-            dss_ingestion_timestamp='{datetime.now}';
+            dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp;
         """
 
         # Prepare the data
@@ -289,7 +287,8 @@ class SalesforceListingSessionDbHelper:
                 "parent_communication_french__c": listing_session.parent_communication_french__c,
                 "parent_communication_spanish__c": listing_session.parent_communication_spanish__c,
                 "program_type__c": listing_session.program_type__c,
-                "lesson_plan__c": listing_session.lesson_plan__c
+                "lesson_plan__c": listing_session.lesson_plan__c,
+                "dss_ingestion_timestamp": datetime.now() 
             }
             for listing_session in new_raw_listing_sessions
         ]
