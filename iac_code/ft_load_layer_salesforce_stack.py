@@ -61,6 +61,17 @@ class FtLoadLayerSalesforceStack(Stack):
         )
 
         '''
+        ZZZ - return this to Base Stack after troubleshooting DB Helper
+        '''
+        # Define a Lambda Layer for data_core
+        data_core_lambda_layer = lambda_.LayerVersion(
+            self, f'DataCoreLayer',
+            code=lambda_.Code.from_asset('data_core_layer'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
+            description="A layer for data_core",
+        )
+
+        '''
         LOAD LAYER - Lambda & State Machine
         Loop through salesforce_entities
         '''
@@ -97,7 +108,7 @@ class FtLoadLayerSalesforceStack(Stack):
             lambda_process_files = lambda_.Function(self, f"LambdaProcessLoadLayerFilesSalesforce{salesforce_object}",
                 runtime=lambda_.Runtime.PYTHON_3_8,
                 function_name=f"ft-{env}-salesforce-{entity_name}-load-files",
-                layers=[ds_base_stack.psycopg2_lambda_layer, ds_base_stack.data_core_lambda_layer],
+                layers=[ds_base_stack.psycopg2_lambda_layer, data_core_lambda_layer],
                 #vpc=datawarehouse_vpc,
                 #vpc_subnets=ec2.SubnetSelection(
                 #    subnets=public_subnets

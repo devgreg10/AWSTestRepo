@@ -39,6 +39,7 @@ class FtDecisionSupportBaseStack(Stack):
             layer_version_name=f'ft-{env}-aws-decision-support-lambda-layer-{version_number.replace(".", "-")}'
         )
 
+        '''  ZZZ uncomment after troubleshooting DB Helper
         # Define a Lambda Layer for data_core
         self.data_core_lambda_layer = lambda_.LayerVersion(
             self, f'DataCoreLayer',
@@ -46,6 +47,7 @@ class FtDecisionSupportBaseStack(Stack):
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
             description="A layer for data_core",
         )
+        '''
 
         '''
         LAMBDAS

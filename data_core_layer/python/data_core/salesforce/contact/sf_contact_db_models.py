@@ -1,7 +1,7 @@
 from datetime import datetime
 from attrs import define
 from data_core.util.db_model import DbModel
-from typing import List, Optional
+from typing import List
 
 import json
 
@@ -64,7 +64,7 @@ class SfContactRawDbModel(DbModel):
     isdeleted: str
     createddate: str
     systemmodstamp: str
-    dss_ingestion_timestamp: Optional[datetime]
+    dss_ingestion_timestamp: datetime
 
     # extend the DbModel to ignore extra arguments not included in the model that are passed in by the database view
     def __init__(self, **kwargs):
@@ -103,7 +103,8 @@ def map_source_to_raw(source: SfContactSourceModel) -> SfContactRawDbModel:
         lastmodifieddate=source.LastModifiedDate,
         isdeleted=source.IsDeleted,
         createddate=source.CreatedDate,
-        systemmodstamp=source.SystemModstamp
+        systemmodstamp=source.SystemModstamp,
+        dss_ingestion_timestamp=datetime.now()
     )
 
 def map_sources_to_raws(source_list: List[SfContactSourceModel]) -> List[SfContactRawDbModel]:
