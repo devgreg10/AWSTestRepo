@@ -51,7 +51,7 @@ class SalesforceContactDbHelper:
             %s, %s, %s, %s, %s, 
             %s, %s, %s, %s, '{datetime.now()}'
         )
-        ON CONFLICT (id) 
+        ON CONFLICT (id, systemmodstamp) 
         DO UPDATE SET
             chapter_affiliation__c = EXCLUDED.chapter_affiliation__c,
             chapterid_contact__c = EXCLUDED.chapterid_contact__c,
