@@ -38,7 +38,7 @@ class SalesforceListingSessionDbHelper:
 
         # Define the upsert SQL statement
         upsert_query = f"""
-        INSERT INTO sf_listing_session (
+        INSERT INTO ft_ds_raw.sf_listing_session (
             id, lastmodifieddate, isdeleted, createddate, name, recordtypeid, createdbyid,
             lastmodifiedbyid, systemmodstamp, lastactivitydate, lastvieweddate, lastreferenceddate,
             listing__c, actual_price__c, age_restriction__c, base_price__c, brief_description__c,
