@@ -49,7 +49,7 @@ class SalesforceContactDbHelper:
             %s, %s, %s, %s, %s, 
             %s, %s, %s, %s, %s, 
             %s, %s, %s, %s, %s, 
-            %s, %s, %s, %s, {datetime.now()}
+            %s, %s, %s, %s, '{datetime.now()}'
         )
         ON CONFLICT (id) 
         DO UPDATE SET
@@ -76,7 +76,7 @@ class SalesforceContactDbHelper:
             isdeleted = EXCLUDED.isdeleted,
             createddate = EXCLUDED.createddate,
             systemmodstamp = EXCLUDED.systemmodstamp,
-            dss_ingestion_timestamp = {datetime.now()}; 
+            dss_ingestion_timestamp = '{datetime.now()}'; 
         """
 
         # Prepare the data
