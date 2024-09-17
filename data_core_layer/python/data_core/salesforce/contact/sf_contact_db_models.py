@@ -40,21 +40,31 @@ class SfContactRawDbModel(DbModel):
     """
     Base model for Raw Salesforce Contact
     """
-    id: str 
-    mailingpostalcode: str 
-    chapter_affiliation__c: str 
-    chapterid_contact__c: str 
-    casesafeid__c: str 
-    contact_type__c: str 
-    age__c: str 
-    ethnicity__c: str 
-    gender__c: str 
-    grade__c: str 
-    participation_status__c: str 
-    isdeleted: str 
-    lastmodifieddate: str 
-    createddate: str 
-    dss_last_modified_timestamp: str 
+    id: str
+    chapter_affiliation__c: str
+    chapterid_contact__c: str
+    casesafeid__c: str
+    contact_type__c: str
+    age__c: str
+    ethnicity__c: str
+    gender__c: str
+    grade__c: str
+    participation_status__c: str
+    mailingpostalcode: str
+    mailingstreet: str
+    mailingcity: str
+    mailingstate: str
+    school_name__c: str
+    school_name_other__c: str
+    firstname: str
+    lastname: str
+    birthdate: str
+    accountid: str
+    lastmodifieddate: str
+    isdeleted: str
+    createddate: str
+    systemmodstamp: str
+    dss_ingestion_timestamp: str
 
     # extend the DbModel to ignore extra arguments not included in the model that are passed in by the database view
     def __init__(self, **kwargs):
@@ -71,7 +81,6 @@ def map_source_to_raw(source: SfContactSourceModel) -> SfContactRawDbModel:
     """
     return SfContactRawDbModel(
         id=source.Id,
-        mailingpostalcode=source.MailingPostalCode,
         chapter_affiliation__c=source.Chapter_Affiliation__c,
         chapterid_contact__c=source.ChapterID_CONTACT__c,
         casesafeid__c=source.CASESAFEID__c,
@@ -81,10 +90,20 @@ def map_source_to_raw(source: SfContactSourceModel) -> SfContactRawDbModel:
         gender__c=source.Gender__c,
         grade__c=source.Grade__c,
         participation_status__c=source.Participation_Status__c,
-        isdeleted=source.IsDeleted,
+        mailingpostalcode=source.MailingPostalCode,
+        mailingstreet=source.MailingStreet,
+        mailingcity=source.MailingCity,
+        mailingstate=source.MailingState,
+        school_name__c=source.School_Name__c,
+        school_name_other__c=source.School_Name_Other__c,
+        firstname=source.FirstName,
+        lastname=source.LastName,
+        birthdate=source.Birthdate,
+        accountid=source.AccountId,
         lastmodifieddate=source.LastModifiedDate,
+        isdeleted=source.IsDeleted,
         createddate=source.CreatedDate,
-        dss_last_modified_timestamp=source.SystemModstamp
+        systemmodstamp=source.SystemModstamp,
     )
 
 def map_sources_to_raws(source_list: List[SfContactSourceModel]) -> List[SfContactRawDbModel]:
