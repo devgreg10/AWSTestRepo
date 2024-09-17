@@ -4,9 +4,10 @@ import psycopg2
 import os
 import logging
 from datetime import datetime
-from data_core.salesforce.contact.contact_db_helper import SalesforceContactDbHelper
-from data_core.salesforce.contact.contact_db_models import SfContactRawDbModel
+from data_core.salesforce.contact.sf_contact_db_helper import SalesforceContactDbHelper
+from data_core.salesforce.contact.sf_contact_db_models import SfContactSourceModel
 from data_core.util.db_execute_helper import DbExecutorHelper
+from data_core.util.db_exceptions import DbException, DbErrorCode
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -34,8 +35,6 @@ def lambda_handler(event, context):
 
         db_connection = None
 
-        record_count = 0
-
         try:
 
             db_connection = DbExecutorHelper.get_db_connection_by_secret_arn(
@@ -48,30 +47,50 @@ def lambda_handler(event, context):
             # Get the JSON file from S3
             response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
 
-            # Stream and process each JSON object separately
-            for line in response['Body'].iter_lines():
-                if line.strip():  # Skip empty lines
-                    try:
-                        
-                        sf_raw_contact = SfContactRawDbModel.from_dict(json.loads(line))
+            chunk = []
 
-                        SalesforceContactDbHelper.insert_sf_raw_contact(
-                            db_connection=db_connection,
-                            new_raw_contact=sf_raw_contact,
-                            commit_changes= (record_count >= commit_batch_size),
-                            close_db_conn=False
-                        )
+            try:
 
-                        record_count += 1
+                # Stream and process each JSON object separately
+                for line in response['Body'].iter_lines():
 
-                        # Commit after every 'n' records
-                        if record_count >= commit_batch_size:
-                            record_count = 0  # Reset the counter
+                    if line.strip():  # Skip empty lines
 
-                    except Exception as record_error:
-                        # If there is an error processing the record, log the error with the file name
-                        logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
-                        error_records.append({'file_name': file_name, 'line': line})
+                        # parse the json line into a dictionary
+                        contact_json = json.loads(line)
+
+                        # Create the SfContactSourceModel object from the dictionary
+                        sf_source_contact = SfContactSourceModel(**contact_json)
+
+                        # Add the contact to the current chunk
+                        chunk.append(sf_source_contact)
+
+                        # Once the commit_batch_size is met, process the chunk and reset the list
+                        if len(chunk) == commit_batch_size:
+                            
+                            logging.info(f"calling SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts")
+                            SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts(
+                                db_connection = db_connection,
+                                source_contacts = chunk,
+                                commit_changes = True)
+                
+                # Process any remaining contacts that didn't fill the last chunk and close the DB connection
+                if chunk:
+                    SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts(
+                        db_connection = db_connection,
+                        source_contacts = chunk,
+                        commit_changes = True)              
+                            
+            except DbException as ex:
+                if ex.error_code == DbErrorCode.NATURAL_KEY_VIOLATION.value:
+                    logging.error(f"Record already exists from file {file_name}: {line} | Error: {record_error}")
+                else:
+                    raise ex                        
+
+            except Exception as record_error:
+                # If there is an error processing the record, log the error with the file name
+                logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
+                error_records.append({'file_name': file_name, 'line': line})
 
             # Move the file to the "Complete" folder
             destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
@@ -85,20 +104,16 @@ def lambda_handler(event, context):
                                     Key=destination_key)
             s3_client.delete_object(Bucket=bucket_name, Key=file_name)
             logging.info(f"File moved to 'Complete' folder: {destination_key}")
-            
 
         except Exception as e:
-            logger.error(f"DB Error occurred: {e}")
+            logger.error(f"Error occurred loading S3 contacts to Raw: {e}")
             if db_connection:
                 db_connection.rollback()
             raise e
         
         finally:
-            # Commit any remaining records
-            if record_count > 0:
-                db_connection.commit()
-                logging.info(f"Committed remaining {record_count} records to the database.")
 
+            # Close the DB Connection
             if db_connection:
                 db_connection.close()
 
