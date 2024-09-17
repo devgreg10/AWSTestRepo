@@ -75,7 +75,7 @@ class SfContactRawDbModel(DbModel):
 
 
 
-def map_source_to_raw(source: SfContactSourceModel) -> SfContactRawDbModel:
+def map_sf_contact_source_to_raw(source: SfContactSourceModel) -> SfContactRawDbModel:
     """
     Maps an instance of SfContactSourceModel to SfContactRawDbModel.
     """
@@ -107,7 +107,7 @@ def map_source_to_raw(source: SfContactSourceModel) -> SfContactRawDbModel:
         dss_ingestion_timestamp=datetime.now()
     )
 
-def map_sources_to_raws(source_list: List[SfContactSourceModel]) -> List[SfContactRawDbModel]:
+def map_sf_contact_sources_to_raws(source_list: List[SfContactSourceModel]) -> List[SfContactRawDbModel]:
     """
     Maps a list of SfContactSourceModel objects to a list of SfContactRawDbModel objects.
 
@@ -117,4 +117,4 @@ def map_sources_to_raws(source_list: List[SfContactSourceModel]) -> List[SfConta
     Returns:
     - List of SfContactRawDbModel instances.
     """
-    return [map_source_to_raw(source) for source in source_list]
+    return [map_sf_contact_source_to_raw(source) for source in source_list]

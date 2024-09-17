@@ -1,4 +1,4 @@
-from data_core.salesforce.contact.sf_contact_db_models import SfContactRawDbModel, SfContactSourceModel, map_sources_to_raws
+from data_core.salesforce.contact.sf_contact_db_models import SfContactRawDbModel, SfContactSourceModel, map_sf_contact_sources_to_raws
 from data_core.util.db_execute_helper import DbExecutorHelper
 from psycopg2.extensions import connection
 from datetime import datetime
@@ -17,7 +17,7 @@ class SalesforceContactDbHelper:
                                                     commit_changes: bool = True):
         
         SalesforceContactDbHelper.insert_sf_raw_contacts(db_connection = db_connection,
-                                                         new_raw_contacts=map_sources_to_raws(source_contacts))
+                                                         new_raw_contacts=map_sf_contact_sources_to_raws(source_contacts))
 
     @staticmethod
     def insert_sf_raw_contacts(*, 

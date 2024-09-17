@@ -62,6 +62,7 @@ load_layer_salesforce_stack = FtLoadLayerSalesforceStack(
     id = f"ft-{env}-load-layer-salesforce-stack",
     env = env,
     region=os.getenv('default_region'),
+    email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
     concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
     commit_batch_size = os.getenv('load_layer_commit_batch_size'),
     ds_base_stack = decision_support_base_stack,

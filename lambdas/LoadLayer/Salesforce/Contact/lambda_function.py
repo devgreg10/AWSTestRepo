@@ -1,6 +1,5 @@
 import json
 import boto3
-import psycopg2
 import os
 import logging
 from datetime import datetime
@@ -17,6 +16,8 @@ logger.setLevel(logging.INFO)
 def lambda_handler(event, context):
 
     db_connection = None
+
+    function_name = "Load layer lambda for Salesforce listing_session"
 
     try:
         session = boto3.session.Session()
@@ -44,7 +45,7 @@ def lambda_handler(event, context):
                 region=region
             )
 
-            logging.info(f"Salesforce Contact Load - Processing file: {file_name} from bucket: {bucket_name}")
+            logging.info(f"{function_name} - Processing file: {file_name} from bucket: {bucket_name}")
 
             # Get the JSON file from S3
             response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
@@ -64,7 +65,7 @@ def lambda_handler(event, context):
                         # Create the SfContactSourceModel object from the dictionary
                         sf_source_contact = SfContactSourceModel(**contact_json)
 
-                        logging.info(f"SfContactSourceModel: {json.dumps(asdict(sf_source_contact), indent=4)}")
+                        # logging.info(f"SfContactSourceModel: {json.dumps(asdict(sf_source_contact), indent=4)}")
 
                         # Add the contact to the current chunk
                         chunk.append(sf_source_contact)
@@ -72,15 +73,18 @@ def lambda_handler(event, context):
                         # Once the commit_batch_size is met, process the chunk and reset the list
                         if len(chunk) == commit_batch_size:
                             
-                            logging.info(f"calling SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts for chunk size {commit_batch_size}")
+                            logging.info(f"{function_name} - calling SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts for chunk size {commit_batch_size}")
                             SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts(
                                 db_connection = db_connection,
                                 source_contacts = chunk,
                                 commit_changes = True)
+                                
+                            # reset chunk upon commit
+                            chunk = []
                 
                 # Process any remaining contacts that didn't fill the last chunk and close the DB connection
                 if chunk:
-                    logging.info(f"calling SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts for chunk size {len(chunk)}")
+                    logging.info(f"{function_name} - calling SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts for chunk size {len(chunk)}")
                     SalesforceContactDbHelper.insert_sf_raw_contacts_from_source_contacts(
                         db_connection = db_connection,
                         source_contacts = chunk,
@@ -88,31 +92,30 @@ def lambda_handler(event, context):
                             
             except DbException as ex:
                 if ex.error_code == DbErrorCode.NATURAL_KEY_VIOLATION.value:
-                    logging.error(f"Record already exists from file {file_name}: {line} | Error: {record_error}")
+                    logging.error(f"{function_name} - Record already exists from file {file_name}: {line} | Error: {record_error}")
                 else:
                     raise ex                        
 
             except Exception as record_error:
                 # If there is an error processing the record, log the error with the file name
-                logging.error(f"Error processing record from file {file_name}: {line} | Error: {record_error}")
+                logging.error(f"{function_name} - Error processing record from file {file_name}: {line} | Error: {record_error}")
                 error_records.append({'file_name': file_name, 'line': line})
 
-            '''
             # Move the file to the "Complete" folder
             destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
             if not destination_key.endswith('.json'):
                 destination_key += '.json'
 
-            logging.info(f"Attempting to copy file | bucket_name: {bucket_name} | file_name: {file_name} | destination_key: {destination_key}")
+            logging.info(f"{function_name} - Attempting to copy file | bucket_name: {bucket_name} | file_name: {file_name} | destination_key: {destination_key}")
 
             s3_client.copy_object(Bucket=bucket_name, 
                                     CopySource={'Bucket': bucket_name, 'Key': file_name}, 
                                     Key=destination_key)
             s3_client.delete_object(Bucket=bucket_name, Key=file_name)
-            logging.info(f"File moved to 'Complete' folder: {destination_key}")
-            '''
+            logging.info(f"{function_name} - File moved to 'Complete' folder: {destination_key}")
+            
         except Exception as e:
-            logger.error(f"Error occurred loading S3 contacts to Raw: {e}")
+            logger.error(f"{function_name} - Error occurred loading S3 contacts to Raw: {e}")
             if db_connection:
                 db_connection.rollback()
             raise e
@@ -129,15 +132,15 @@ def lambda_handler(event, context):
             error_records = decode_bytes(error_records)
             error_file_content = json.dumps(error_records, indent=4)
             s3_client.put_object(Bucket=bucket_name, Key=error_file_name, Body=error_file_content)
-            logging.info(f"Error records written to {error_file_name} in the 'error/' folder")
+            logging.info(f"{function_name} - Error records written to {error_file_name} in the 'error/' folder")
 
         return {
             'statusCode': 200,
-            'body': json.dumps('Processing complete with error handling.')
+            'body': json.dumps(f"{function_name} - Processing complete with error handling.")
         }
 
     except Exception as e:
-        logger.error(f"Error occurred: {e}")
+        logger.error(f"{function_name} - Error occurred: {e}")
         raise e
     
 

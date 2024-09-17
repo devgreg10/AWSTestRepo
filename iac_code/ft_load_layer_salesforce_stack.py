@@ -1,13 +1,14 @@
 from aws_cdk import (
     aws_lambda as lambda_,
-    aws_iam as iam,
-    aws_s3 as s3,
+    aws_cloudwatch as cloudwatch,
+    aws_cloudwatch_actions as cloudwatch_actions,
     aws_ec2 as ec2,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
     aws_events as events,
     aws_events_targets as targets,
-    aws_secretsmanager as secretsmanager,
+    aws_sns as sns,
+    aws_sns_subscriptions as subscriptions,
     Stack,
     Duration
 )
@@ -27,6 +28,7 @@ class FtLoadLayerSalesforceStack(Stack):
                  id: str, 
                  env: str,
                  region: str, 
+                 email_addresses_to_alert_on_error: str,
                  concurrent_lambdas: int, 
                  commit_batch_size: int, 
                  ds_base_stack: FtDecisionSupportBaseStack,
@@ -126,6 +128,33 @@ class FtLoadLayerSalesforceStack(Stack):
             ds_base_stack.data_lake_bucket.grant_read_write(lambda_process_files)
             # Grant the Lambda function permissions to read the DB Connection Secret
             ds_base_stack.db_secret.grant_read(lambda_process_files)
+
+            # Create an SNS Topic for error notifications
+            sns_topic = sns.Topic(self, 
+                                  f"LambdaProcessLoadLayerFilesSalesforce{salesforce_object}ErrorTopic",
+                                  topic_name=f"ft-{env}-load-layer-salesforce-{entity_name}-error",
+                                  display_name="Lambda Error Alerts Topic")
+
+            # comma-delimited string of email addresses
+            email_addresses = [email.strip() for email in email_addresses_to_alert_on_error.split(",") ]
+            for email in email_addresses:
+                # Add an email subscription to the SNS Topic 
+                sns_topic.add_subscription(subscriptions.EmailSubscription(email))
+
+            # Create a CloudWatch alarm based on the 'Errors' metric
+            error_metric = lambda_process_files.metric_errors()
+
+            # Define the alarm
+            alarm = cloudwatch.Alarm(self, 
+                                     f"LambdaLoadLayerSalesforce{salesforce_object}Alarm",
+                                     alarm_name=f"ft-{env}-load-layer-salesforce-{entity_name}-error-alarm",
+                                     metric=error_metric,
+                                     threshold=1,  # Alarm when there is at least 1 error
+                                     evaluation_periods=1,  # How many periods to evaluate before triggering
+                                     datapoints_to_alarm=1)  # Number of data points before triggering alarm
+
+            # Add an SNS action to the alarm, so the alarm triggers a notification
+            alarm.add_alarm_action(cloudwatch_actions.SnsAction(sns_topic))
 
             # Create Tasks for State Machine
             
