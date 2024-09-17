@@ -6,6 +6,8 @@ from datetime import datetime
 import psycopg2
 from typing import List
 
+import logging
+
 class SalesforceContactDbHelper:
 
     @staticmethod
@@ -37,7 +39,7 @@ class SalesforceContactDbHelper:
 
         # Define the upsert SQL statement
         upsert_query = f"""
-        INSERT INTO ft_ds_raw.sf_contact (
+        INSERT INTO ft_ds_raw.sf_contact_dk_test (
             id, mailingpostalcode, chapter_affiliation__c, chapterid_contact__c, 
             casesafeid__c, contact_type__c, age__c, ethnicity__c, gender__c, grade__c, 
             participation_status__c, isdeleted, lastmodifieddate, createddate, dss_last_modified_timestamp

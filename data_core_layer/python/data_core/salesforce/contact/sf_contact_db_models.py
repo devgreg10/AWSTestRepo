@@ -35,13 +35,6 @@ class SfContactSourceModel():
     CreatedDate: str 
     SystemModstamp: str
 
-    # extend the DbModel to ignore extra arguments not included in the model that are passed in by the database view
-    def __init__(self, **kwargs):
-        """
-        Overriding init method
-        """
-        DbModel.__init__(self, **kwargs)
-
 @define(kw_only=True)
 class SfContactRawDbModel(DbModel):
     """
@@ -77,30 +70,21 @@ def map_source_to_raw(source: SfContactSourceModel) -> SfContactRawDbModel:
     Maps an instance of SfContactSourceModel to SfContactRawDbModel.
     """
     return SfContactRawDbModel(
-        Id=source.Id,
-        Chapter_Affiliation__c=source.Chapter_Affiliation__c,
-        ChapterID_CONTACT__c=source.ChapterID_CONTACT__c,
-        CASESAFEID__c=source.CASESAFEID__c,
-        Contact_Type__c=source.Contact_Type__c,
-        Age__c=source.Age__c,
-        Ethnicity__c=source.Ethnicity__c,
-        Gender__c=source.Gender__c,
-        Grade__c=source.Grade__c,
-        Participation_Status__c=source.Participation_Status__c,
-        MailingPostalCode=source.MailingPostalCode,
-        MailingStreet=source.MailingStreet,
-        MailingCity=source.MailingCity,
-        MailingState=source.MailingState,
-        School_Name__c=source.School_Name__c,
-        School_Name_Other__c=source.School_Name_Other__c,
-        FirstName=source.FirstName,
-        LastName=source.LastName,
-        Birthdate=source.Birthdate,
-        AccountId=source.AccountId,
-        LastModifiedDate=source.LastModifiedDate,
-        IsDeleted=source.IsDeleted,
-        CreatedDate=source.CreatedDate,
-        SystemModstamp=source.SystemModstamp,
+        id=source.Id,
+        mailingpostalcode=source.MailingPostalCode,
+        chapter_affiliation__c=source.Chapter_Affiliation__c,
+        chapterid_contact__c=source.ChapterID_CONTACT__c,
+        casesafeid__c=source.CASESAFEID__c,
+        contact_type__c=source.Contact_Type__c,
+        age__c=source.Age__c,
+        ethnicity__c=source.Ethnicity__c,
+        gender__c=source.Gender__c,
+        grade__c=source.Grade__c,
+        participation_status__c=source.Participation_Status__c,
+        isdeleted=source.IsDeleted,
+        lastmodifieddate=source.LastModifiedDate,
+        createddate=source.CreatedDate,
+        dss_last_modified_timestamp=source.SystemModstamp
     )
 
 def map_sources_to_raws(source_list: List[SfContactSourceModel]) -> List[SfContactRawDbModel]:
