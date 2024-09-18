@@ -75,6 +75,8 @@ class FtTransformLayerSalesforceStack(Stack):
             code=lambda_.Code.from_asset('lambdas/ExecuteDbFunction'),
             handler='lambda_function.lambda_handler'
         )
+        # Grant the Lambda function permissions to read the DB Connection Secret
+        ds_base_stack.db_secret.grant_read(self.lambda_execute_db_function)
 
         # Define the parameters as a dictionary
         raw_to_valid_params = {"process_all_raw_records_flag": True}
