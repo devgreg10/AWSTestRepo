@@ -78,8 +78,10 @@ transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
     app, 
     id = f"ft-{env}-transform-layer-salesforce-stack",
     env = env,
+    region=os.getenv('default_region'),
     ds_base_stack = decision_support_base_stack,
-    ingestion_layer_stack=ingestion_layer_salesforce_stack
+    ingestion_layer_stack=ingestion_layer_salesforce_stack,
+    load_layer_stack=load_layer_salesforce_stack
 )
 
 '''

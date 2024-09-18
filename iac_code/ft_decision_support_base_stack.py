@@ -74,6 +74,8 @@ class FtDecisionSupportBaseStack(Stack):
         self.db_secret.grant_read(self.lambda_retrieve_secrets)
 
         # Define a Lambda that can execute a stored procedure
+        # ZZZ - Replace this commented out lambda with the LambdaExecuteFunction from Tranform Layer Stack
+        '''
         self.lambda_execute_stored_procedure = lambda_.Function(self, "LambdaExecuteStoredProcedure",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name=f"ft-{env}-execute-stored-procedure",
@@ -86,6 +88,7 @@ class FtDecisionSupportBaseStack(Stack):
             code=lambda_.Code.from_asset('lambdas/ExecuteStoredProcedure'),
             handler='lambda_function.lambda_handler'
         )
+        '''
         
         '''
         DATA LAKE - S3 Bucket
