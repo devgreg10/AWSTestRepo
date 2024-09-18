@@ -17,7 +17,7 @@ def lambda_handler(event, context):
 
     db_connection = None
 
-    function_name = "Load layer lambda for Salesforce listing_session"
+    function_name = "Load layer lambda for Salesforce session_registration"
 
     try:
         session = boto3.session.Session()
