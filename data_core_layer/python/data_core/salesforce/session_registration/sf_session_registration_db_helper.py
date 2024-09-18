@@ -36,7 +36,7 @@ class SalesforceSessionRegistrationDbHelper:
 
         # Define the upsert SQL statement
         upsert_query = """
-        INSERT INTO sf_registration_session (
+        INSERT INTO ft_ds_raw.sf_session_registration (
             id, lastmodifieddate, isdeleted, createddate, name, createdbyid, lastmodifiedbyid,
             systemmodstamp, lastactivitydate, lastvieweddate, lastreferenceddate, listing_session__c,
             contact__c, allergies__c, amount_paid__c, emergency_contact_email__c, emergency_contact_name__c,
