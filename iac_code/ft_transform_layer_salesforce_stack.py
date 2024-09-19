@@ -79,7 +79,7 @@ class FtTransformLayerSalesforceStack(Stack):
         ds_base_stack.db_secret.grant_read(self.lambda_execute_db_function)
 
         # Define the parameters as a dictionary
-        raw_to_valid_params = {"process_all_raw_records_flag": True}
+        raw_to_valid_params = {"load_full_data_flag": True}
 
         for salesforce_entity in ingestion_layer_stack.salesforce_entities:
 
