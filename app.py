@@ -2,6 +2,8 @@ import os
 
 import aws_cdk as cdk
 
+from iac_code.layer_1.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
+from iac_code.layer_2.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
 from iac_code.ft_decision_support_base_stack import FtDecisionSupportBaseStack
 from iac_code.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
 from iac_code.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
@@ -25,64 +27,77 @@ else:
 BOOTSTRAP LAYER
 '''
 
+decision_support_bootstrap_stack = FtDecisionSupportBootstrapStack(
+    app,
+    id=f"ft-1-{env}-decision-support-bootstrap-stack",
+    env = env
+)
+
 '''
 NETWORK LAYER
 '''
 
 '''
-PERSISTENCE LAYER
+PERSISTENT STORAGE LAYER
 '''
-decision_support_base_stack = FtDecisionSupportBaseStack(
+decision_support_persistent_storage_stack = FtDecisionSupportPersistentStorageStack(
     app, 
-    id=f"ft-{env}-decision-support-base-stack", 
-    env=env, 
-    secret_region=os.getenv('default_region'),
-    version_number=os.getenv('version_number')
-)
-
-'''
-INGESTION LAYER
-'''
-
-#Salesforce
-ingestion_layer_salesforce_stack = FtIngestionLayerSalesforceStack(
-    app, 
-    id = f"ft-{env}-ingestion-layer-salesforce-stack",
+    id = f"ft-2-{env}-decision-support-persistent-storage-stack",
     env = env,
-    ds_base_stack = decision_support_base_stack
+    boostrap_stack = decision_support_bootstrap_stack
 )
 
-'''
-LOAD LAYER
-'''
+# decision_support_base_stack = FtDecisionSupportBaseStack(
+#     app, 
+#     id=f"ft-{env}-decision-support-base-stack", 
+#     env=env, 
+#     secret_region=os.getenv('default_region'),
+#     version_number=os.getenv('version_number')
+# )
 
-#Salesforce
-load_layer_salesforce_stack = FtLoadLayerSalesforceStack(
-    app, 
-    id = f"ft-{env}-load-layer-salesforce-stack",
-    env = env,
-    region=os.getenv('default_region'),
-    email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
-    concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
-    commit_batch_size = os.getenv('load_layer_commit_batch_size'),
-    ds_base_stack = decision_support_base_stack,
-    ingestion_layer_stack=ingestion_layer_salesforce_stack
-)
+# '''
+# INGESTION LAYER
+# '''
 
-'''
-TRANSFORM LAYER
-'''
+# #Salesforce
+# ingestion_layer_salesforce_stack = FtIngestionLayerSalesforceStack(
+#     app, 
+#     id = f"ft-{env}-ingestion-layer-salesforce-stack",
+#     env = env,
+#     ds_base_stack = decision_support_base_stack
+# )
 
-#Salesforce
-transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
-    app, 
-    id = f"ft-{env}-transform-layer-salesforce-stack",
-    env = env,
-    region=os.getenv('default_region'),
-    ds_base_stack = decision_support_base_stack,
-    ingestion_layer_stack=ingestion_layer_salesforce_stack,
-    load_layer_stack=load_layer_salesforce_stack
-)
+# '''
+# LOAD LAYER
+# '''
+
+# #Salesforce
+# load_layer_salesforce_stack = FtLoadLayerSalesforceStack(
+#     app, 
+#     id = f"ft-{env}-load-layer-salesforce-stack",
+#     env = env,
+#     region=os.getenv('default_region'),
+#     email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
+#     concurrent_lambdas = os.getenv('load_layer_salesforce_concurrent_lambdas'),
+#     commit_batch_size = os.getenv('load_layer_commit_batch_size'),
+#     ds_base_stack = decision_support_base_stack,
+#     ingestion_layer_stack=ingestion_layer_salesforce_stack
+# )
+
+# '''
+# TRANSFORM LAYER
+# '''
+
+# #Salesforce
+# transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
+#     app, 
+#     id = f"ft-{env}-transform-layer-salesforce-stack",
+#     env = env,
+#     region=os.getenv('default_region'),
+#     ds_base_stack = decision_support_base_stack,
+#     ingestion_layer_stack=ingestion_layer_salesforce_stack,
+#     load_layer_stack=load_layer_salesforce_stack
+# )
 
 '''
 TAGS
