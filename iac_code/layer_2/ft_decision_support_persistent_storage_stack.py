@@ -162,7 +162,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             security_group=bastion_sg,
             role=bastion_role,
-            # key_name=key_name  # The key pair created programmatically
+            key_name=f"ft-{env}-key"
         )
 
         # bastion_host = ec2.BastionHostLinux(
