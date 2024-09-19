@@ -109,12 +109,12 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             connection = ec2.Port.tcp(22), 
             description = "Allow SSH access to bastion")
 
-        db_username = f"ft-{env}-datawarehouse-master-user"
+        db_username = f"ft_{env}_data_warehouse_master_user"
 
         # Create a new Secret for the RDS Master user
-        db_secret = secrets.Secret(
+        db_master_usersecret = secrets.Secret(
             self, 
-            "DBSecret",
+            "DBMasterUserSecret",
             secret_name = f"ft-{env}-datawarehouse-db-master-user-secret",
             generate_secret_string=secrets.SecretStringGenerator(
                 secret_string_template=json.dumps({"username": db_username}),
@@ -133,7 +133,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             vpc_subnets=ec2.SubnetSelection(
                 subnets=boostrap_stack.decision_support_vpc.private_subnets
             ),
-            credentials=rds.Credentials.from_secret(db_secret, username=db_username),
+            credentials=rds.Credentials.from_secret(db_master_usersecret, username=db_username),
             engine=rds.DatabaseClusterEngine.aurora_postgres(
                 version=rds.AuroraPostgresEngineVersion.VER_15_3 
             ),
@@ -156,6 +156,20 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             serverless_v2_min_capacity=0.5,
             serverless_v2_max_capacity=2,
             security_groups=[rds_sg]
+        )
+        
+        # Create another Secret for an Admin User that can be communicated to developers
+        db_admin_user_secret = secrets.Secret(
+            self, 
+            "DBAdminUserSecret",
+            secret_name = f"ft-{env}-datawarehouse-db-admin-user-secret",
+            generate_secret_string=secrets.SecretStringGenerator(
+                secret_string_template=json.dumps({"username": f"ft_{env}_data_warehouse_admin_user"}),
+                exclude_punctuation=True,
+                exclude_characters='"@/',
+                include_space=False,
+                generate_string_key="password"
+            )
         )
 
         # Create IAM Role for the Bastion Host with Session Manager permissions
