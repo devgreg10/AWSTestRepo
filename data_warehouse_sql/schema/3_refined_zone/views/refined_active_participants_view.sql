@@ -1,18 +1,28 @@
 CREATE OR REPLACE VIEW ft_ds_refined.active_participants_view
 AS
 SELECT
-contact_id_18,
-chapter_id,
-age,
-gender,
-ethnicity,
-grade,
-mailing_zip_postal_code,
-participation_status,
-contact_type,
-sf_last_modified_date,
-created_date,
-dss_last_modified_timestamp
+    contact_id_18,
+    chapter_id,
+    contact_type,
+    age,
+    ethnicity,
+    gender,
+    grade,
+    participation_status,
+    mailing_zip_postal_code,
+    mailing_street,
+    mailing_city,
+    mailing_state,
+    school_name,
+    school_name_other,
+    first_name,
+    last_name,
+    birthdate,
+    household_id,
+    sf_created_timestamp,
+    sf_last_modified_timestamp,
+    sf_system_modstamp,
+    dss_ingestion_timestamp
 --just ommitted the is_deleted field
 FROM ft_ds_refined.contact
 WHERE

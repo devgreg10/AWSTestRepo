@@ -52,6 +52,6 @@ BEGIN
         IsDeleted = EXCLUDED.IsDeleted,
         CreatedDate = EXCLUDED.CreatedDate,
         dss_last_modified_timestamp = EXCLUDED.dss_last_modified_timestamp
-        ;
+    ;
 END;
 $$;

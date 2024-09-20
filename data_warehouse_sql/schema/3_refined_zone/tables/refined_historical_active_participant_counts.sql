@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.sf_metric_historical_active_participant
 --     domestic_participant_count INTEGER
 -- );
 
-CREATE OR REPLACE PROCEDURE ft_ds_admin.historical_metric_sf_contact_counts_by_chapter ()
+CREATE OR REPLACE PROCEDURE ft_ds_admin.historical_metric_sf_contact_counts_by_chapter()
 LANGUAGE plpgsql
 AS $$
 BEGIN

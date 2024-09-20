@@ -274,9 +274,8 @@
 -- );
 
 CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact (
-    PRIMARY KEY (LastModifiedDate, Id),
+    PRIMARY KEY (SystemModstamp, Id),
     Id TEXT,
-    MailingPostalCode TEXT,
     Chapter_Affiliation__c TEXT,
     ChapterID_CONTACT__c TEXT,
     CASESAFEID__c TEXT,
@@ -286,8 +285,19 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_contact (
     Gender__c TEXT,
     Grade__c TEXT,
     Participation_Status__c TEXT,
-    IsDeleted TEXT,
+    MailingPostalCode TEXT,
+    MailingStreet TEXT,
+    MailingCity TEXT,
+    MailingState TEXT,
+    School_Name__c TEXT,
+    School_Name_Other__c TEXT,
+    FirstName TEXT,
+    LastName TEXT,
+    Birthdate TEXT,
+    AccountId TEXT,
     LastModifiedDate TEXT,
+    IsDeleted TEXT,
     CreatedDate TEXT,
-    dss_last_modified_timestamp TIMESTAMPTZ
+    SystemModstamp TEXT,
+    dss_ingestion_timestamp TIMESTAMPTZ
 );
