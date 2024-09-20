@@ -10,22 +10,18 @@ from aws_cdk import (
 
 from constructs import Construct
 
-class FtDecisionSupportBaseStack(Stack):
+from iac_code.layer_1.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
+from iac_code.layer_2.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
 
-    def __init__(self, scope: Construct, id: str, env: str, secret_region: str, version_number: str, **kwargs) -> None:
+class FtDecisionSupportCoreStack(Stack):
+
+    def __init__(self, 
+                 scope: Construct, 
+                 id: str, 
+                 env: str, 
+                 version_number: str, 
+                 **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-
-        '''
-        DB Connection String - AWS Secret
-        '''
-        # Store the known Aurora PostgreSQL credentials in AWS Secrets Manager
-        self.db_secret = secretsmanager.Secret(self, "AuroraDBSecret",
-            description="Aurora PostgreSQL DB credentials",
-            secret_name=f"ft-{env}-aurora-postgres-connection-secret",
-            secret_string_value=SecretValue.plain_text(
-                '{"username":"ftdevpublicdbuser","password":"tempdbpassword_kirkcousinsqbatlantafalc0ns","dbname":"postgres","host":"firsttee-cdk-public-data-ftdevpublicauroradbclust-j3otj0e0ak2o.cluster-c5qwcaqekjc2.us-east-1.rds.amazonaws.com"}'
-            )
-        )
 
         '''
         LAMBDA LAYERS
@@ -39,40 +35,10 @@ class FtDecisionSupportBaseStack(Stack):
             layer_version_name=f'ft-{env}-aws-decision-support-lambda-layer-{version_number.replace(".", "-")}'
         )
 
-        '''  ZZZ uncomment after troubleshooting DB Helper
-        # Define a Lambda Layer for data_core
-        self.data_core_lambda_layer = lambda_.LayerVersion(
-            self, f'DataCoreLayer',
-            code=lambda_.Code.from_asset('data_core_layer'),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
-            description="A layer for data_core",
-        )
-        '''
-
         '''
         LAMBDAS
         '''
-        # Define Lambda to retrieve secrets
-        self.lambda_retrieve_secrets = lambda_.Function(self, "LambdaRetrieveSecrets",
-            runtime=lambda_.Runtime.PYTHON_3_8,
-            function_name=f"ft-{env}-retrieve-secrets",
-            #layers=[psycopg2_layer],
-            #vpc=datawarehouse_vpc,
-            #vpc_subnets=ec2.SubnetSelection(
-            #    subnets=public_subnets
-            #),
-            timeout=Duration.seconds(30),
-            code=lambda_.Code.from_asset('lambdas/RetrieveSecrets'),
-            handler='lambda_function.lambda_handler',
-            environment={
-                "DB_SECRET_ARN": self.db_secret.secret_arn,
-                "DB_SECRET_REGION": secret_region,
-            }
-        )
-
-        # Grant the Lambda function permission to retrieve the DB secret
-        self.db_secret.grant_read(self.lambda_retrieve_secrets)
-
+       
         # Define a Lambda that can execute a stored procedure
         # ZZZ - Replace this commented out lambda with the LambdaExecuteFunction from Tranform Layer Stack
         '''

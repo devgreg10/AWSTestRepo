@@ -13,8 +13,10 @@ from aws_cdk import (
     Duration
 )
 
-from iac_code.ft_decision_support_base_stack import FtDecisionSupportBaseStack
-from iac_code.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
+from iac_code.layer_1.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
+from iac_code.layer_2.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
+from iac_code.layer_3.ft_decision_support_core_stack import FtDecisionSupportCoreStack
+from iac_code.layer_4.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
 
 from constructs import Construct
 
@@ -30,8 +32,10 @@ class FtLoadLayerSalesforceStack(Stack):
                  region: str, 
                  email_addresses_to_alert_on_error: str,
                  concurrent_lambdas: int, 
-                 commit_batch_size: int, 
-                 ds_base_stack: FtDecisionSupportBaseStack,
+                 commit_batch_size: int,
+                 bootstrap_stack: FtDecisionSupportBootstrapStack, 
+                 storage_stack: FtDecisionSupportPersistentStorageStack,
+                 ds_core_stack: FtDecisionSupportCoreStack,
                  ingestion_layer_stack: FtIngestionLayerSalesforceStack, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
@@ -43,28 +47,6 @@ class FtLoadLayerSalesforceStack(Stack):
         else:
             load_dotenv(os.path.join(BASEDIR,"../.env.dev"))
 
-        vpc_name = os.getenv('vpc_name')
-        vpc_id = os.getenv('vpc_id')
-        public_subnets = [ec2.Subnet.from_subnet_attributes(
-                            self, 
-                            "PublicSubnetA", 
-                            subnet_id=os.getenv('public_subnet_a'),
-                            availability_zone=os.getenv("public_subnet_a_az")
-                          )]
-        private_subnets = [ec2.Subnet.from_subnet_id(self, "PrivateSubnetA", os.getenv('private_subnet_a')),
-                           ec2.Subnet.from_subnet_id(self, "PrivateSubnetD", os.getenv('private_subnet_d'))]
-
-        # Get a reference to the existing VPC
-        datawarehouse_vpc = ec2.Vpc.from_vpc_attributes(
-            self,
-            "ExistingVPC",
-            vpc_id=vpc_id,
-            availability_zones=["us-east-1a"]
-        )
-
-        '''
-        ZZZ - return this to Base Stack after troubleshooting DB Helper
-        '''
         # Define a Lambda Layer for data_core
         self.data_core_lambda_layer = lambda_.LayerVersion(
             self, f'DataCoreLayer',
@@ -90,44 +72,44 @@ class FtLoadLayerSalesforceStack(Stack):
             lambda_list_s3_files = lambda_.Function(self, f"LambdaListFilesSalesforce{salesforce_object}",
                 runtime=lambda_.Runtime.PYTHON_3_8,
                 function_name=f"ft-{env}-s3-list-salesforce-{entity_name}-files",
-                #vpc=datawarehouse_vpc,
-                #vpc_subnets=ec2.SubnetSelection(
-                #    subnets=public_subnets
-                #),
+                vpc=bootstrap_stack.decision_support_vpc,
+                vpc_subnets=ec2.SubnetSelection(
+                   subnets=bootstrap_stack.decision_support_vpc.private_subnets
+                ),
                 timeout=Duration.seconds(30),
                 code=lambda_.Code.from_asset('lambdas/ListS3Files'),
                 handler='lambda_function.lambda_handler',
                 environment={
-                    "BUCKET_NAME": ds_base_stack.data_lake_bucket.bucket_name,
+                    "BUCKET_NAME": ds_core_stack.data_lake_bucket.bucket_name,
                     "BUCKET_FOLDER": s3_bucket_folder
                 }
             )
 
             # Grant the Lambda function permissions to read from the Data Lake bucket 
-            ds_base_stack.data_lake_bucket.grant_read_write(lambda_list_s3_files)
+            ds_core_stack.data_lake_bucket.grant_read_write(lambda_list_s3_files)
             
             # Define a Lambda to Process all Files
             lambda_process_files = lambda_.Function(self, f"LambdaProcessLoadLayerFilesSalesforce{salesforce_object}",
                 runtime=lambda_.Runtime.PYTHON_3_8,
                 function_name=f"ft-{env}-salesforce-{entity_name}-load-files",
-                layers=[ds_base_stack.psycopg2_lambda_layer, self.data_core_lambda_layer],
-                #vpc=datawarehouse_vpc,
-                #vpc_subnets=ec2.SubnetSelection(
-                #    subnets=public_subnets
-                #),
+                layers=[ds_core_stack.psycopg2_lambda_layer, self.data_core_lambda_layer],
+                vpc=bootstrap_stack.decision_support_vpc,
+                vpc_subnets=ec2.SubnetSelection(
+                   subnets=bootstrap_stack.decision_support_vpc.private_subnets
+                ),
                 timeout=Duration.minutes(15),
                 code=lambda_.Code.from_asset(f'lambdas/LoadLayer/Salesforce/{salesforce_object}'),
                 handler='lambda_function.lambda_handler',
                 environment={
-                    "BUCKET_NAME": ds_base_stack.data_lake_bucket.bucket_name,
+                    "BUCKET_NAME": ds_core_stack.data_lake_bucket.bucket_name,
                     "BUCKET_FOLDER": s3_bucket_folder,
                     "COMMIT_BATCH_SIZE": commit_batch_size
                 }
             )
             # Grant the Lambda function permissions to read from and write to the S3 data lake
-            ds_base_stack.data_lake_bucket.grant_read_write(lambda_process_files)
+            ds_core_stack.data_lake_bucket.grant_read_write(lambda_process_files)
             # Grant the Lambda function permissions to read the DB Connection Secret
-            ds_base_stack.db_secret.grant_read(lambda_process_files)
+            storage_stack.db_master_user_secret.grant_read(lambda_process_files)
 
             # Create an SNS Topic for error notifications
             sns_topic = sns.Topic(self, 
@@ -180,7 +162,7 @@ class FtLoadLayerSalesforceStack(Stack):
                 parameters={
                     "region": region,
                     "file_name.$": "$$.Map.Item.Value",
-                    "secret_arn": ds_base_stack.db_secret.secret_arn  # Pass the secret arn
+                    "secret_arn": storage_stack.db_master_user_secret.secret_arn  # Pass the secret arn
                 }
             )
 

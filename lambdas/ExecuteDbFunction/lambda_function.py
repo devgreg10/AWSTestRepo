@@ -17,6 +17,8 @@ def lambda_handler(event, context):
     logging.info(f"db_schema:  {db_schema}")
     input_parameters = event['input_parameters']
     logging.info(f"input_parameters: {input_parameters}")
+    if not input_parameters:
+        input_parameters = {}
     secret_arn = event['secret_arn']
     logging.info(f"secret_arn: {secret_arn}")
     region = event['region']

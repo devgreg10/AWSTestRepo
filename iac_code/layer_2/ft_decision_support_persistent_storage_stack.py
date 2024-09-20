@@ -112,7 +112,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         db_username = f"ft_{env}_data_warehouse_master_user"
 
         # Create a new Secret for the RDS Master user
-        db_master_usersecret = secrets.Secret(
+        self.db_master_user_secret = secrets.Secret(
             self, 
             "DBMasterUserSecret",
             secret_name = f"ft-{env}-datawarehouse-db-master-user-secret",
@@ -133,7 +133,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             vpc_subnets=ec2.SubnetSelection(
                 subnets=boostrap_stack.decision_support_vpc.private_subnets
             ),
-            credentials=rds.Credentials.from_secret(db_master_usersecret, username=db_username),
+            credentials=rds.Credentials.from_secret(self.db_master_user_secret, username=db_username),
             engine=rds.DatabaseClusterEngine.aurora_postgres(
                 version=rds.AuroraPostgresEngineVersion.VER_15_3 
             ),
