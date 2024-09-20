@@ -47,7 +47,7 @@ Layer 3 - DECISION SUPPORT CORE LAYER
 '''
 decision_support_base_stack = FtDecisionSupportCoreStack(
     app, 
-    id=f"ft-{env}-decision-support-base-stack", 
+    id=f"ft-3-{env}-decision-support-base-stack", 
     env=env, 
     version_number=os.getenv('version_number')
 )
@@ -59,7 +59,7 @@ Layer 4 - INGESTION LAYER
 #Salesforce
 ingestion_layer_salesforce_stack = FtIngestionLayerSalesforceStack(
     app, 
-    id = f"ft-{env}-ingestion-layer-salesforce-stack",
+    id = f"ft-4-{env}-ingestion-layer-salesforce-stack",
     env = env,
     ds_core_stack = decision_support_base_stack
 )
@@ -71,7 +71,7 @@ Layer 5 - LOAD LAYER
 #Salesforce
 load_layer_salesforce_stack = FtLoadLayerSalesforceStack(
     app, 
-    id = f"ft-{env}-load-layer-salesforce-stack",
+    id = f"ft-5-{env}-load-layer-salesforce-stack",
     env = env,
     region=os.getenv('default_region'),
     email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
@@ -90,7 +90,7 @@ Layer 6 - TRANSFORM LAYER
 #Salesforce
 transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
     app, 
-    id = f"ft-{env}-transform-layer-salesforce-stack",
+    id = f"ft-6-{env}-transform-layer-salesforce-stack",
     env = env,
     region=os.getenv('default_region'),
     bootstrap_stack = decision_support_bootstrap_stack,
