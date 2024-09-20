@@ -4,8 +4,8 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_iam as iam,
     Stack,
-    SecretValue,
-    Duration
+    CfnOutput,
+    RemovalPolicy
 )
 
 from constructs import Construct
@@ -59,10 +59,23 @@ class FtDecisionSupportCoreStack(Stack):
         '''
         DATA LAKE - S3 Bucket
         '''
-        self.data_lake_bucket = s3.Bucket(self, 
-            "FTDevDataLakeBucket",
-            bucket_name=f"ft-{env}-data-lake"
-        )
+        data_lake_bucket_name = f"ft-{env}-data-lake"
+
+        try:
+
+            # Check to see if it already exists before recreating
+            self.data_lake_bucket = s3.Bucket.from_bucket_name(
+                self, 
+                "ExistingBucket", bucket_name=data_lake_bucket_name)
+            CfnOutput(self, "ExistingBucketOutput", value=self.data_lake_bucket.bucket_name)
+            
+        except Exception as e: 
+            # if CfnOutput throws an exception, then the bucket doesn't exist and needs to be created
+            self.data_lake_bucket = s3.Bucket(self, 
+                "FTDevDataLakeBucket",
+                bucket_name=data_lake_bucket_name,
+                removal_policy=RemovalPolicy.DESTROY,
+            )
 
         # DataLake - Define S3 bucket policy for AppFlow
         appflow_policy_statement = iam.PolicyStatement(
