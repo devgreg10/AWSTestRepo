@@ -18,8 +18,6 @@ from cdk_ec2_key_pair import KeyPair
 
 import os
 import json
-import boto3
-import psycopg2
 
 from cloud.layer_1_bootstrap.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
 
