@@ -10,11 +10,11 @@ from aws_cdk import (
 
 from datetime import datetime, timedelta, timezone
 
-from iac_code.layer_3.ft_decision_support_core_stack import FtDecisionSupportCoreStack
-from iac_code.appflow.tasks.ft_salesforce_contact_tasks import FtSalesforceContactAppFlowTasks
-from iac_code.appflow.tasks.ft_salesforce_listing_session_tasks import FtSalesforceListingSessionAppFlowTasks
-from iac_code.appflow.tasks.ft_salesforce_listing_tasks import FtSalesforceListingAppFlowTasks
-from iac_code.appflow.tasks.ft_salesforce_session_registration_tasks import FtSalesforceSessionRegistrationAppFlowTasks
+from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_contact_tasks import FtSalesforceContactAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_session_tasks import FtSalesforceListingSessionAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_tasks import FtSalesforceListingAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_session_registration_tasks import FtSalesforceSessionRegistrationAppFlowTasks
 
 from constructs import Construct
 
@@ -30,7 +30,7 @@ class FtIngestionLayerSalesforceStack(Stack):
                  scope: Construct, 
                  id: str, 
                  env: str, 
-                 ds_core_stack: FtDecisionSupportCoreStack, **kwargs) -> None:
+                 storage_stack: FtDecisionSupportPersistentStorageStack, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -111,12 +111,12 @@ class FtIngestionLayerSalesforceStack(Stack):
                     connector_type="S3",
                     destination_connector_properties=appflow.CfnFlow.DestinationConnectorPropertiesProperty(
                         s3=appflow.CfnFlow.S3DestinationPropertiesProperty(
-                            bucket_name=ds_core_stack.data_lake_bucket.bucket_name,
+                            bucket_name=storage_stack.data_lake_bucket.bucket_name,
                             bucket_prefix=f"{s3_bucket_folder}ingress",
                             s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
                                 aggregation_config=appflow.CfnFlow.AggregationConfigProperty(
                                     aggregation_type="None",
-                                    target_file_size=64
+                                    target_file_size=32
                                 ),
                                 file_type="JSON",
                                 prefix_config=appflow.CfnFlow.PrefixConfigProperty(

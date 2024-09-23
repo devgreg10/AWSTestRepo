@@ -11,11 +11,11 @@ from aws_cdk import (
 
 from constructs import Construct
 
-from iac_code.layer_1.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
-from iac_code.layer_2.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
-from iac_code.layer_3.ft_decision_support_core_stack import FtDecisionSupportCoreStack
-from iac_code.layer_4.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
-from iac_code.layer_5.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
+from cloud.layer_1_bootstrap.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
+from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
+from cloud.layer_3_core.ft_decision_support_core_stack import FtDecisionSupportCoreStack
+from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
+from cloud.layer_5_load_layer.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
 
 from dotenv import load_dotenv
 import os
@@ -57,7 +57,7 @@ class FtTransformLayerSalesforceStack(Stack):
                 subnets=bootstrap_stack.decision_support_vpc.private_subnets
             ),
             timeout=Duration.seconds(300),
-            code=lambda_.Code.from_asset('lambdas/ExecuteDbFunction'),
+            code=lambda_.Code.from_asset('cloud/lambdas/ExecuteDbFunction'),
             handler='lambda_function.lambda_handler'
         )
         # Grant the Lambda function permissions to read the DB Connection Secret

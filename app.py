@@ -2,12 +2,12 @@ import os
 
 import aws_cdk as cdk
 
-from iac_code.layer_1.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
-from iac_code.layer_2.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
-from iac_code.layer_3.ft_decision_support_core_stack import FtDecisionSupportCoreStack
-from iac_code.layer_4.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
-from iac_code.layer_5.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
-from iac_code.layer_6.ft_transform_layer_salesforce_stack import FtTransformLayerSalesforceStack
+from cloud.layer_1_bootstrap.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
+from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
+from cloud.layer_3_core.ft_decision_support_core_stack import FtDecisionSupportCoreStack
+from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
+from cloud.layer_5_load_layer.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
+from cloud.layer_6_transform_layer.ft_transform_layer_salesforce_stack import FtTransformLayerSalesforceStack
 
 from dotenv import load_dotenv
 
@@ -28,7 +28,7 @@ Layer 1 - BOOTSTRAP LAYER
 '''
 decision_support_bootstrap_stack = FtDecisionSupportBootstrapStack(
     app,
-    id=f"ft-1-{env}-decision-support-bootstrap-stack",
+    id=f"ft-{env}-decision-support-bootstrap-stack",
     env = env
 )
 
@@ -37,7 +37,7 @@ Layer 2 - PERSISTENT STORAGE LAYER
 '''
 decision_support_persistent_storage_stack = FtDecisionSupportPersistentStorageStack(
     app, 
-    id = f"ft-2-{env}-decision-support-persistent-storage-stack",
+    id = f"ft-{env}-decision-support-persistent-storage-stack",
     env = env,
     boostrap_stack = decision_support_bootstrap_stack
 )
@@ -47,7 +47,7 @@ Layer 3 - DECISION SUPPORT CORE LAYER
 '''
 decision_support_base_stack = FtDecisionSupportCoreStack(
     app, 
-    id=f"ft-3-{env}-decision-support-base-stack", 
+    id=f"ft-{env}-decision-support-base-stack", 
     env=env, 
     version_number=os.getenv('version_number')
 )
@@ -59,9 +59,9 @@ Layer 4 - INGESTION LAYER
 #Salesforce
 ingestion_layer_salesforce_stack = FtIngestionLayerSalesforceStack(
     app, 
-    id = f"ft-4-{env}-ingestion-layer-salesforce-stack",
+    id = f"ft-{env}-ingestion-layer-salesforce-stack",
     env = env,
-    ds_core_stack = decision_support_base_stack
+    storage_stack = decision_support_persistent_storage_stack
 )
 
 '''
@@ -71,7 +71,7 @@ Layer 5 - LOAD LAYER
 #Salesforce
 load_layer_salesforce_stack = FtLoadLayerSalesforceStack(
     app, 
-    id = f"ft-5-{env}-load-layer-salesforce-stack",
+    id = f"ft-{env}-load-layer-salesforce-stack",
     env = env,
     region=os.getenv('default_region'),
     email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
@@ -90,7 +90,7 @@ Layer 6 - TRANSFORM LAYER
 #Salesforce
 transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
     app, 
-    id = f"ft-6-{env}-transform-layer-salesforce-stack",
+    id = f"ft-{env}-transform-layer-salesforce-stack",
     env = env,
     region=os.getenv('default_region'),
     bootstrap_stack = decision_support_bootstrap_stack,

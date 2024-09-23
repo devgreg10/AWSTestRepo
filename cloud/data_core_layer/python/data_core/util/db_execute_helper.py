@@ -91,7 +91,7 @@ class FilterOptions:
     """
     FilterOptions provides a way to connect one to many different filter statements. Each FilterOptions object can combine a number of filter statements (FilterOption) with a single MatchType. To use multiple match types utilize the nested filter options parameter to combine several FilterOptions classes into one. 
     """
-    filter_options: List[FilterOption]
+    filter_options: list[FilterOption]
     match_type: MatchType
     nested_filter_options: List[FilterOptions] = None
 

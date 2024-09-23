@@ -13,10 +13,10 @@ from aws_cdk import (
     Duration
 )
 
-from iac_code.layer_1.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
-from iac_code.layer_2.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
-from iac_code.layer_3.ft_decision_support_core_stack import FtDecisionSupportCoreStack
-from iac_code.layer_4.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
+from cloud.layer_1_bootstrap.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
+from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
+from cloud.layer_3_core.ft_decision_support_core_stack import FtDecisionSupportCoreStack
+from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
 
 from constructs import Construct
 
@@ -50,7 +50,7 @@ class FtLoadLayerSalesforceStack(Stack):
         # Define a Lambda Layer for data_core
         self.data_core_lambda_layer = lambda_.LayerVersion(
             self, f'DataCoreLayer',
-            code=lambda_.Code.from_asset('data_core_layer'),
+            code=lambda_.Code.from_asset('cloud/data_core_layer'),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
             description="A layer for data_core",
         )
@@ -77,16 +77,16 @@ class FtLoadLayerSalesforceStack(Stack):
                    subnets=bootstrap_stack.decision_support_vpc.private_subnets
                 ),
                 timeout=Duration.seconds(30),
-                code=lambda_.Code.from_asset('lambdas/ListS3Files'),
+                code=lambda_.Code.from_asset('cloud/lambdas/ListS3Files'),
                 handler='lambda_function.lambda_handler',
                 environment={
-                    "BUCKET_NAME": ds_core_stack.data_lake_bucket.bucket_name,
+                    "BUCKET_NAME": storage_stack.data_lake_bucket.bucket_name,
                     "BUCKET_FOLDER": s3_bucket_folder
                 }
             )
 
             # Grant the Lambda function permissions to read from the Data Lake bucket 
-            ds_core_stack.data_lake_bucket.grant_read_write(lambda_list_s3_files)
+            storage_stack.data_lake_bucket.grant_read_write(lambda_list_s3_files)
             
             # Define a Lambda to Process all Files
             lambda_process_files = lambda_.Function(self, f"LambdaProcessLoadLayerFilesSalesforce{salesforce_object}",
@@ -98,16 +98,16 @@ class FtLoadLayerSalesforceStack(Stack):
                    subnets=bootstrap_stack.decision_support_vpc.private_subnets
                 ),
                 timeout=Duration.minutes(15),
-                code=lambda_.Code.from_asset(f'lambdas/LoadLayer/Salesforce/{salesforce_object}'),
+                code=lambda_.Code.from_asset(f'cloud/lambdas/LoadLayer/Salesforce/{salesforce_object}'),
                 handler='lambda_function.lambda_handler',
                 environment={
-                    "BUCKET_NAME": ds_core_stack.data_lake_bucket.bucket_name,
+                    "BUCKET_NAME": storage_stack.data_lake_bucket.bucket_name,
                     "BUCKET_FOLDER": s3_bucket_folder,
                     "COMMIT_BATCH_SIZE": commit_batch_size
                 }
             )
             # Grant the Lambda function permissions to read from and write to the S3 data lake
-            ds_core_stack.data_lake_bucket.grant_read_write(lambda_process_files)
+            storage_stack.data_lake_bucket.grant_read_write(lambda_process_files)
             # Grant the Lambda function permissions to read the DB Connection Secret
             storage_stack.db_master_user_secret.grant_read(lambda_process_files)
 
