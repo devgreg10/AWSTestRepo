@@ -11,10 +11,10 @@ chapter_affiliation__c NOT IN (
     '0011R00002oM2hNQAS',
     '0013600000xOm3cAAC'
 )
-AND (
-        chapter_id IS NULL
-        OR LENGTH(chapter_id) <> 18
-        OR chapter_id = ''
+and not (
+        chapter_affiliation__c IS NULL
+        OR LENGTH(chapter_affiliation__c) <> 18
+        OR chapter_affiliation__c = ''
     )
 ;
 
