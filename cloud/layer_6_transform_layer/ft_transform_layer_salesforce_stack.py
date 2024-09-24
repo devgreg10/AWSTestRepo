@@ -47,7 +47,6 @@ class FtTransformLayerSalesforceStack(Stack):
         Loop through salesforce_entities
         '''
 
-        # ZZZ - Move this back the Base Stack 
         self.lambda_execute_db_function = lambda_.Function(self, f"LambdaExecuteDbFunction",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name=f"ft-{env}-execute-db-function",
@@ -80,7 +79,7 @@ class FtTransformLayerSalesforceStack(Stack):
                 self, f"Execute Raw to Valid Salesforce {entity_name}",
                 lambda_function=self.lambda_execute_db_function,
                 payload=sfn.TaskInput.from_object({
-                    "db_function": f"write_sf_{entity_name}_raw_to_valid",
+                    "db_function": f"write_sf_{entity_name.replace('-','_')}_raw_to_valid",
                     "db_schema": "ft_ds_admin",
                     "input_parameters": raw_to_valid_params,
                     "secret_arn": storage_stack.db_master_user_secret.secret_arn,
