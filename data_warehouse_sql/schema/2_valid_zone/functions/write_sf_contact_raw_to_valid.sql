@@ -110,7 +110,7 @@ BEGIN
     WHERE
         contact_type IS NULL
         --this is a multi-picklist, so the permutations and combinations are too much to list here
-        OR chapter_id = ''
+        OR contact_type = ''
     ; 
     -- age
     -- ethnicity
