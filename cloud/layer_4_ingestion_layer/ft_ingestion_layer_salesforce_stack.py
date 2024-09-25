@@ -8,7 +8,8 @@ from aws_cdk import (
     aws_iam as iam
 )
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+import pytz
 
 from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_contact_tasks import FtSalesforceContactAppFlowTasks
@@ -79,8 +80,8 @@ class FtIngestionLayerSalesforceStack(Stack):
             # S3 Bucket folder where this entity will be written
             s3_bucket_folder = f"salesforce/{entity_name}/"
 
-            # AppFlow will be scheduled to start 15 min from now, so get the current time in UTC
-            now = datetime.now()
+            # Get the current time in New York time zone (EST/EDT)
+            now = datetime.now(pytz.timezone("America/New_York"))
 
             # Define 9 PM (21:00) for today
             next_nine_pm = now.replace(hour=21, minute=0, second=0, microsecond=0)
