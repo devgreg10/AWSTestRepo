@@ -80,13 +80,17 @@ class FtIngestionLayerSalesforceStack(Stack):
             s3_bucket_folder = f"salesforce/{entity_name}/"
 
             # AppFlow will be scheduled to start 15 min from now, so get the current time in UTC
-            now = datetime.now(timezone.utc)
+            now = datetime.now()
 
-            # Add 15 minutes to the current time
-            future_time = now + timedelta(minutes=15)
+            # Define 9 PM (21:00) for today
+            next_nine_pm = now.replace(hour=21, minute=0, second=0, microsecond=0)
 
-            # Convert the future time to a UNIX timestamp
-            unix_timestamp = int(future_time.timestamp())
+            # If it's already past 9 PM, calculate for the next day
+            if now >= next_nine_pm:
+                next_nine_pm += timedelta(days=1)
+
+            # Convert the time to a Unix timestamp (seconds since epoch)
+            unix_timestamp = int(next_nine_pm.timestamp())
         
             # Create the AppFlow flow
             self.ingestion_appflow = appflow.CfnFlow(
@@ -128,20 +132,20 @@ class FtIngestionLayerSalesforceStack(Stack):
                         )
                     )
                 )],
-                # trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-                #     trigger_type="Scheduled",
-                #     trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
-                #         schedule_expression="rate(60minutes)",
-                #         data_pull_mode="Incremental",
-                #         schedule_start_time=unix_timestamp,
-                #         time_zone="America/New_York",
-                #         schedule_offset=0
-                #     )
-                # ),
-                # flow_status="Suspended",
                 trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-                   trigger_type="OnDemand"
+                    trigger_type="Scheduled",
+                    trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
+                        schedule_expression="rate(12hours)",
+                        data_pull_mode="Incremental",
+                        schedule_start_time=unix_timestamp,
+                        time_zone="America/New_York",
+                        schedule_offset=0
+                    )
                 ),
+                flow_status="Active",
+                # trigger_config=appflow.CfnFlow.TriggerConfigProperty(
+                #    trigger_type="OnDemand"
+                # ),
                 tasks = appflow_tasks
                 
             )
