@@ -218,8 +218,8 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             period=Duration.minutes(1)
         ).create_alarm(
             self,
-            id=f"ft-{env}-primary-postgres-database-cluster-cpu-utilization-60-percent-alarm",
-            alarm_name="Database Cluster CPU 60 Percent",
+            id="Database Cluster CPU 60 Percent",
+            alarm_name=f"ft-{env}-primary-postgres-database-cluster-cpu-utilization-60-percent-alarm",
             alarm_description="If any RDS instance in the RDS Global Database Cluster's regional cluster has a CPU 60 percent or higher display as In alarm.",
             threshold=60,
             evaluation_periods=2,
@@ -231,8 +231,8 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             period=Duration.minutes(1)
         ).create_alarm(
             self,
-            id=f"ft-{env}-primary-postgres-database-cluster-cpu-utilization-80-percent-alarm",
-            alarm_name="Database Cluster CPU 80 Percent",
+            id="Database Cluster CPU 80 Percent",
+            alarm_name=f"ft-{env}-primary-postgres-database-cluster-cpu-utilization-80-percent-alarm",
             alarm_description="If any RDS instance in the RDS Global Database Cluster's regional cluster has a CPU 80 percent or higher display as In alarm.",
             threshold=60,
             evaluation_periods=2,
@@ -244,8 +244,8 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             period=Duration.minutes(1)
         ).create_alarm(
             self,
-            id=f"ft-{env}-primary-postgres-database-cluster-deadlocks-one-alarm",
-            alarm_name="Database Cluster Deadlocks equal to or greater than 1",
+            id="Database Cluster Deadlocks equal to or greater than 1",
+            alarm_name=f"ft-{env}-primary-postgres-database-cluster-deadlocks-one-alarm",
             alarm_description="If the RDS Database Cluster has one or more deadlocks display as In alarm.",
             threshold=1,
             evaluation_periods=2,
@@ -256,7 +256,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
 
         # Create another Secret for an Admin User that can be communicated to developers
         self.data_warehouse_db_cluster.add_rotation_multi_user(
-            id = f"AdminUser{env}",
+            id = "AdminUser",
             secret = rds.DatabaseSecret(
                 self, 
                 "DBAdminUserSecret",
@@ -269,7 +269,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
 
         # Create another Secret for a Servie Account User to be used by our Lambdas
         self.data_warehouse_db_cluster.add_rotation_multi_user(
-            id = f"LambdaUser{env}",
+            id = "LambdaUser",
             secret = rds.DatabaseSecret(
                 self, 
                 "DBLambdaUserSecret",
@@ -282,7 +282,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
 
         # Create IAM Role for the Bastion Host with Session Manager permissions
         bastion_role = iam.Role(
-            self, f"BastionHostRole{env}",
+            self, "BastionHostRole",
             role_name=f"ft-{env}-bastion-host-session-manager-role",
             assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"),
             managed_policies=[
@@ -292,7 +292,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
 
         # Bastion Host in Public Subnet for DB Access
         bastion_host = ec2.Instance(
-            self, f"BastionHost{env}",
+            self, "BastionHost",
             instance_name=f"ft-{env}-bastion-host",
             instance_type=ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.NANO),
             machine_image=ec2.MachineImage.latest_amazon_linux(),
