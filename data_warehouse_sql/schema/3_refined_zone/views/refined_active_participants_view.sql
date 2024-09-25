@@ -4,7 +4,7 @@ SELECT
     contact_id_18,
     chapter_id,
     contact_type,
-    age,
+    --age,
     ethnicity,
     gender,
     grade,
@@ -28,7 +28,10 @@ FROM ft_ds_refined.contact
 WHERE
     participation_status = 'Active'
     AND contact_type LIKE '%Participant%'
-    AND age IS NOT NULL
+    --AND age IS NOT NULL
+    AND household_id IS NOT NULL
+    AND household_id <> ''
+    AND birthdate IS NOT NULL
     AND gender IS NOT NULL
     AND gender <> ''
     AND ethnicity IS NOT NULL

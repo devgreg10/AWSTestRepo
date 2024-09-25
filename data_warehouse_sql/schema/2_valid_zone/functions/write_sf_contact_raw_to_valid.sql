@@ -69,7 +69,7 @@ BEGIN
     WHERE
         dss_ingestion_timestamp >
         CASE
-            WHEN load_threshold_timestamp IS NULL THEN (SELECT MAX(execution_timestamp) from ft_ds_valid.raw_to_valid_execution_log)
+            WHEN load_threshold_timestamp IS NULL THEN (SELECT MAX(execution_timestamp) from ft_ds_valid.raw_to_valid_execution_log WHERE entity = 'sf_contact')
             ELSE load_threshold_timestamp
         END
     ;
@@ -496,7 +496,8 @@ BEGIN
 
     INSERT INTO ft_ds_valid.raw_to_valid_execution_log
     SELECT
-    MAX(dss_ingestion_timestamp)
+    MAX(dss_ingestion_timestamp) AS execution_timestamp,
+    'sf_contact' AS entity
     FROM ft_ds_valid.sf_contact
     ;
 END;
