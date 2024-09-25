@@ -21,9 +21,8 @@ SELECT
     household_id,
     sf_created_timestamp,
     sf_last_modified_timestamp,
-    sf_system_modstamp,
-    dss_ingestion_timestamp
---just ommitted the is_deleted field
+    sf_system_modstamp
+-- ommitted the is_deleted and dss_ingestion timestamps fields since they are unanalyzable metadata fields.
 FROM ft_ds_refined.contact
 WHERE
     participation_status = 'Active'
