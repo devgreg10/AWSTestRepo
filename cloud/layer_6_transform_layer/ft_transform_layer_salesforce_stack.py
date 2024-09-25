@@ -55,7 +55,7 @@ class FtTransformLayerSalesforceStack(Stack):
             vpc_subnets=ec2.SubnetSelection(
                 subnets=bootstrap_stack.decision_support_vpc.private_subnets
             ),
-            timeout=Duration.seconds(300),
+            timeout=Duration.minutes(15),
             code=lambda_.Code.from_asset('cloud/lambdas/ExecuteDbFunction'),
             handler='lambda_function.lambda_handler'
         )
