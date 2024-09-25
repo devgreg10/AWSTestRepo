@@ -133,20 +133,20 @@ class FtIngestionLayerSalesforceStack(Stack):
                         )
                     )
                 )],
-                trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-                    trigger_type="Scheduled",
-                    trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
-                        schedule_expression="rate(12hours)",
-                        data_pull_mode="Incremental",
-                        schedule_start_time=unix_timestamp,
-                        time_zone="America/New_York",
-                        schedule_offset=0
-                    )
-                ),
-                flow_status="Active",
                 # trigger_config=appflow.CfnFlow.TriggerConfigProperty(
-                #    trigger_type="OnDemand"
+                #     trigger_type="Scheduled",
+                #     trigger_properties=appflow.CfnFlow.ScheduledTriggerPropertiesProperty(
+                #         schedule_expression="rate(12hours)",
+                #         data_pull_mode="Incremental",
+                #         schedule_start_time=unix_timestamp,
+                #         time_zone="America/New_York",
+                #         schedule_offset=0
+                #     )
                 # ),
+                # flow_status="Active",
+                trigger_config=appflow.CfnFlow.TriggerConfigProperty(
+                   trigger_type="OnDemand"
+                ),
                 tasks = appflow_tasks
                 
             )
