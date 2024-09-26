@@ -21,6 +21,8 @@ from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import Ft
 from constructs import Construct
 
 from dotenv import load_dotenv
+import pytz
+from datetime import datetime
 import os
 
 class FtLoadLayerSalesforceStack(Stack):
@@ -189,25 +191,37 @@ class FtLoadLayerSalesforceStack(Stack):
                 definition=definition
             )
 
-            
-            # Create an EventBridge rule to capture the AppFlow run complete event
-            appflow_event_rule = events.Rule(
-                self, f"AppFlowRunCompleteRuleSalesforce{salesforce_object}",
-                rule_name=f"ft-{env}-ingestion-layer-salesforce-{entity_name}-success",
-                event_pattern= events.EventPattern(
-                    source=["aws.appflow"],
-                    detail_type=["AppFlow End Flow Run Report"],
-                    detail={
-                        "status": ["Execution Successful"],  
-                        "flow-name": [ingestion_layer_stack.ingestion_appflow.flow_name],
-                        "num-of-records-processed": [{
-                            "anything-but": ["0"]
-                        }]
-                    }
-                ),
-                enabled=False # set this to be disabled initially
-            ) 
+            # Use EventBridge Rules to trigger the state machine on a cron schedule
+            # Load Layer should run every 6 hours at 3:15, 9:15, 15:15, and 21:15 EST daily
+            est_timezone = pytz.timezone("America/New_York")
+            now_timezone = datetime.now(est_timezone)
 
-            # Set the target of the rule to the Step Functions state machine
-            appflow_event_rule.add_target(targets.SfnStateMachine(state_machine))
+            times_est = [
+                {"hour": 3, "minute": 15},
+                {"hour": 9, "minute": 15},
+                {"hour": 15, "minute": 15},
+                {"hour": 21, "minute": 15}
+            ]
+
+            # Loop over the times and create the EventBridge rules for each
+            for time_est in times_est:
+                est_time = est_timezone.localize(datetime(now_timezone.year, now_timezone.month, now_timezone.day, time_est["hour"], time_est["minute"], 0))
+                utc_time = est_time.astimezone(pytz.utc)
+
+                # Create a cron rule for each converted UTC time
+                rule = events.Rule(
+                    self, f"ft-{env}-salesforce-{entity_name}-load-cron-rule-{time_est['hour']}-{time_est['minute']}",
+                    schedule=events.Schedule.cron(
+                        minute=str(utc_time.minute),
+                        hour=str(utc_time.hour),
+                        day="*", month="*", year="*"
+                    )
+                )
+
+                # Add the state machine as a target for the rule
+                rule.add_target(targets.SfnStateMachine(state_machine))
+
+
+
+            
 
