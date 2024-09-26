@@ -5,6 +5,8 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
+    aws_events as events,
+    aws_events_targets as targets,
     Stack,
     Duration
 )
@@ -19,6 +21,8 @@ from cloud.layer_5_load_layer.ft_load_layer_salesforce_stack import FtLoadLayerS
 
 from dotenv import load_dotenv
 import os
+import pytz
+from datetime import datetime
 
 class FtTransformLayerSalesforceStack(Stack):
 
@@ -106,6 +110,36 @@ class FtTransformLayerSalesforceStack(Stack):
                 timeout=Duration.minutes(60)
             )
 
+            # Use EventBridge Rules to trigger the Raw to Valid state machine on a cron schedule
+            # Raw to Valid Transformation Layer should run every 6 hours at 3:30, 9:30, 15:30, and 21:30 EST daily
+            est_timezone = pytz.timezone("America/New_York")
+            now_timezone = datetime.now(est_timezone)
+
+            times_est = [
+                {"hour": 3, "minute": 30},
+                {"hour": 9, "minute": 30},
+                {"hour": 15, "minute": 30},
+                {"hour": 21, "minute": 30}
+            ]
+
+            # Loop over the times and create the EventBridge rules for each
+            for time_est in times_est:
+                est_time = est_timezone.localize(datetime(now_timezone.year, now_timezone.month, now_timezone.day, time_est["hour"], time_est["minute"], 0))
+                utc_time = est_time.astimezone(pytz.utc)
+
+                # Create a cron rule for each converted UTC time
+                rule = events.Rule(
+                    self, f"ft-{env}-sf-{entity_name}-r2v-{time_est['hour']}-{time_est['minute']}-cron-rule",
+                    schedule=events.Schedule.cron(
+                        minute=str(utc_time.minute),
+                        hour=str(utc_time.hour),
+                        day="*", month="*", year="*"
+                    )
+                )
+
+                # Add the state machine as a target for the rule
+                rule.add_target(targets.SfnStateMachine(raw_to_valid_state_machine))
+
         '''
         VALID to REFINED
         This step in the Transformation Layer should be invoked across ALL entities.
@@ -142,6 +176,34 @@ class FtTransformLayerSalesforceStack(Stack):
             definition=valid_to_refined_definition,
             timeout=Duration.minutes(60)
         )
+
+        # Use EventBridge Rules to trigger the Valid to Refined state machine on a cron schedule
+        # Valid to Refined Transformation Layer should run every 6 hours at 5:00, 11:00, 17:00, and 23:00 EST daily
+
+        times_est = [
+            {"hour": 5, "minute": 00},
+            {"hour": 11, "minute": 00},
+            {"hour": 17, "minute": 00},
+            {"hour": 23, "minute": 00}
+        ]
+
+        # Loop over the times and create the EventBridge rules for each
+        for time_est in times_est:
+            est_time = est_timezone.localize(datetime(now_timezone.year, now_timezone.month, now_timezone.day, time_est["hour"], time_est["minute"], 0))
+            utc_time = est_time.astimezone(pytz.utc)
+
+            # Create a cron rule for each converted UTC time
+            rule = events.Rule(
+                self, f"ft-{env}-sf-v2r-{time_est['hour']}{time_est['minute']}-cron-rule",
+                schedule=events.Schedule.cron(
+                    minute=str(utc_time.minute),
+                    hour=str(utc_time.hour),
+                    day="*", month="*", year="*"
+                )
+            )
+
+            # Add the state machine as a target for the rule
+            rule.add_target(targets.SfnStateMachine(valid_to_refined_state_machine))
 
         # '''
         # HISTORICAL METRICS

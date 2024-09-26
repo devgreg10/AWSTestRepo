@@ -210,7 +210,7 @@ class FtLoadLayerSalesforceStack(Stack):
 
                 # Create a cron rule for each converted UTC time
                 rule = events.Rule(
-                    self, f"ft-{env}-salesforce-{entity_name}-load-cron-rule-{time_est['hour']}-{time_est['minute']}",
+                    self, f"ft-{env}-sf-{entity_name}-load-{time_est['hour']}{time_est['minute']}-cron-rule",
                     schedule=events.Schedule.cron(
                         minute=str(utc_time.minute),
                         hour=str(utc_time.hour),
