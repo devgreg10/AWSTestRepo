@@ -129,12 +129,13 @@ class FtTransformLayerSalesforceStack(Stack):
 
                 # Create a cron rule for each converted UTC time
                 rule = events.Rule(
-                    self, f"ft-{env}-sf-{entity_name}-r2v-{time_est['hour']}-{time_est['minute']}-cron-rule",
+                    self, f"FtTransformSalesforce{entity_name}{time_est['hour']}{time_est['minute']}CronRule",
                     schedule=events.Schedule.cron(
                         minute=str(utc_time.minute),
                         hour=str(utc_time.hour),
                         day="*", month="*", year="*"
-                    )
+                    ),
+                    rule_name=f"ft-{env}-sf-{entity_name}-r2v-{time_est['hour']}-{time_est['minute']}-cron-rule"
                 )
 
                 # Add the state machine as a target for the rule
@@ -194,12 +195,13 @@ class FtTransformLayerSalesforceStack(Stack):
 
             # Create a cron rule for each converted UTC time
             rule = events.Rule(
-                self, f"ft-{env}-sf-v2r-{time_est['hour']}{time_est['minute']}-cron-rule",
+                self, f"FtTransformValidToRefinedCronRule{time_est['hour']}{time_est['minute']}",
                 schedule=events.Schedule.cron(
                     minute=str(utc_time.minute),
                     hour=str(utc_time.hour),
                     day="*", month="*", year="*"
-                )
+                ),
+                rule_name= f"ft-{env}-sf-v2r-{time_est['hour']}{time_est['minute']}-cron-rule"
             )
 
             # Add the state machine as a target for the rule
