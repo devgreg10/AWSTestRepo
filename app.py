@@ -93,6 +93,7 @@ transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
     id = f"ft-{env}-transform-layer-salesforce-stack",
     env = env,
     region=os.getenv('default_region'),
+    email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
     bootstrap_stack = decision_support_bootstrap_stack,
     storage_stack = decision_support_persistent_storage_stack,
     ds_core_stack = decision_support_base_stack,

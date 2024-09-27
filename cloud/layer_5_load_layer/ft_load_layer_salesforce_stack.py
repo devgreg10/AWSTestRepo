@@ -216,7 +216,7 @@ class FtLoadLayerSalesforceStack(Stack):
                         hour=str(utc_time.hour),
                         day="*", month="*", year="*"
                     ),
-                    rule_name=f"ft-{env}-sf-{entity_name}-load-{time_est['hour']}{time_est['minute']}-cron-rule",
+                    rule_name=f"ft-{env}-salesforce-{entity_name}-load-{time_est['hour']}{time_est['minute']}-cron-rule",
                 )
 
                 # Add the state machine as a target for the rule

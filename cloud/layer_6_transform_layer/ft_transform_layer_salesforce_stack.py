@@ -7,6 +7,10 @@ from aws_cdk import (
     aws_stepfunctions_tasks as tasks,
     aws_events as events,
     aws_events_targets as targets,
+    aws_cloudwatch as cloudwatch,
+    aws_cloudwatch_actions as cw_actions,
+    aws_sns as sns,
+    aws_sns_subscriptions as subs,
     Stack,
     Duration
 )
@@ -31,6 +35,7 @@ class FtTransformLayerSalesforceStack(Stack):
                  id: str, 
                  env: str, 
                  region: str,
+                 email_addresses_to_alert_on_error: str,
                  bootstrap_stack: FtDecisionSupportBootstrapStack,
                  storage_stack: FtDecisionSupportPersistentStorageStack,
                  ds_core_stack: FtDecisionSupportCoreStack,
@@ -69,6 +74,19 @@ class FtTransformLayerSalesforceStack(Stack):
         '''
         RAW to VALID
         '''
+
+        # Create an SNS topic to notify on alarm
+        alarm_topic = sns.Topic(
+                        self, 
+                        "FtTransformLayerSalesforceAlarmTopic",
+                        topic_name=f"ft-{env}-salesforce-tranform-layer-alarm")
+        
+        # comma-delimited string of email addresses
+        email_addresses = [email.strip() for email in email_addresses_to_alert_on_error.split(",") ]
+        for email in email_addresses:
+            # Add subscription to the SNS topic (e.g., email notification)
+            alarm_topic.add_subscription(subs.EmailSubscription(email))
+
         # Define the parameters as a dictionary
         raw_to_valid_params = {}
 
@@ -110,6 +128,10 @@ class FtTransformLayerSalesforceStack(Stack):
                 timeout=Duration.minutes(60)
             )
 
+            # ___________________________________
+            # TRIGGER STATE MACHINE ON A SCHEDULE
+            # ___________________________________
+
             # Use EventBridge Rules to trigger the Raw to Valid state machine on a cron schedule
             # Raw to Valid Transformation Layer should run every 6 hours at 3:30, 9:30, 15:30, and 21:30 EST daily
             est_timezone = pytz.timezone("America/New_York")
@@ -135,11 +157,47 @@ class FtTransformLayerSalesforceStack(Stack):
                         hour=str(utc_time.hour),
                         day="*", month="*", year="*"
                     ),
-                    rule_name=f"ft-{env}-sf-{entity_name}-r2v-{time_est['hour']}-{time_est['minute']}-cron-rule"
+                    rule_name=f"ft-{env}-sf-{entity_name}-raw-to-valid-{time_est['hour']}{time_est['minute']}-cron-rule"
                 )
 
                 # Add the state machine as a target for the rule
                 rule.add_target(targets.SfnStateMachine(raw_to_valid_state_machine))
+
+            # _________________________________________
+            # MONITORING - ALARM UPON ERROR or TIME OUT
+            # _________________________________________
+            
+            # CloudWatch Alarm to monitor failed executions
+            failed_executions_metric = raw_to_valid_state_machine.metric("ExecutionsFailed")
+
+            failed_executions_alarm = cloudwatch.Alarm(
+                self, f"FtSalesforce{entity_name}RawToValidFailedExecutionsAlarm",
+                alarm_name=f"ft-{env}-salesforce-{entity_name}-raw-to-valid-error",
+                metric=failed_executions_metric,
+                threshold=1,  # Alarm if more than 1 failure occurs
+                evaluation_periods=1,
+                comparison_operator=cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+                datapoints_to_alarm=1
+            )
+
+            # Add SNS action to the alarm
+            failed_executions_alarm.add_alarm_action(cw_actions.SnsAction(alarm_topic))
+
+            # Similarly, create alarm ExecutionsTimedOut
+            timed_out_executions_metric = raw_to_valid_state_machine.metric("ExecutionsTimedOut")
+
+            timed_out_executions_alarm = cloudwatch.Alarm(
+                self, f"FtSalesforce{entity_name}RawToValidTimedOutExecutionsAlarm",
+                alarm_name=f"ft-{env}-salesforce-{entity_name}-raw-to-valid-timeout",
+                metric=timed_out_executions_metric,
+                threshold=1,  # Alarm if any execution times out
+                evaluation_periods=1,
+                comparison_operator=cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+                datapoints_to_alarm=1
+            )
+
+            # Attach SNS topic to this alarm as well
+            timed_out_executions_alarm.add_alarm_action(cw_actions.SnsAction(alarm_topic))
 
         '''
         VALID to REFINED
@@ -173,10 +231,14 @@ class FtTransformLayerSalesforceStack(Stack):
         # Create the state machine
         valid_to_refined_state_machine = sfn.StateMachine(
             self, f"FtTransformStateMachineValidToRefined",
-            state_machine_name=f"ft-{env}-transform-layer-valid-to-refined",
+            state_machine_name=f"ft-{env}-salesforce-valid-to-refined",
             definition=valid_to_refined_definition,
             timeout=Duration.minutes(60)
         )
+
+        # ___________________________________
+        # TRIGGER STATE MACHINE ON A SCHEDULE
+        # ___________________________________
 
         # Use EventBridge Rules to trigger the Valid to Refined state machine on a cron schedule
         # Valid to Refined Transformation Layer should run every 6 hours at 5:00, 11:00, 17:00, and 23:00 EST daily
@@ -201,11 +263,47 @@ class FtTransformLayerSalesforceStack(Stack):
                     hour=str(utc_time.hour),
                     day="*", month="*", year="*"
                 ),
-                rule_name= f"ft-{env}-sf-v2r-{time_est['hour']}{time_est['minute']}-cron-rule"
+                rule_name= f"ft-{env}-salesforce-valid-to-refined-{time_est['hour']}{time_est['minute']}-cron-rule"
             )
 
             # Add the state machine as a target for the rule
             rule.add_target(targets.SfnStateMachine(valid_to_refined_state_machine))
+
+        # _________________________________________
+        # MONITORING - ALARM UPON ERROR or TIME OUT
+        # _________________________________________
+        
+        # CloudWatch Alarm to monitor failed executions
+        failed_executions_metric = valid_to_refined_state_machine.metric("ExecutionsFailed")
+
+        failed_executions_alarm = cloudwatch.Alarm(
+            self, f"FtSalesforceValidToRefinedFailedExecutionsAlarm",
+            alarm_name=f"ft-{env}-salesforce-valid-to-refined-{entity_name}-error",
+            metric=failed_executions_metric,
+            threshold=1,  # Alarm if more than 1 failure occurs
+            evaluation_periods=1,
+            comparison_operator=cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+            datapoints_to_alarm=1
+        )
+
+        # Add SNS action to the alarm
+        failed_executions_alarm.add_alarm_action(cw_actions.SnsAction(alarm_topic))
+
+        # Similarly, create alarm ExecutionsTimedOut
+        timed_out_executions_metric = valid_to_refined_state_machine.metric("ExecutionsTimedOut")
+
+        timed_out_executions_alarm = cloudwatch.Alarm(
+            self, "FtSalesforceValidToRefinedTimedOutExecutionsAlarm",
+            alarm_name=f"ft-{env}-salesforce-valid-to-refined-{entity_name}-timeout",
+            metric=timed_out_executions_metric,
+            threshold=1,  # Alarm if any execution times out
+            evaluation_periods=1,
+            comparison_operator=cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+            datapoints_to_alarm=1
+        )
+
+        # Attach SNS topic to this alarm as well
+        timed_out_executions_alarm.add_alarm_action(cw_actions.SnsAction(alarm_topic))
 
         # '''
         # HISTORICAL METRICS
