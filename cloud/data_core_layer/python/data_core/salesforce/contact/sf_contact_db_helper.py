@@ -39,7 +39,7 @@ class SalesforceContactDbHelper:
         INSERT INTO ft_ds_raw.sf_contact (
             id, isdeleted, masterrecordid, accountid, lastname, firstname, salutation, name,
             mailingstreet, mailingcity, mailingstate, mailingpostalcode, mailingcountry, mailinglatitude, mailinglongitude, 
-            mailinggeocodeaccuracy, mailingaddress, phone, mobilephone, homephone, otherphone, reportstoid, email, title, 
+            mailinggeocodeaccuracy, phone, mobilephone, homephone, otherphone, reportstoid, email, title, 
             department, leadsource, birthdate, description, ownerid, hasoptedoutofemail, donotcall, createddate, createdbyid,
             lastmodifieddate, lastmodifiedbyid, systemmodstamp, emailbouncedreason, emailbounceddate, isemailbounced, individualid, 
             pronouns, genderidentity, chapter_affiliation__c, chapterid__c, override__c, active__c, ownerid__c, trigger_time__c, 
@@ -90,7 +90,7 @@ class SalesforceContactDbHelper:
         VALUES (
             %(id)s, %(isdeleted)s, %(masterrecordid)s, %(accountid)s, %(lastname)s, %(firstname)s, %(salutation)s, %(name)s,
             %(mailingstreet)s, %(mailingcity)s, %(mailingstate)s, %(mailingpostalcode)s, %(mailingcountry)s, %(mailinglatitude)s, 
-            %(mailinglongitude)s, %(mailinggeocodeaccuracy)s, %(mailingaddress)s, %(phone)s, %(mobilephone)s, %(homephone)s, 
+            %(mailinglongitude)s, %(mailinggeocodeaccuracy)s, %(phone)s, %(mobilephone)s, %(homephone)s, 
             %(otherphone)s, %(reportstoid)s, %(email)s, %(title)s, %(department)s, %(leadsource)s, %(birthdate)s, %(description)s, 
             %(ownerid)s, %(hasoptedoutofemail)s, %(donotcall)s, %(createddate)s, %(createdbyid)s, %(lastmodifieddate)s, 
             %(lastmodifiedbyid)s, %(systemmodstamp)s, %(emailbouncedreason)s, %(emailbounceddate)s, %(isemailbounced)s, %(individualid)s, %(pronouns)s, %(genderidentity)s,
@@ -162,7 +162,6 @@ class SalesforceContactDbHelper:
             mailinglatitude = EXCLUDED.mailinglatitude,
             mailinglongitude = EXCLUDED.mailinglongitude,
             mailinggeocodeaccuracy = EXCLUDED.mailinggeocodeaccuracy,
-            mailingaddress = EXCLUDED.mailingaddress,
             phone = EXCLUDED.phone,
             mobilephone = EXCLUDED.mobilephone,
             homephone = EXCLUDED.homephone,
@@ -421,7 +420,6 @@ class SalesforceContactDbHelper:
                 "mailinglatitude": contact.mailinglatitude,
                 "mailinglongitude": contact.mailinglongitude,
                 "mailinggeocodeaccuracy": contact.mailinggeocodeaccuracy,
-                "mailingaddress": contact.mailingaddress,
                 "phone": contact.phone,
                 "mobilephone": contact.mobilephone,
                 "homephone": contact.homephone,

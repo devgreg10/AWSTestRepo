@@ -24,7 +24,6 @@ class SfContactSourceModel():
     MailingLatitude: str
     MailingLongitude: str
     MailingGeocodeAccuracy: str
-    MailingAddress: str
     Phone: str
     MobilePhone: str
     HomePhone: str
@@ -286,7 +285,6 @@ class SfContactRawDbModel(DbModel):
     mailinglatitude: str
     mailinglongitude: str
     mailinggeocodeaccuracy: str
-    mailingaddress: str
     phone: str
     mobilephone: str
     homephone: str
@@ -557,7 +555,6 @@ def map_sf_contact_source_to_raw(source: SfContactSourceModel) -> SfContactRawDb
         mailinglatitude=source.MailingLatitude,
         mailinglongitude=source.MailingLongitude,
         mailinggeocodeaccuracy=source.MailingGeocodeAccuracy,
-        mailingaddress=source.MailingAddress,
         phone=source.Phone,
         mobilephone=source.MobilePhone,
         homephone=source.HomePhone,
