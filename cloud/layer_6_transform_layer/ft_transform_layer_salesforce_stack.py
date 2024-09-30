@@ -90,9 +90,6 @@ class FtTransformLayerSalesforceStack(Stack):
             # Add subscription to the SNS topic (e.g., email notification)
             alarm_topic.add_subscription(subs.EmailSubscription(email))
 
-        # Define the parameters as a dictionary
-        raw_to_valid_params = {}
-
         for salesforce_entity in ingestion_layer_stack.salesforce_entities:
 
             entity_name = salesforce_entity["entity_name"]
@@ -106,7 +103,6 @@ class FtTransformLayerSalesforceStack(Stack):
                 payload=sfn.TaskInput.from_object({
                     "db_function": f"write_sf_{entity_name.replace('-','_')}_raw_to_valid",
                     "db_schema": "ft_ds_admin",
-                    "input_parameters": raw_to_valid_params,
                     "secret_arn": storage_stack.db_master_user_secret.secret_arn,
                     "region": region
                 }),

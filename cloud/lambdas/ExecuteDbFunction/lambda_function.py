@@ -15,10 +15,6 @@ def lambda_handler(event, context):
     logging.info(f"db_function: {db_function}")
     db_schema = event['db_schema']
     logging.info(f"db_schema:  {db_schema}")
-    input_parameters = event['input_parameters']
-    logging.info(f"input_parameters: {input_parameters}")
-    if not input_parameters:
-        input_parameters = {}
     secret_arn = event['secret_arn']
     logging.info(f"secret_arn: {secret_arn}")
     region = event['region']
@@ -38,7 +34,6 @@ def lambda_handler(event, context):
             db_connection = db_connection,
             db_schema = db_schema, 
             db_function = db_function,
-            input_parameters = input_parameters,
             commit_changes = True,
             close_db_conn = False)
 
