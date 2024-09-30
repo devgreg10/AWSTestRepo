@@ -19,6 +19,7 @@ from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import F
 from cloud.layer_3_core.ft_decision_support_core_stack import FtDecisionSupportCoreStack
 from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
 from cloud.shared.state_machine_alarm_generator import StateMachineAlarmGenerator
+from cloud.shared.utc_time_calculator import  UTCTimeCalculator
 
 from constructs import Construct
 
@@ -213,11 +214,15 @@ class FtLoadLayerSalesforceStack(Stack):
 
             # Use EventBridge Rules to trigger the state machine on a cron schedule
             # Load Layer should run every 6 hours at 3:15, 9:15, 15:15, and 21:15 EST daily
+
+            # calculate UTC time for 3:00 EST
+            utc_three = UTCTimeCalculator(scope=self, hour_in_EST=3)
+
             rule = events.Rule(
                 self, f"FtLoadSalesforce{salesforce_object}CronScheduleRule",
                     schedule=events.Schedule.cron(
                     minute="15",        # At the start of the hour (0 minutes)
-                    hour="14/6",       # Start at 2:00 PM UTC (9am EST) and repeat every 6 hours
+                    hour=f"{str(utc_three)}/6",       # Start at 2:00 PM UTC (9am EST) and repeat every 6 hours
                     day="*",           # Every day
                     month="*",         # Every month
                     year="*"          # Every year

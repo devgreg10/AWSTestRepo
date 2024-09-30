@@ -24,6 +24,7 @@ from cloud.layer_3_core.ft_decision_support_core_stack import FtDecisionSupportC
 from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
 from cloud.layer_5_load_layer.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
 from cloud.shared.state_machine_alarm_generator import StateMachineAlarmGenerator
+from cloud.shared.utc_time_calculator import  UTCTimeCalculator
 
 from dotenv import load_dotenv
 import os
@@ -143,13 +144,17 @@ class FtTransformLayerSalesforceStack(Stack):
             # ___________________________________
             # TRIGGER STATE MACHINE ON A SCHEDULE
             # ___________________________________
+            # Load Layer should run every 6 hours at 3:30, 9:30, 15:30, and 21:30 EST daily
+
+            # calculate UTC time for 3:00 EST
+            utc_three = UTCTimeCalculator(scope=self, hour_in_EST=3)
 
             # Create a cron rule for each converted UTC time
             rule = events.Rule(
                 self, f"FtTransformSalesforce{entity_name}CronRule",
                 schedule=events.Schedule.cron(
                     minute="30",       # At the 30th minute of the hour
-                    hour="14/6",       # Start at 2:30 PM UTC (9am EST) and repeat every 6 hours
+                    hour=f"{str(utc_three)}/6",   # Start at 2:30 PM UTC (9am EST) and repeat every 6 hours
                     day="*",           # Every day
                     month="*",         # Every month
                     year="*"          # Every year
@@ -227,12 +232,14 @@ class FtTransformLayerSalesforceStack(Stack):
         # Use EventBridge Rules to trigger the Valid to Refined state machine on a cron schedule
         # Valid to Refined Transformation Layer should run every 6 hours at 5:00, 11:00, 17:00, and 23:00 EST daily
        
+        utc_five = UTCTimeCalculator(scope=self, hour_in_EST=5)
+
         # Create a cron rule for each converted UTC time
         rule = events.Rule(
             self, f"FtTransformValidToRefinedCronRule",
             schedule=events.Schedule.cron(
                 minute="0",        # At the start of the hour (0 minutes)
-                hour="16/6",       # Start at 4:00 PM UTC (11am EST) and repeat every 6 hours
+                hour=f"{str(utc_five)}/6",       # Start at 4:00 PM UTC (11am EST) and repeat every 6 hours
                 day="*",           # Every day
                 month="*",         # Every month
                 year="*"          # Every year
