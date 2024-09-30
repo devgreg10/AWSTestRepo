@@ -10,461 +10,306 @@ class FtSalesforceContactAppFlowTasks(Construct):
         super().__init__(scope, id)
 
     def get_tasks(self) -> List[appflow.CfnFlow.TaskProperty]:
-        tasks: List[appflow.CfnFlow.TaskProperty] = [
-            appflow.CfnFlow.TaskProperty(
-                source_fields=[
-                    "Id", "Chapter_Affiliation__c", "ChapterID_CONTACT__c", "CASESAFEID__c",
-                    "Contact_Type__c", "Age__c", "Ethnicity__c", "Gender__c", "Grade__c",
-                    "Participation_Status__c", "MailingPostalCode", "MailingStreet",
-                    "MailingCity", "MailingState", "School_Name__c", "School_Name_Other__c",
-                    "FirstName", "LastName", "Birthdate", "AccountId", "LastModifiedDate",
-                    "IsDeleted", "CreatedDate", "SystemModstamp"
-                ],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="PROJECTION"
-                ),
-                task_type="Filter",
-                task_properties=[]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Id"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Id",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="id"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="id"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Chapter_Affiliation__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Chapter_Affiliation__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="reference"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="reference"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["ChapterID_CONTACT__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="ChapterID_CONTACT__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["CASESAFEID__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="CASESAFEID__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Contact_Type__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Contact_Type__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="multipicklist"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="multipicklist"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Age__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Age__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="double"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="double"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Ethnicity__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Ethnicity__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="picklist"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="picklist"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Gender__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Gender__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="picklist"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="picklist"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Grade__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Grade__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="picklist"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="picklist"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Participation_Status__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Participation_Status__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="picklist"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="picklist"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["MailingPostalCode"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="MailingPostalCode",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["MailingStreet"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="MailingStreet",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="textarea"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="textarea"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["MailingCity"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="MailingCity",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["MailingState"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="MailingState",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["School_Name__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="School_Name__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["School_Name_Other__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="School_Name_Other__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["FirstName"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="FirstName",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["LastName"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="LastName",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Birthdate"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="Birthdate",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="date"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="date"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["AccountId"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="AccountId",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="reference"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="reference"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["LastModifiedDate"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="LastModifiedDate",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="datetime"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="datetime"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["IsDeleted"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="IsDeleted",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="boolean"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="boolean"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["CreatedDate"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="CreatedDate",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="datetime"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="datetime"
-                    ),
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["SystemModstamp"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
-                    salesforce="NO_OP"
-                ),
-                destination_field="SystemModstamp",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="datetime"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="datetime"
-                    ),
-                ]
-            )
+
+        full_field_mappings = [
+            {"sourceField": "Id", "destinationField": "Id", "sourceDataType": "id", "destinationDataType": "id"},
+            {"sourceField": "IsDeleted", "destinationField": "IsDeleted", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "MasterRecordId", "destinationField": "MasterRecordId", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "AccountId", "destinationField": "AccountId", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "LastName", "destinationField": "LastName", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "FirstName", "destinationField": "FirstName", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Salutation", "destinationField": "Salutation", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Name", "destinationField": "Name", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "OtherStreet", "destinationField": "OtherStreet", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            # {"sourceField": "OtherCity", "destinationField": "OtherCity", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "OtherState", "destinationField": "OtherState", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "OtherPostalCode", "destinationField": "OtherPostalCode", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "OtherCountry", "destinationField": "OtherCountry", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "OtherLatitude", "destinationField": "OtherLatitude", "sourceDataType": "double", "destinationDataType": "double"},
+            # {"sourceField": "OtherLongitude", "destinationField": "OtherLongitude", "sourceDataType": "double", "destinationDataType": "double"},
+            # {"sourceField": "OtherGeocodeAccuracy", "destinationField": "OtherGeocodeAccuracy", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            # {"sourceField": "OtherAddress", "destinationField": "OtherAddress", "sourceDataType": "address", "destinationDataType": "address"},
+            {"sourceField": "MailingStreet", "destinationField": "MailingStreet", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "MailingCity", "destinationField": "MailingCity", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "MailingState", "destinationField": "MailingState", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "MailingPostalCode", "destinationField": "MailingPostalCode", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "MailingCountry", "destinationField": "MailingCountry", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "MailingLatitude", "destinationField": "MailingLatitude", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "MailingLongitude", "destinationField": "MailingLongitude", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "MailingGeocodeAccuracy", "destinationField": "MailingGeocodeAccuracy", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "MailingAddress", "destinationField": "MailingAddress", "sourceDataType": "address", "destinationDataType": "address"},
+            {"sourceField": "Phone", "destinationField": "Phone", "sourceDataType": "phone", "destinationDataType": "phone"},
+            # {"sourceField": "Fax", "destinationField": "Fax", "sourceDataType": "phone", "destinationDataType": "phone"},
+            {"sourceField": "MobilePhone", "destinationField": "MobilePhone", "sourceDataType": "phone", "destinationDataType": "phone"},
+            {"sourceField": "HomePhone", "destinationField": "HomePhone", "sourceDataType": "phone", "destinationDataType": "phone"},
+            {"sourceField": "OtherPhone", "destinationField": "OtherPhone", "sourceDataType": "phone", "destinationDataType": "phone"},
+            # {"sourceField": "AssistantPhone", "destinationField": "AssistantPhone", "sourceDataType": "phone", "destinationDataType": "phone"},
+            {"sourceField": "ReportsToId", "destinationField": "ReportsToId", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "Email", "destinationField": "Email", "sourceDataType": "email", "destinationDataType": "email"},
+            {"sourceField": "Title", "destinationField": "Title", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Department", "destinationField": "Department", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "AssistantName", "destinationField": "AssistantName", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "LeadSource", "destinationField": "LeadSource", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Birthdate", "destinationField": "Birthdate", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Description", "destinationField": "Description", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "OwnerId", "destinationField": "OwnerId", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "HasOptedOutOfEmail", "destinationField": "HasOptedOutOfEmail", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            # {"sourceField": "HasOptedOutOfFax", "destinationField": "HasOptedOutOfFax", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "DoNotCall", "destinationField": "DoNotCall", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "CreatedDate", "destinationField": "CreatedDate", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            {"sourceField": "CreatedById", "destinationField": "CreatedById", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "LastModifiedDate", "destinationField": "LastModifiedDate", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            {"sourceField": "LastModifiedById", "destinationField": "LastModifiedById", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "SystemModstamp", "destinationField": "SystemModstamp", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            # {"sourceField": "LastActivityDate", "destinationField": "LastActivityDate", "sourceDataType": "date", "destinationDataType": "date"},
+            # {"sourceField": "LastCURequestDate", "destinationField": "LastCURequestDate", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            # {"sourceField": "LastCUUpdateDate", "destinationField": "LastCUUpdateDate", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            # {"sourceField": "LastViewedDate", "destinationField": "LastViewedDate", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            # {"sourceField": "LastReferencedDate", "destinationField": "LastReferencedDate", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            {"sourceField": "EmailBouncedReason", "destinationField": "EmailBouncedReason", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "EmailBouncedDate", "destinationField": "EmailBouncedDate", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            {"sourceField": "IsEmailBounced", "destinationField": "IsEmailBounced", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            # {"sourceField": "PhotoUrl", "destinationField": "PhotoUrl", "sourceDataType": "url", "destinationDataType": "url"},
+            # {"sourceField": "Jigsaw", "destinationField": "Jigsaw", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "JigsawContactId", "destinationField": "JigsawContactId", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "IndividualId", "destinationField": "IndividualId", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "Pronouns", "destinationField": "Pronouns", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "GenderIdentity", "destinationField": "GenderIdentity", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Chapter_Affiliation__c", "destinationField": "Chapter_Affiliation__c", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "ChapterID__c", "destinationField": "ChapterID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Override__c", "destinationField": "Override__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Active__c", "destinationField": "Active__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "OwnerID__c", "destinationField": "OwnerID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Trigger_Time__c", "destinationField": "Trigger_Time__c", "sourceDataType": "datetime", "destinationDataType": "datetime"},
+            {"sourceField": "Contact_Type_Text__c", "destinationField": "Contact_Type_Text__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Military__c", "destinationField": "Military__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Contact_ID__c", "destinationField": "Contact_ID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Primary_Contact_s_Email__c", "destinationField": "Primary_Contact_s_Email__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Region__c", "destinationField": "Region__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "ChapterID_CONTACT__c", "destinationField": "ChapterID_CONTACT__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Accomplishment_Level__c", "destinationField": "Accomplishment_Level__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Additional_Information__c", "destinationField": "Additional_Information__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "Area_of_Interest__c", "destinationField": "Area_of_Interest__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Attended_Coach_Advanced_Training__c", "destinationField": "Attended_Coach_Advanced_Training__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Birthdate_Map__c", "destinationField": "Birthdate_Map__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Branded_Program_Location__c", "destinationField": "Branded_Program_Location__c", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "CASESAFEID__c", "destinationField": "CASESAFEID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Chapter_Title__c", "destinationField": "Chapter_Title__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "First_Tee_Employment_Type__c", "destinationField": "First_Tee_Employment_Type__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Coach_Fee_Amount_Paid__c", "destinationField": "Coach_Fee_Amount_Paid__c", "sourceDataType": "currency", "destinationDataType": "currency"},
+            {"sourceField": "Coach_Fee_Paid_Date__c", "destinationField": "Coach_Fee_Paid_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Coach_Inactive_Date__c", "destinationField": "Coach_Inactive_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Coach_Level__c", "destinationField": "Coach_Level__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Golf_Level__c", "destinationField": "Golf_Level__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Inactive__c", "destinationField": "Inactive__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Legacy_ID__c", "destinationField": "Legacy_ID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "School_City__c", "destinationField": "School_City__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "School_Name_Other__c", "destinationField": "School_Name_Other__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "School_Name__c", "destinationField": "School_Name__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "School_State__c", "destinationField": "School_State__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Transitioned__c", "destinationField": "Transitioned__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Player_Coach_Training__c", "destinationField": "Player_Coach_Training__c", "sourceDataType": "date", "destinationDataType": "date"},
+            # {"sourceField": "Identify_User__c", "destinationField": "Identify_User__c", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "Contact_Type_Helper__c", "destinationField": "Contact_Type_Helper__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Total_Available_Credits__c", "destinationField": "Total_Available_Credits__c", "sourceDataType": "currency", "destinationDataType": "currency"},
+            {"sourceField": "Docebo_Is_Coach__c", "destinationField": "Docebo_Is_Coach__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Request_Advanced_Training__c", "destinationField": "Request_Advanced_Training__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            # {"sourceField": "rh2__Currency_Test__c", "destinationField": "rh2__Currency_Test__c", "sourceDataType": "currency", "destinationDataType": "currency"},
+            # {"sourceField": "rh2__Formula_Test__c", "destinationField": "rh2__Formula_Test__c", "sourceDataType": "currency", "destinationDataType": "currency"},
+            # {"sourceField": "rh2__Integer_Test__c", "destinationField": "rh2__Integer_Test__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Participant_Level_Accomplishments__c", "destinationField": "Participant_Level_Accomplishments__c", "sourceDataType": "double", "destinationDataType": "double"},
+            # {"sourceField": "Count_Contact__c", "destinationField": "Count_Contact__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Coach_Membership_Fee_Due__c", "destinationField": "Coach_Membership_Fee_Due__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Coach_Membership_Fee_Paid__c", "destinationField": "Coach_Membership_Fee_Paid__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Coach_Program_Start_Date__c", "destinationField": "Coach_Program_Start_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Coach_Qualified_For__c", "destinationField": "Coach_Qualified_For__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Coach_Retention_Status_Changed_Date__c", "destinationField": "Coach_Retention_Status_Changed_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Company__c", "destinationField": "Company__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Contact_Type__c", "destinationField": "Contact_Type__c", "sourceDataType": "multipicklist", "destinationDataType": "multipicklist"},
+            {"sourceField": "Curriculum_Session_Registration_Date__c", "destinationField": "Curriculum_Session_Registration_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Custom_Created_Date__c", "destinationField": "Custom_Created_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Eligible_Participants__c", "destinationField": "Eligible_Participants__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Executive_Director_Email__c", "destinationField": "Executive_Director_Email__c", "sourceDataType": "email", "destinationDataType": "email"},
+            {"sourceField": "General_Availability_Days_of_the_Week__c", "destinationField": "General_Availability_Days_of_the_Week__c", "sourceDataType": "multipicklist", "destinationDataType": "multipicklist"},
+            {"sourceField": "General_Availability_Seasons__c", "destinationField": "General_Availability_Seasons__c", "sourceDataType": "multipicklist", "destinationDataType": "multipicklist"},
+            {"sourceField": "Golf_Course_Affiliation__c", "destinationField": "Golf_Course_Affiliation__c", "sourceDataType": "string", "destinationDataType": "string"},
+            # {"sourceField": "Home_Phone_Map__c", "destinationField": "Home_Phone_Map__c", "sourceDataType": "phone", "destinationDataType": "phone"},
+            {"sourceField": "Hours_of_Training_Attended__c", "destinationField": "Hours_of_Training_Attended__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "How_did_you_hear_about_us__c", "destinationField": "How_did_you_hear_about_us__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Is_Coach__c", "destinationField": "Is_Coach__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Lead_Coach_Total_Hours__c", "destinationField": "Lead_Coach_Total_Hours__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Age__c", "destinationField": "Age__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Allergies__c", "destinationField": "Allergies__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "Contact_Inactive_Date__c", "destinationField": "Contact_Inactive_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "County__c", "destinationField": "County__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Dietary_Restrictions__c", "destinationField": "Dietary_Restrictions__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Disabilities__c", "destinationField": "Disabilities__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Emergency_Contact_Email__c", "destinationField": "Emergency_Contact_Email__c", "sourceDataType": "email", "destinationDataType": "email"},
+            {"sourceField": "Emergency_Contact_Name__c", "destinationField": "Emergency_Contact_Name__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Emergency_Contact_Number__c", "destinationField": "Emergency_Contact_Number__c", "sourceDataType": "phone", "destinationDataType": "phone"},
+            {"sourceField": "Request_ACT_Training__c", "destinationField": "Request_ACT_Training__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Emergency_Contact__c", "destinationField": "Emergency_Contact__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Ethnicity__c", "destinationField": "Ethnicity__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Gender__c", "destinationField": "Gender__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Lead_Coach_Total_Sessions__c", "destinationField": "Lead_Coach_Total_Sessions__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Lead_Source_Other__c", "destinationField": "Lead_Source_Other__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "Lifetime_Member__c", "destinationField": "Lifetime_Member__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Listing__c", "destinationField": "Listing__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Mailing_Address_Company__c", "destinationField": "Mailing_Address_Company__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "Main_Program_Location__c", "destinationField": "Main_Program_Location__c", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "Master_Coach_Recognition_Year__c", "destinationField": "Master_Coach_Recognition_Year__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Other_Address_Company__c", "destinationField": "Other_Address_Company__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "Other_Golf_Certifications_Description__c", "destinationField": "Other_Golf_Certifications_Description__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "Other_Qualifications__c", "destinationField": "Other_Qualifications__c", "sourceDataType": "multipicklist", "destinationDataType": "multipicklist"},
+            {"sourceField": "Participation_Status__c", "destinationField": "Participation_Status__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Primary_Contact_s_Mobile_Phone_Provider__c", "destinationField": "Primary_Contact_s_Mobile_Phone_Provider__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Primary_Contact_s_Mobile__c", "destinationField": "Primary_Contact_s_Mobile__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Primary_Contact_s_Name__c", "destinationField": "Primary_Contact_s_Name__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Program_Director_Primary_Email__c", "destinationField": "Program_Director_Primary_Email__c", "sourceDataType": "email", "destinationDataType": "email"},
+            {"sourceField": "Program_Director_Secondary_Email__c", "destinationField": "Program_Director_Secondary_Email__c", "sourceDataType": "email", "destinationDataType": "email"},
+            {"sourceField": "Program_Level__c", "destinationField": "Program_Level__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Progressed_Participants__c", "destinationField": "Progressed_Participants__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "FMP_ID__c", "destinationField": "FMP_ID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Grade__c", "destinationField": "Grade__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Historic_Health_Info__c", "destinationField": "Historic_Health_Info__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Legacy_Participant_User_Id__c", "destinationField": "Legacy_Participant_User_Id__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "MRM_ID__c", "destinationField": "MRM_ID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Membership_Created_Date__c", "destinationField": "Membership_Created_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Membership_Status__c", "destinationField": "Membership_Status__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Membership_Valid_From__c", "destinationField": "Membership_Valid_From__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Membership_Valid_To__c", "destinationField": "Membership_Valid_To__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Middle_Name__c", "destinationField": "Middle_Name__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Military_Affiliation__c", "destinationField": "Military_Affiliation__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Military_Base_Installation__c", "destinationField": "Military_Base_Installation__c", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "Military_Branch__c", "destinationField": "Military_Branch__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Mobile_Phone_Provider__c", "destinationField": "Mobile_Phone_Provider__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Nickname__c", "destinationField": "Nickname__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Preferred_Contact_Method__c", "destinationField": "Preferred_Contact_Method__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Reggie_Id__c", "destinationField": "Reggie_Id__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Reggie_Participant_Id__c", "destinationField": "Reggie_Participant_Id__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Relationship_To_Participants__c", "destinationField": "Relationship_To_Participants__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Secondary_Email__c", "destinationField": "Secondary_Email__c", "sourceDataType": "email", "destinationDataType": "email"},
+            {"sourceField": "USGA_Handicap__c", "destinationField": "USGA_Handicap__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Work_Phone__c", "destinationField": "Work_Phone__c", "sourceDataType": "phone", "destinationDataType": "phone"},
+            {"sourceField": "Progression_Status_Changed_Date__c", "destinationField": "Progression_Status_Changed_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Progression_Status__c", "destinationField": "Progression_Status__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Reason_For_Leaving__c", "destinationField": "Reason_For_Leaving__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Recognized_The_First_Tee_Coach_Year__c", "destinationField": "Recognized_The_First_Tee_Coach_Year__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Retained_Coach_Count__c", "destinationField": "Retained_Coach_Count__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Retention_Status__c", "destinationField": "Retention_Status__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Secondary_Contact_s_Email__c", "destinationField": "Secondary_Contact_s_Email__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Serve_as_National_Trainer__c", "destinationField": "Serve_as_National_Trainer__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Served_as_One_Day_Observer__c", "destinationField": "Served_as_One_Day_Observer__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Session_Transfer_From__c", "destinationField": "Session_Transfer_From__c", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "Session_Transfer_To__c", "destinationField": "Session_Transfer_To__c", "sourceDataType": "reference", "destinationDataType": "reference"},
+            {"sourceField": "Status__c", "destinationField": "Status__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Support_Coach_Total_Coaching_Hours__c", "destinationField": "Support_Coach_Total_Coaching_Hours__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Support_Coach_Total_Sessions__c", "destinationField": "Support_Coach_Total_Sessions__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Title__c", "destinationField": "Title__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Total_Coaching_Hours1__c", "destinationField": "Total_Coaching_Hours1__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Total_Coaching_Hours__c", "destinationField": "Total_Coaching_Hours__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Total_Listing_Sessions_Delivered__c", "destinationField": "Total_Listing_Sessions_Delivered__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Total_Sessions_Coach_Assigned__c", "destinationField": "Total_Sessions_Coach_Assigned__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Track_Program_Level__c", "destinationField": "Track_Program_Level__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Participant_Hours__c", "destinationField": "Participant_Hours__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Parent_Contact__c", "destinationField": "Parent_Contact__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Litmos__Access_Level__c", "destinationField": "Litmos__Access_Level__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Litmos__Completed_Percentage__c", "destinationField": "Litmos__Completed_Percentage__c", "sourceDataType": "percent", "destinationDataType": "percent"},
+            {"sourceField": "Litmos__Courses_Assigned__c", "destinationField": "Litmos__Courses_Assigned__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Litmos__Courses_Completed__c", "destinationField": "Litmos__Courses_Completed__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Litmos__Deactivate_From_Litmos__c", "destinationField": "Litmos__Deactivate_From_Litmos__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Litmos__Full_Name__c", "destinationField": "Litmos__Full_Name__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Litmos__Languages__c", "destinationField": "Litmos__Languages__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Litmos__Level__c", "destinationField": "Litmos__Level__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Litmos__LitmosID__c", "destinationField": "Litmos__LitmosID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Litmos__Litmos_Activated__c", "destinationField": "Litmos__Litmos_Activated__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Litmos__Litmos_Login_Access__c", "destinationField": "Litmos__Litmos_Login_Access__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Litmos__Litmos_UserId__c", "destinationField": "Litmos__Litmos_UserId__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Litmos__OriginalId__c", "destinationField": "Litmos__OriginalId__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Litmos__Sync_Litmos__c", "destinationField": "Litmos__Sync_Litmos__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Litmos__Total_Sum_Percentages__c", "destinationField": "Litmos__Total_Sum_Percentages__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Litmos__User_Id__c", "destinationField": "Litmos__User_Id__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Litmos__p_Completed_Percentage__c", "destinationField": "Litmos__p_Completed_Percentage__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Executive_Updates__c", "destinationField": "Executive_Updates__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "SafeSport_Compliance_not_Required__c", "destinationField": "SafeSport_Compliance_not_Required__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Student_Notes__c", "destinationField": "Student_Notes__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
+            {"sourceField": "Language__c", "destinationField": "Language__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "FT_App_Pilot__c", "destinationField": "FT_App_Pilot__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "International_Chapter__c", "destinationField": "International_Chapter__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "FYI__c", "destinationField": "FYI__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Impact_Today__c", "destinationField": "Impact_Today__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Press_Clippings__c", "destinationField": "Press_Clippings__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Market_Size__c", "destinationField": "Market_Size__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Territory__c", "destinationField": "Territory__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Active_Chapter__c", "destinationField": "Active_Chapter__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "CombinationforKey__c", "destinationField": "CombinationforKey__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Created_by_lead__c", "destinationField": "Created_by_lead__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Sports_Engine_ID__c", "destinationField": "Sports_Engine_ID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Cloudingo_Related_Account_Type__c", "destinationField": "Cloudingo_Related_Account_Type__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "MDR__c", "destinationField": "MDR__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Merged_Email__c", "destinationField": "Merged_Email__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "MDR_NID__c", "destinationField": "MDR_NID__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Ethnicity_Location__c", "destinationField": "Ethnicity_Location__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Duplicates_Removed__c", "destinationField": "Duplicates_Removed__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "AccountIdDUPMatch__c", "destinationField": "AccountIdDUPMatch__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Birthdate_Dupe_Match__c", "destinationField": "Birthdate_Dupe_Match__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Background_Check_Exp_bucket__c", "destinationField": "Background_Check_Exp_bucket__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Background_Check_Expiration_Date__c", "destinationField": "Background_Check_Expiration_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "Background_Check_Passed__c", "destinationField": "Background_Check_Passed__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Background_Check_Status__c", "destinationField": "Background_Check_Status__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Compliant__c", "destinationField": "Compliant__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Days_until_Background_Check_Expires__c", "destinationField": "Days_until_Background_Check_Expires__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Days_until_SafeSport_Training_Expires__c", "destinationField": "Days_until_SafeSport_Training_Expires__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Number_of_Safety_Records__c", "destinationField": "Number_of_Safety_Records__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "SafeSport_Training_Completed__c", "destinationField": "SafeSport_Training_Completed__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "SafeSport_Training_Exp_bucket__c", "destinationField": "SafeSport_Training_Exp_bucket__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "SafeSport_Training_Expiration_Date__c", "destinationField": "SafeSport_Training_Expiration_Date__c", "sourceDataType": "date", "destinationDataType": "date"},
+            {"sourceField": "SafeSport_Training_Status__c", "destinationField": "SafeSport_Training_Status__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Contact_Name__c", "destinationField": "Contact_Name__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Training_Type__c", "destinationField": "Training_Type__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Chapter_Safe_Sport_Designation__c", "destinationField": "Chapter_Safe_Sport_Designation__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Email__c", "destinationField": "Docebo_Email__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Docebo_User_ID__c", "destinationField": "Docebo_User_ID__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Docebo_Is_Community_Staff__c", "destinationField": "Docebo_Is_Community_Staff__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Is_Parent__c", "destinationField": "Docebo_Is_Parent__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Is_Participant__c", "destinationField": "Docebo_Is_Participant__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Is_School_Staff__c", "destinationField": "Docebo_Is_School_Staff__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Username_Override__c", "destinationField": "Docebo_Username_Override__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Docebo_Username__c", "destinationField": "Docebo_Username__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Salesforce_Username__c", "destinationField": "Salesforce_Username__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Docebo_Pilot_User__c", "destinationField": "Docebo_Pilot_User__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Is_HQ_Staff__c", "destinationField": "Docebo_Is_HQ_Staff__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Disconnect__c", "destinationField": "Docebo_Disconnect__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Account_Active__c", "destinationField": "Docebo_Account_Active__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Master_Coach__c", "destinationField": "Master_Coach__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Primary_Contact_Home_Phone__c", "destinationField": "Primary_Contact_Home_Phone__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "User_Email__c", "destinationField": "User_Email__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Impact_Today_Board_Members__c", "destinationField": "Impact_Today_Board_Members__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Impact_Today_Coaches__c", "destinationField": "Impact_Today_Coaches__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Impact_Today_Leaders__c", "destinationField": "Impact_Today_Leaders__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "NCCP__c", "destinationField": "NCCP__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Pursuing_Ace__c", "destinationField": "Pursuing_Ace__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Is_Junior_Coach__c", "destinationField": "Docebo_Is_Junior_Coach__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Lifetime_Gamification_Points__c", "destinationField": "Lifetime_Gamification_Points__c", "sourceDataType": "double", "destinationDataType": "double"},
+            {"sourceField": "Respect_In_Sport_Certification__c", "destinationField": "Respect_In_Sport_Certification__c", "sourceDataType": "string", "destinationDataType": "string"},
+            {"sourceField": "Canva_Admin__c", "destinationField": "Canva_Admin__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Website_Admin__c", "destinationField": "Website_Admin__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
+            {"sourceField": "Docebo_Username_Randomly_Generated__c", "destinationField": "Docebo_Username_Randomly_Generated__c", "sourceDataType": "boolean", "destinationDataType": "boolean"}
         ]
 
+        # Generate the task mappings in the required format
+        tasks: List[appflow.CfnFlow.TaskProperty] = [
+            appflow.CfnFlow.TaskProperty(
+                source_fields=[mapping["sourceField"]],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
+                destination_field=mapping["destinationField"],
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="DESTINATION_DATA_TYPE", value=mapping["destinationDataType"]),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="SOURCE_DATA_TYPE", value=mapping["sourceDataType"]),
+                ]
+            )
+            for mapping in full_field_mappings
+        ]
+        
         return tasks
-
-
-
-
-
-
-
