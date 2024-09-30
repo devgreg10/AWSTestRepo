@@ -2,7 +2,7 @@ from datetime import datetime
 import pytz
 
 class UTCTimeCalculator:
-    def __init__(self, scope, 
+    def __init__(self,  
                  hour_in_EST: int):
         """
         Reusable class to calculate UTC hour given the hour in EST.
@@ -10,13 +10,9 @@ class UTCTimeCalculator:
         :param scope: The CDK scope (Stack or Construct) where this alarm will be defined.
         :param hour_in_EST: The hour in EST to calculate.
         """
-        self.scope = scope
         self.hour_in_EST = hour_in_EST 
 
-        # Calculate the hour in UTC
-        self.calculate_utc_hour()
-
-    def calculate_utc_hour(self):
+    def calculate_utc_hour(self) -> int:
          
         # Define the EST timezone
         est = pytz.timezone("America/New_York")
@@ -30,7 +26,5 @@ class UTCTimeCalculator:
         # Convert 3 AM EST to UTC
         utc_time = est_time.astimezone(pytz.utc)
 
-        # Extract the UTC hour
-        utc_hour = utc_time.hour
-
-        return utc_hour
+        # return the UTC hour
+        return utc_time.hour
