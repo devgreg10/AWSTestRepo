@@ -147,7 +147,7 @@ class FtTransformLayerSalesforceStack(Stack):
             # Load Layer should run every 6 hours at 3:30, 9:30, 15:30, and 21:30 EST daily
 
             # calculate UTC time for 3:00 EST
-            utc_three = UTCTimeCalculator(hour_in_EST=3).calculate_utc_hour()
+            utc_three = UTCTimeCalculator(hour_in_EST=3, modulo=6).calculate_utc_hour()
 
             # Create a cron rule for each converted UTC time
             rule = events.Rule(
@@ -232,7 +232,7 @@ class FtTransformLayerSalesforceStack(Stack):
         # Use EventBridge Rules to trigger the Valid to Refined state machine on a cron schedule
         # Valid to Refined Transformation Layer should run every 6 hours at 5:00, 11:00, 17:00, and 23:00 EST daily
        
-        utc_five = UTCTimeCalculator(hour_in_EST=5).calculate_utc_hour()
+        utc_five = UTCTimeCalculator(hour_in_EST=5, modulo=6).calculate_utc_hour()
 
         # Create a cron rule for each converted UTC time
         rule = events.Rule(

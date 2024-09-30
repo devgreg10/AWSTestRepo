@@ -216,7 +216,7 @@ class FtLoadLayerSalesforceStack(Stack):
             # Load Layer should run every 6 hours at 3:15, 9:15, 15:15, and 21:15 EST daily
 
             # calculate UTC time for 3:00 EST
-            utc_three = UTCTimeCalculator(hour_in_EST=3).calculate_utc_hour()
+            utc_three = UTCTimeCalculator(hour_in_EST=3, modulo=6).calculate_utc_hour()
 
             rule = events.Rule(
                 self, f"FtLoadSalesforce{salesforce_object}CronScheduleRule",
