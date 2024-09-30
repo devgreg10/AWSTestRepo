@@ -9,6 +9,7 @@ from aws_cdk import (
     aws_events_targets as targets,
     aws_sns as sns,
     aws_sns_subscriptions as subscriptions,
+    aws_logs as logs,
     Stack,
     Duration
 )
@@ -17,6 +18,7 @@ from cloud.layer_1_bootstrap.ft_decision_support_bootstrap_stack import FtDecisi
 from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
 from cloud.layer_3_core.ft_decision_support_core_stack import FtDecisionSupportCoreStack
 from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import FtIngestionLayerSalesforceStack
+from cloud.shared.state_machine_alarm_generator import StateMachineAlarmGenerator
 
 from constructs import Construct
 
@@ -61,6 +63,13 @@ class FtLoadLayerSalesforceStack(Stack):
         LOAD LAYER - Lambda & State Machine
         Loop through salesforce_entities
         '''
+
+        # Create an SNS topic to notify on alarm
+        alarm_topic = sns.Topic(
+            self, 
+            "FtLoadLayerSalesforceAlarmTopic",
+            topic_name=f"ft-{env}-salesforce-load-layer-alarm"
+        )
 
         for salesforce_entity in ingestion_layer_stack.salesforce_entities:
 
@@ -184,45 +193,53 @@ class FtLoadLayerSalesforceStack(Stack):
             # Define the state machine workflow
             definition = list_s3_files_task.next(process_files_task)
 
+            load_layer_log_group = logs.LogGroup(
+                self, f"FtTranformLayer{entity_name}LogGroup",
+                log_group_name=f"/aws/ft-{env}-salesforce-load-{entity_name}-log-group",
+                retention=logs.RetentionDays.ONE_WEEK  # Retain logs for 1 week
+            )
+
             # Create the state machine
             state_machine = sfn.StateMachine(
                 self, f"FtLoadStateMachineSalesforce{salesforce_object}",
                 state_machine_name=f"ft-{env}-load-layer-salesforce-{entity_name}",
-                definition=definition
+                definition=definition,
+                timeout=Duration.minutes(120),
+                logs=sfn.LogOptions(
+                    destination=load_layer_log_group,
+                    level=sfn.LogLevel.ALL  # Log all events 
+                )
             )
 
             # Use EventBridge Rules to trigger the state machine on a cron schedule
             # Load Layer should run every 6 hours at 3:15, 9:15, 15:15, and 21:15 EST daily
-            est_timezone = pytz.timezone("America/New_York")
-            now_timezone = datetime.now(est_timezone)
-
-            times_est = [
-                {"hour": 3, "minute": 15},
-                {"hour": 9, "minute": 15},
-                {"hour": 15, "minute": 15},
-                {"hour": 21, "minute": 15}
-            ]
-
-            # Loop over the times and create the EventBridge rules for each
-            for time_est in times_est:
-                est_time = est_timezone.localize(datetime(now_timezone.year, now_timezone.month, now_timezone.day, time_est["hour"], time_est["minute"], 0))
-                utc_time = est_time.astimezone(pytz.utc)
-
-                # Create a cron rule for each converted UTC time
-                rule = events.Rule(
-                    self, f"FtLoadSalesforce{salesforce_object}CronSchedule{time_est['hour']}{time_est['minute']}Rule",
+            rule = events.Rule(
+                self, f"FtLoadSalesforce{salesforce_object}CronScheduleRule",
                     schedule=events.Schedule.cron(
-                        minute=str(utc_time.minute),
-                        hour=str(utc_time.hour),
-                        day="*", month="*", year="*"
-                    ),
-                    rule_name=f"ft-{env}-salesforce-{entity_name}-load-{time_est['hour']}{time_est['minute']}-cron-rule",
-                )
+                    minute="15",        # At the start of the hour (0 minutes)
+                    hour="14/6",       # Start at 2:00 PM UTC (9am EST) and repeat every 6 hours
+                    day="*",           # Every day
+                    month="*",         # Every month
+                    year="*"          # Every year
+                ),
+                rule_name=f"ft-{env}-salesforce-{entity_name}-load-cron-rule",
+            )
 
-                # Add the state machine as a target for the rule
-                rule.add_target(targets.SfnStateMachine(state_machine))
+            # Add the state machine as a target for the rule
+            rule.add_target(targets.SfnStateMachine(state_machine))
 
-
+            # _________________________________________
+            # MONITORING - ALARM UPON ERROR or TIME OUT
+            # _________________________________________
+            
+            StateMachineAlarmGenerator(
+                scope=self,
+                id_prefix=f"FtSalesforce{entity_name}Load",
+                alarm_name_prefix=f"ft-{env}-salesforce-{entity_name}_load",
+                log_group=load_layer_log_group,
+                sns_topic=alarm_topic,
+                state_machine=state_machine
+            )
 
             
 
