@@ -121,12 +121,16 @@ class FtIngestionLayerSalesforceStack(Stack):
                             s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
                                 aggregation_config=appflow.CfnFlow.AggregationConfigProperty(
                                     aggregation_type="None",
-                                    target_file_size=32
+                                    target_file_size=32 # 32MB target file size
                                 ),
                                 file_type="JSON",
                                 prefix_config=appflow.CfnFlow.PrefixConfigProperty(
                                     prefix_format="MINUTE", # Determines the level of granularity for the date and time that's included in the prefix.
-                                    prefix_type="FILENAME" # Determines the format of the prefix, and whether it applies to the file name, file path, or both.
+                                    prefix_type="FILENAME", # Determines the format of the prefix, and whether it applies to the file name, file path, or both.
+                                    path_prefix_hierarchy=[
+                                        "SCHEMA_VERSION",
+                                        "EXECUTION_ID"
+                                    ]
                                 ),
                                 preserve_source_data_typing=False # all source data converted into strings
                             )
