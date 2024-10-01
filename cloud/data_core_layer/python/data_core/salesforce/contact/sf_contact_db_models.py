@@ -678,7 +678,6 @@ def map_sf_contact_source_to_raw(source: SfContactSourceModel) -> SfContactRawDb
         membership_valid_from__c=source.Membership_Valid_From__c,
         membership_valid_to__c=source.Membership_Valid_To__c,
         middle_name__c=source.Middle_Name__c,
-        middle_name__c=source.Middle_Name__c,
         military_affiliation__c=source.Military_Affiliation__c,
         military_base_installation__c=source.Military_Base_Installation__c,
         military_branch__c=source.Military_Branch__c,
