@@ -607,7 +607,7 @@ class FtSalesforceContactAppFlowTasks(Construct):
             )
         )
 
-        # Task for partitioning based on the field ChapterID__c, otherwise the file size is too large
+        # Task for partitioning based on the field Chapter_Affiliation__c, otherwise the file size is too large
         tasks.append(
             appflow.CfnFlow.TaskProperty(
                 source_fields=[],
@@ -616,7 +616,7 @@ class FtSalesforceContactAppFlowTasks(Construct):
                 task_properties=[
                     appflow.CfnFlow.TaskPropertiesObjectProperty(
                         key="ORDERED_PARTITION_KEYS_LIST",
-                        value='["ChapterID__c"]'  # Partition on "ChapterID__c"
+                        value='["Chapter_Affiliation__c"]'  # Partition on "Chapter_Affiliation__c"
                     )
                 ]
             )
