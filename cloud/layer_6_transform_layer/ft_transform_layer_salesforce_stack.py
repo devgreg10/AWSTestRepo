@@ -1,19 +1,16 @@
 from aws_cdk import (
     aws_lambda as lambda_,
-    aws_iam as iam,
-    aws_s3 as s3,
     aws_ec2 as ec2,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
     aws_events as events,
     aws_events_targets as targets,
-    aws_cloudwatch as cloudwatch,
-    aws_cloudwatch_actions as cw_actions,
     aws_sns as sns,
     aws_sns_subscriptions as subs,
     aws_logs as logs,
     Stack,
-    Duration
+    Duration,
+    RemovalPolicy
 )
 
 from constructs import Construct
@@ -122,7 +119,8 @@ class FtTransformLayerSalesforceStack(Stack):
             raw_to_valid_log_group = logs.LogGroup(
                 self, f"FtTransformStateMachineSalesforce{entity_name}LogGroup",
                 log_group_name=f"/aws/ft-{env}-salesforce-raw-to-valid-{entity_name}",
-                retention=logs.RetentionDays.ONE_WEEK  # Retain logs for 1 week
+                retention=logs.RetentionDays.ONE_WEEK,  # Retain logs for 1 week
+                removal_policy=RemovalPolicy.DESTROY
             )
 
             # Create the state machine
@@ -206,7 +204,8 @@ class FtTransformLayerSalesforceStack(Stack):
         valid_to_refined_log_group = logs.LogGroup(
             self, "FtTransformValidToRefinedLogGroup",
             log_group_name=f"/aws/ft-{env}-valid-to-refined-log-group",
-            retention=logs.RetentionDays.ONE_WEEK  # Retain logs for 1 week
+            retention=logs.RetentionDays.ONE_WEEK,  # Retain logs for 1 week
+            removal_policy=RemovalPolicy.DESTROY
         )
 
         # Create the state machine

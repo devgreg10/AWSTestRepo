@@ -11,7 +11,8 @@ from aws_cdk import (
     aws_sns_subscriptions as subscriptions,
     aws_logs as logs,
     Stack,
-    Duration
+    Duration,
+    RemovalPolicy
 )
 
 from cloud.layer_1_bootstrap.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
@@ -197,7 +198,8 @@ class FtLoadLayerSalesforceStack(Stack):
             load_layer_log_group = logs.LogGroup(
                 self, f"FtTranformLayer{entity_name}LogGroup",
                 log_group_name=f"/aws/ft-{env}-salesforce-load-{entity_name}-log-group",
-                retention=logs.RetentionDays.ONE_WEEK  # Retain logs for 1 week
+                retention=logs.RetentionDays.ONE_WEEK,  # Retain logs for 1 week
+                removal_policy=RemovalPolicy.DESTROY
             )
 
             # Create the state machine
