@@ -608,5 +608,20 @@ class FtSalesforceContactAppFlowTasks(Construct):
                 task_properties=[]
             )
         )
+
+        # Task for partitioning based on the field Grade__c, otherwise the file size is too large
+        tasks.append(
+            appflow.CfnFlow.TaskProperty(
+                source_fields=[],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
+                task_type="Partition",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="ORDERED_PARTITION_KEYS_LIST",
+                        value='["Grade__c"]'  # Partition on "Grade__c"
+                    )
+                ]
+            )
+        )
         
         return tasks

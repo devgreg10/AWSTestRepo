@@ -35,7 +35,7 @@ class SalesforceContactDbHelper:
         cursor = db_connection.cursor()
 
         # Define the upsert SQL statement
-            upsert_query = """
+        upsert_query = """
         INSERT INTO ft_ds_raw.sf_contact (
             id, isdeleted, masterrecordid, accountid, lastname, firstname, salutation, name,
             mailingstreet, mailingcity, mailingstate, mailingpostalcode, mailingcountry, mailinglatitude, mailinglongitude, 
