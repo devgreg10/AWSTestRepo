@@ -87,19 +87,19 @@ load_layer_salesforce_stack = FtLoadLayerSalesforceStack(
 Layer 6 - TRANSFORM LAYER
 '''
 
-#Salesforce
-transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
-    app, 
-    id = f"ft-{env}-transform-layer-salesforce-stack",
-    env = env,
-    region=os.getenv('default_region'),
-    email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
-    bootstrap_stack = decision_support_bootstrap_stack,
-    storage_stack = decision_support_persistent_storage_stack,
-    ds_core_stack = decision_support_base_stack,
-    ingestion_layer_stack=ingestion_layer_salesforce_stack,
-    load_layer_stack=load_layer_salesforce_stack
-)
+# #Salesforce
+# transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
+#     app, 
+#     id = f"ft-{env}-transform-layer-salesforce-stack",
+#     env = env,
+#     region=os.getenv('default_region'),
+#     email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
+#     bootstrap_stack = decision_support_bootstrap_stack,
+#     storage_stack = decision_support_persistent_storage_stack,
+#     ds_core_stack = decision_support_base_stack,
+#     ingestion_layer_stack=ingestion_layer_salesforce_stack,
+#     load_layer_stack=load_layer_salesforce_stack
+# )
 
 '''
 TAGS
