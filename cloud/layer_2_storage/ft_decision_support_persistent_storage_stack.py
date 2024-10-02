@@ -52,6 +52,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         self.data_lake_bucket = s3.Bucket(self, 
             "FTDevDataLakeBucket",
             bucket_name=data_lake_bucket_name,
+            object_ownership=s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
             removal_policy=RemovalPolicy.DESTROY
         )
 
@@ -92,6 +93,21 @@ class FtDecisionSupportPersistentStorageStack(Stack):
                     self.data_lake_bucket.bucket_arn,       # The bucket itself
                     f"{self.data_lake_bucket.bucket_arn}/*" # All objects within the bucket
                 ]
+            )
+        )
+
+        # Add a bucket policy to allow the S3OperationsRole to access objects
+        self.data_lake_bucket.add_to_resource_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                principals=[s3_role],
+                actions=[
+                    "s3:ListBucket",
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:DeleteObject"
+                ],
+                resources=[self.data_lake_bucket.bucket_arn, f"{self.data_lake_bucket.bucket_arn}/*"]
             )
         )
 
