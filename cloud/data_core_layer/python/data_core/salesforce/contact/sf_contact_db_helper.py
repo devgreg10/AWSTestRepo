@@ -552,7 +552,7 @@ class SalesforceContactDbHelper:
                 %(docebo_username_randomly_generated__c)s,
                 %(dss_ingestion_timestamp)s
             )
-            ON CONFLICT (id)
+            ON CONFLICT (id, systemmodstamp)
             DO UPDATE SET
                 isdeleted = EXCLUDED.isdeleted,
                 masterrecordid = EXCLUDED.masterrecordid,
