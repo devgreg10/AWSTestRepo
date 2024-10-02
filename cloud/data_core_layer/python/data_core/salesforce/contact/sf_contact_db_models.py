@@ -361,7 +361,6 @@ class SfContactRawDbModel(DbModel):
     general_availability_days_of_the_week__c: str
     general_availability_seasons__c: str
     golf_course_affiliation__c: str
-    home_phone_map__c: str
     hours_of_training_attended__c: str
     how_did_you_hear_about_us__c: str
     is_coach__c: str
