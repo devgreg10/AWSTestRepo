@@ -79,7 +79,7 @@ class FtLoadLayerSalesforceStack(Stack):
             salesforce_object = salesforce_entity["salesforce_object"]
 
             # S3 Bucket folder where this entity will be written
-            s3_bucket_folder = f"salesforce/{entity_name}/"
+            s3_bucket_folder = f"salesforce/{entity_name}/ingress/"
 
             # Define a Lambda to list all files
             lambda_list_s3_files = lambda_.Function(self, f"LambdaListFilesSalesforce{salesforce_object}",
