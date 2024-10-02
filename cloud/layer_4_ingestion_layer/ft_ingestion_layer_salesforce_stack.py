@@ -121,7 +121,7 @@ class FtIngestionLayerSalesforceStack(Stack):
                             s3_output_format_config=appflow.CfnFlow.S3OutputFormatConfigProperty(
                                 aggregation_config=appflow.CfnFlow.AggregationConfigProperty(
                                     aggregation_type="None",
-                                    target_file_size=32 # 32MB target file size
+                                    target_file_size=16 # 16MB target file size
                                 ),
                                 file_type="JSON",
                                 prefix_config=appflow.CfnFlow.PrefixConfigProperty(
