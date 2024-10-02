@@ -2,6 +2,7 @@ import json
 import boto3
 import os
 import logging
+import re
 from datetime import datetime
 from data_core.salesforce.contact.sf_contact_db_helper import SalesforceContactDbHelper
 from data_core.salesforce.contact.sf_contact_db_models import SfContactSourceModel
@@ -52,6 +53,13 @@ def lambda_handler(event, context):
 
             chunk = []
 
+            # Use regex to extract the value of Chapter_Affiliation__c (when partitioning by Chapter_Affilation__c)
+            match = re.search(r'Chapter_Affiliation__c=([^/]+)', file_name)
+
+            if match:
+                chapter_affiliation = match.group(1) if match else "unknown_affiliation"
+                logging.info(f"Chapter Affiliation: {chapter_affiliation}")
+
             try:
 
                 # Stream and process each JSON object separately
@@ -61,6 +69,8 @@ def lambda_handler(event, context):
 
                         # parse the json line into a dictionary
                         contact_json = json.loads(line)
+                        # append Chapter Affiliation because as a partition key, it is not included
+                        contact_json['Chapter_Affiliation__c'] = chapter_affiliation
 
                         # Create the SfContactSourceModel object from the dictionary
                         sf_source_contact = SfContactSourceModel(**contact_json)
@@ -101,16 +111,25 @@ def lambda_handler(event, context):
                 logging.error(f"{function_name} - Error processing record from file {file_name}: {line} | Error: {record_error}")
                 error_records.append({'file_name': file_name, 'line': line})
 
-            # Move the file to the "Complete" folder
-            destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
+            
+            if match:
+                # Construct the destination key including the Chapter_Affiliation__c subfolder
+                destination_key = f'{bucket_folder}complete/Chapter_Affiliation__c={chapter_affiliation}/{os.path.basename(file_name)}'
+
+            else:
+                destination_key = f'{bucket_folder}complete/{os.path.basename(file_name)}'
+
             if not destination_key.endswith('.json'):
                 destination_key += '.json'
 
             logging.info(f"{function_name} - Attempting to copy file | bucket_name: {bucket_name} | file_name: {file_name} | destination_key: {destination_key}")
 
+            # Copy the object to the new location (destination key)
             s3_client.copy_object(Bucket=bucket_name, 
                                     CopySource={'Bucket': bucket_name, 'Key': file_name}, 
                                     Key=destination_key)
+            
+            # Delete the original object after it has been copied
             s3_client.delete_object(Bucket=bucket_name, Key=file_name)
             logging.info(f"{function_name} - File moved to 'Complete' folder: {destination_key}")
             
