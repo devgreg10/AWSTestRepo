@@ -73,24 +73,27 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         # Attach AppFlow policy to the bucket
         self.data_lake_bucket.add_to_resource_policy(appflow_policy_statement)
 
-        # Define bucket policy for AWS Management Console users to move files
-        move_files_policy_statement = iam.PolicyStatement(
-            effect=iam.Effect.ALLOW,
-            principals=[iam.AccountRootPrincipal()],  # Allows any user from the account
-            actions=[
-                "s3:ListBucket",    # List objects in the bucket
-                "s3:GetObject",     # Get objects (needed for move)
-                "s3:PutObject",     # Put objects (needed for move)
-                "s3:DeleteObject"   # Delete objects (needed for move)
-            ],
-            resources=[
-                self.data_lake_bucket.bucket_arn,        # Required for s3:ListBucket
-                f"{self.data_lake_bucket.bucket_arn}/*"  # All objects in the bucket
-            ]
+        # Create an IAM Role for S3 operations (move and delete files)
+        s3_role = iam.Role(
+            self, "S3DataLakeRole",
+            assumed_by=iam.ServicePrincipal("ec2.amazonaws.com")
         )
 
-        # Attach the move files policy to the bucket
-        self.data_lake_bucket.add_to_resource_policy(move_files_policy_statement)
+        # Add the necessary permissions to the role for moving and deleting files/subfolders
+        s3_role.add_to_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "s3:ListBucket",       # List files and folders in the bucket
+                    "s3:GetObject",         # Read objects (required for copying)
+                    "s3:PutObject",         # Write objects (required for copying to the destination)
+                    "s3:DeleteObject"       # Delete objects (to remove the source file and delete subfolders)
+                ],
+                resources=[
+                    self.data_lake_bucket.bucket_arn,       # The bucket itself
+                    f"{self.data_lake_bucket.bucket_arn}/*" # All objects within the bucket
+                ]
+            )
+        )
 
         '''
         DATA WAREHOUSE - Creation
