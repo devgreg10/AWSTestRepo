@@ -436,7 +436,6 @@ class FtSalesforceContactAppFlowTasks(Construct):
                     "General_Availability_Days_of_the_Week__c",
                     "General_Availability_Seasons__c",
                     "Golf_Course_Affiliation__c",
-                    "Home_Phone_Map__c",
                     "Hours_of_Training_Attended__c",
                     "How_did_you_hear_about_us__c",
                     "Is_Coach__c",
