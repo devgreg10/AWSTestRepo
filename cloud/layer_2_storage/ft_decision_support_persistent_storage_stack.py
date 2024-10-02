@@ -87,7 +87,8 @@ class FtDecisionSupportPersistentStorageStack(Stack):
                     "s3:ListBucket",       # List files and folders in the bucket
                     "s3:GetObject",         # Read objects (required for copying)
                     "s3:PutObject",         # Write objects (required for copying to the destination)
-                    "s3:DeleteObject"       # Delete objects (to remove the source file and delete subfolders)
+                    "s3:DeleteObject",
+                    "s3:CopyObject"       # Delete objects (to remove the source file and delete subfolders)
                 ],
                 resources=[
                     self.data_lake_bucket.bucket_arn,       # The bucket itself
@@ -105,7 +106,8 @@ class FtDecisionSupportPersistentStorageStack(Stack):
                     "s3:ListBucket",
                     "s3:GetObject",
                     "s3:PutObject",
-                    "s3:DeleteObject"
+                    "s3:DeleteObject",
+                    "s3:CopyObject"
                 ],
                 resources=[self.data_lake_bucket.bucket_arn, f"{self.data_lake_bucket.bucket_arn}/*"]
             )
