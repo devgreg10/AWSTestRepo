@@ -101,7 +101,6 @@ class SfContactSourceModel():
     General_Availability_Days_of_the_Week__c: str
     General_Availability_Seasons__c: str
     Golf_Course_Affiliation__c: str
-    Home_Phone_Map__c: str
     Hours_of_Training_Attended__c: str
     How_did_you_hear_about_us__c: str
     Is_Coach__c: str
@@ -632,7 +631,6 @@ def map_sf_contact_source_to_raw(source: SfContactSourceModel) -> SfContactRawDb
         general_availability_days_of_the_week__c=source.General_Availability_Days_of_the_Week__c,
         general_availability_seasons__c=source.General_Availability_Seasons__c,
         golf_course_affiliation__c=source.Golf_Course_Affiliation__c,
-        home_phone_map__c=source.Home_Phone_Map__c,
         hours_of_training_attended__c=source.Hours_of_Training_Attended__c,
         how_did_you_hear_about_us__c=source.How_did_you_hear_about_us__c,
         is_coach__c=source.Is_Coach__c,
