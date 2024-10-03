@@ -26,8 +26,8 @@ class StateMachineAlarmGenerator:
         :param log_group: Log group of the state machine
         """
         self.scope = scope
-        self.id_prefix = id_prefix # f"FtSalesforce{entity_name}RawToValid"
-        self.alarm_name_prefix = alarm_name_prefix #ft-{env}-salesforce-{entity_name}-raw-to-valid
+        self.id_prefix = id_prefix 
+        self.alarm_name_prefix = alarm_name_prefix 
         self.state_machine = state_machine
         self.sns_topic = sns_topic
         self.log_group = log_group
@@ -98,5 +98,4 @@ class StateMachineAlarmGenerator:
         )
 
         combined_error_alarm.add_alarm_action(cw_actions.SnsAction(self.sns_topic))
-
-        return [failed_executions_alarm, timed_out_executions_alarm, combined_error_alarm]
+        

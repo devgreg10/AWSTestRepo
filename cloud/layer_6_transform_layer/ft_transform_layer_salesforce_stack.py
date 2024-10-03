@@ -22,6 +22,7 @@ from cloud.layer_4_ingestion_layer.ft_ingestion_layer_salesforce_stack import Ft
 from cloud.layer_5_load_layer.ft_load_layer_salesforce_stack import FtLoadLayerSalesforceStack
 from cloud.shared.state_machine_alarm_generator import StateMachineAlarmGenerator
 from cloud.shared.utc_time_calculator import  UTCTimeCalculator
+from cloud.shared.execute_single_db_function_state_machine import ExecuteSingleDbFunctionStateMachineGenerator
 
 from dotenv import load_dotenv
 import os
@@ -55,7 +56,6 @@ class FtTransformLayerSalesforceStack(Stack):
         TRANFORMATION LAYER
         Loop through salesforce_entities
         '''
-
         self.lambda_execute_db_function = lambda_.Function(self, f"LambdaExecuteDbFunction",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name=f"ft-{env}-execute-db-function",
@@ -71,202 +71,131 @@ class FtTransformLayerSalesforceStack(Stack):
         # Grant the Lambda function permissions to read the DB Connection Secret
         storage_stack.db_master_user_secret.grant_read(self.lambda_execute_db_function)
 
-        '''
-        RAW to VALID
-        '''
+        # Create an SNS topic for all of the Transform Layer
+        transform_layer_alarm_topic = sns.Topic(
+            self, 
+            "FtTransformLayerSalesforceAlarmTopic",
+            topic_name=f"ft-{env}-salesforce-tranform-layer-alarm"
+        )
 
-        # Create an SNS topic to notify on alarm
-        alarm_topic = sns.Topic(
-                        self, 
-                        "FtTransformLayerSalesforceAlarmTopic",
-                        topic_name=f"ft-{env}-salesforce-tranform-layer-alarm")
-        
         # comma-delimited string of email addresses
         email_addresses = [email.strip() for email in email_addresses_to_alert_on_error.split(",") ]
         for email in email_addresses:
             # Add subscription to the SNS topic (e.g., email notification)
-            alarm_topic.add_subscription(subs.EmailSubscription(email))
+            transform_layer_alarm_topic.add_subscription(subs.EmailSubscription(email))
 
+        '''
+        RAW to VALID
+        '''
         for salesforce_entity in ingestion_layer_stack.salesforce_entities:
 
             entity_name = salesforce_entity["entity_name"]
 
-            # Create Tasks for Raw to Valid State Machine
-        
-            # Step 1: Call ft_ds_admin.raw_to_valid_sf_contact
-            execute_raw_to_valid_task = tasks.LambdaInvoke(
-                self, f"Execute Raw to Valid Salesforce {entity_name}",
-                lambda_function=self.lambda_execute_db_function,
-                payload=sfn.TaskInput.from_object({
-                    "db_function": f"write_sf_{entity_name.replace('-','_')}_raw_to_valid",
-                    "db_schema": "ft_ds_admin",
-                    "secret_arn": storage_stack.db_master_user_secret.secret_arn,
-                    "region": region
-                }),
-                result_path="$.raw_to_valid_result"
-            ).add_retry(
-                max_attempts=3,
-                interval=Duration.seconds(5),
-                backoff_rate=2.0
-            ).add_catch(
-                sfn.Fail(self, f"Stored Procedure raw_to_valid failed Salesforce {entity_name}", error="Stored Procedure raw_to_valid failed", cause="Stored Procedure raw_to_valid failed"),
-                errors=["States.ALL"]
-            )
-
-            # Define the state machine workflow
-            raw_to_valid_definition = execute_raw_to_valid_task
-
-            raw_to_valid_log_group = logs.LogGroup(
-                self, f"FtTransformStateMachineSalesforce{entity_name}LogGroup",
-                log_group_name=f"/aws/ft-{env}-salesforce-raw-to-valid-{entity_name}",
-                retention=logs.RetentionDays.ONE_WEEK,  # Retain logs for 1 week
-                removal_policy=RemovalPolicy.DESTROY
-            )
-
-            # Create the state machine
-            raw_to_valid_state_machine = sfn.StateMachine(
-                self, f"FtTransformStateMachineSalesforce{entity_name}",
-                state_machine_name=f"ft-{env}-salesforce-raw-to-valid-{entity_name}",
-                definition=raw_to_valid_definition,
-                timeout=Duration.minutes(60),
-                logs=sfn.LogOptions(
-                    destination=raw_to_valid_log_group,
-                    level=sfn.LogLevel.ALL  # Log all events 
-                )
-            )
-
-            # ___________________________________
-            # TRIGGER STATE MACHINE ON A SCHEDULE
-            # ___________________________________
-            # Load Layer should run every 6 hours at 3:30, 9:30, 15:30, and 21:30 EST daily
-
+            # Load Layer - ft_ds_admin.raw_to_valid_sf_contact
+            # Schedule: run every 6 hours at 3:30, 9:30, 15:30, and 21:30 EST daily
             # calculate UTC time for 3:00 EST
             utc_three = UTCTimeCalculator(hour_in_EST=3, modulo=6).calculate_utc_hour()
 
-            # Create a cron rule for each converted UTC time
-            rule = events.Rule(
-                self, f"FtTransformSalesforce{entity_name}CronRule",
-                schedule=events.Schedule.cron(
-                    minute="30",       # At the 30th minute of the hour
-                    hour=f"{str(utc_three)}/6",   # Start at 2:30 PM UTC (9am EST) and repeat every 6 hours
-                    day="*",           # Every day
-                    month="*",         # Every month
-                    year="*"          # Every year
-                ),
-                rule_name=f"ft-{env}-sf-{entity_name}-raw-to-valid-cron-rule"
-            )
-
-            # Add the state machine as a target for the rule
-            rule.add_target(targets.SfnStateMachine(raw_to_valid_state_machine))
-
-            # _________________________________________
-            # MONITORING - ALARM UPON ERROR or TIME OUT
-            # _________________________________________
-            
-            StateMachineAlarmGenerator(
+            ExecuteSingleDbFunctionStateMachineGenerator(
                 scope=self,
-                id_prefix=f"FtSalesforce{entity_name}RawToValid",
-                alarm_name_prefix=f"ft-{env}-salesforce-{entity_name}-raw-to-valid",
-                log_group=raw_to_valid_log_group,
-                sns_topic=alarm_topic,
-                state_machine=raw_to_valid_state_machine
+                lambda_execute_db_function=self.lambda_execute_db_function,
+                id_prefix=f"ft-{env}-salesforce-raw-to-valid-{entity_name}",
+                db_schema="ft_ds_admin",
+                db_function=f"write_sf_{entity_name.replace('-','_')}_raw_to_valid",
+                db_secret_arn=storage_stack.db_master_user_secret.secret_arn,
+                region=region,
+                cron_schedule=events.Schedule.cron(
+                    minute="30",                # At the 30th minute of the hour
+                    hour=f"{str(utc_three)}/6", # 3:00 UTC, repeat every 6 hours
+                    day="*",                    # Every day
+                    month="*",                  # Every month
+                    year="*"                    # Every year
+                ),
+                sns_topic=transform_layer_alarm_topic
             )
-
+        
         '''
         VALID to REFINED
-        This step in the Transformation Layer should be invoked across ALL entities.
+        Invoked across ALL entities.
         '''
-        # Create Tasks for Valid to Refined State Machine
-    
-        # Step 1: Call ft_ds_admin.write_valid_to_refined
-        execute_valid_to_refined_task = tasks.LambdaInvoke(
-            self, f"Execute Valid to Refined transformation",
-            lambda_function=self.lambda_execute_db_function,
-            payload=sfn.TaskInput.from_object({
-                "db_function": f"write_valid_to_refined",
-                "db_schema": "ft_ds_admin",
-                "secret_arn": storage_stack.db_master_user_secret.secret_arn,
-                "region": region
-            }),
-            result_path="$.valid_to_refined_result"
-        ).add_retry(
-            max_attempts=3,
-            interval=Duration.seconds(5),
-            backoff_rate=2.0
-        ).add_catch(
-            sfn.Fail(self, f"Stored Procedure valid-to-refined failed", error="Stored Procedure valid-to-refined failed", cause="Stored Procedure valid-to-refined failed"),
-            errors=["States.ALL"]
-        )
-
-        # Define the state machine workflow
-        valid_to_refined_definition = execute_valid_to_refined_task
-
-        valid_to_refined_log_group = logs.LogGroup(
-            self, "FtTransformValidToRefinedLogGroup",
-            log_group_name=f"/aws/ft-{env}-valid-to-refined-log-group",
-            retention=logs.RetentionDays.ONE_WEEK,  # Retain logs for 1 week
-            removal_policy=RemovalPolicy.DESTROY
-        )
-
-        # Create the state machine
-        valid_to_refined_state_machine = sfn.StateMachine(
-            self, f"FtTransformStateMachineValidToRefined",
-            state_machine_name=f"ft-{env}-salesforce-valid-to-refined",
-            definition=valid_to_refined_definition,
-            timeout=Duration.minutes(60),
-            logs=sfn.LogOptions(
-                destination=valid_to_refined_log_group,
-                level=sfn.LogLevel.ALL  # Log all events 
-            )
-        )
-
-        # ___________________________________
-        # TRIGGER STATE MACHINE ON A SCHEDULE
-        # ___________________________________
-
-        # Use EventBridge Rules to trigger the Valid to Refined state machine on a cron schedule
         # Valid to Refined Transformation Layer should run every 6 hours at 5:00, 11:00, 17:00, and 23:00 EST daily
-       
         utc_five = UTCTimeCalculator(hour_in_EST=5, modulo=6).calculate_utc_hour()
 
-        # Create a cron rule for each converted UTC time
-        rule = events.Rule(
-            self, f"FtTransformValidToRefinedCronRule",
-            schedule=events.Schedule.cron(
-                minute="0",        # At the start of the hour (0 minutes)
-                hour=f"{str(utc_five)}/6",       # Start at 4:00 PM UTC (11am EST) and repeat every 6 hours
-                day="*",           # Every day
-                month="*",         # Every month
-                year="*"          # Every year
-            ),
-            rule_name= f"ft-{env}-salesforce-valid-to-refined-cron-rule"
-        )
-
-        # Add the state machine as a target for the rule
-        rule.add_target(targets.SfnStateMachine(valid_to_refined_state_machine))
-
-        # _________________________________________
-        # MONITORING - ALARM UPON ERROR or TIME OUT
-        # _________________________________________
-        
-        StateMachineAlarmGenerator(
+        ExecuteSingleDbFunctionStateMachineGenerator(
             scope=self,
-            id_prefix=f"FtSalesforceValidToRefined",
-            alarm_name_prefix=f"ft-{env}-salesforce-valid-to-refined",
-            log_group=valid_to_refined_log_group,
-            sns_topic=alarm_topic,
-            state_machine=valid_to_refined_state_machine
+            lambda_execute_db_function=self.lambda_execute_db_function,
+            id_prefix=f"ft-{env}-salesforce-valid-to-refined",
+            db_schema="ft_ds_admin",
+            db_function="write_valid_to_refined",
+            db_secret_arn=storage_stack.db_master_user_secret.secret_arn,
+            region=region,
+            cron_schedule=events.Schedule.cron(
+                minute="0",                # At the 0th minute of the hour
+                hour=f"{str(utc_five)}/6", # 5:00 UTC, repeat every 6 hours
+                day="*",                    # Every day
+                month="*",                  # Every month
+                year="*"                    # Every year
+            ),
+            sns_topic=transform_layer_alarm_topic
         )
 
-        # '''
-        # HISTORICAL METRICS
-        # This step in the Transformation Layer should be invoked across ALL entities.
-        # '''
-        # # Create Tasks for Historical Metrics State Machine
+        '''
+        HISTORICAL METRICS
+        This step in the Transformation Layer should be invoked across ALL entities.
+        '''
+        historical_metrics = [
+            {"db_function": "calculate_historical_active_participant_counts", "short_name": "active_participant_counts"},
+            {"db_function": "calculate_historical_ethnic_diversity_percentage", "short_name": "ethnic_diversity_percentage"},
+            {"db_function": "calculate_historical_female_percentage", "short_name": "female_percentage"},
+            {"db_function": "calculate_historical_retention_percentage", "short_name": "retention_percentage"},
+            {"db_function": "calculate_historical_underserved_areas_counts", "short_name": "underserved_areas_counts"}
+        ]
+
+        # Historical Metric Functions should be run once per day at 3:00am EST
+        for historical_metric in historical_metrics:
+
+            db_function = historical_metric["db_function"]
+            short_name = historical_metric["short_name"]
+
+            ExecuteSingleDbFunctionStateMachineGenerator(
+                scope=self,
+                lambda_execute_db_function=self.lambda_execute_db_function,
+                id_prefix=f"ft-{env}-{short_name}",
+                db_schema="ft_ds_admin",
+                db_function=db_function,
+                db_secret_arn=storage_stack.db_master_user_secret.secret_arn,
+                region=region,
+                cron_schedule=events.Schedule.cron(
+                    minute="0",                 # At the 30th minute of the hour
+                    hour=f"{str(utc_three)}",   # 3:00 UTC daily, does not repeat
+                    day="*",                    # Every day
+                    month="*",                  # Every month
+                    year="*"                    # Every year
+                ),
+                sns_topic=transform_layer_alarm_topic
+            )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # # Create Tasks for Historical Active Participant Counts
     
         # # Step 1: Call ft_ds_admin.write_valid_to_refined
-        # execute_valid_to_refined_task = tasks.LambdaInvoke(
-        #     self, f"Execute Valid to Refined transformation",
+        # execute_historical_active_task = tasks.LambdaInvoke(
+        #     self, f"Execute Historical Metrics transformation",
         #     lambda_function=self.lambda_execute_db_function,
         #     payload=sfn.TaskInput.from_object({
         #         "db_function": f"write_valid_to_refined",
