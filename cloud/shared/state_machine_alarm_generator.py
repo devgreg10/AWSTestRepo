@@ -91,7 +91,7 @@ class StateMachineAlarmGenerator:
                 period=Duration.minutes(1),
                 statistic="Sum"
             ),
-            alarm_name=f"{self.id_prefix}-combined-log-error-alarm",
+            alarm_name=f"{self.alarm_name_prefix}-combined-log-error-alarm",
             threshold=1,  # Alarm if any error (ExecutionFailed, TimedOut, or DbException) occurs
             evaluation_periods=1,
             comparison_operator=cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD

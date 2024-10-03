@@ -274,30 +274,30 @@ class FtDecisionSupportPersistentStorageStack(Stack):
 
 
         # Create another Secret for an Admin User that can be communicated to developers
-        self.data_warehouse_db_cluster.add_rotation_multi_user(
-            id = "AdminUser",
-            secret = rds.DatabaseSecret(
-                self, 
-                "DBAdminUserSecret",
-                secret_name = f"ft-{env}-datawarehouse-db-admin-user-secret",
-                username=f"ft_{env}_data_warehouse_admin_user",
-                master_secret=self.db_master_user_secret,
-                dbname=default_database_name
-            )
-        )
+        # self.data_warehouse_db_cluster.add_rotation_multi_user(
+        #     id = "AdminUser",
+        #     secret = rds.DatabaseSecret(
+        #         self, 
+        #         "DBAdminUserSecret",
+        #         secret_name = f"ft-{env}-datawarehouse-db-admin-user-secret",
+        #         username=f"ft_{env}_data_warehouse_admin_user",
+        #         master_secret=self.db_master_user_secret,
+        #         dbname=default_database_name
+        #     )
+        # )
 
         # Create another Secret for a Servie Account User to be used by our Lambdas
-        self.data_warehouse_db_cluster.add_rotation_multi_user(
-            id = "LambdaUser",
-            secret = rds.DatabaseSecret(
-                self, 
-                "DBLambdaUserSecret",
-                secret_name = f"ft-{env}-datawarehouse-db-lambda-user-secret",
-                username=f"ft_{env}_data_warehouse_lambda_user",
-                master_secret=self.db_master_user_secret,
-                dbname=default_database_name
-            )
-        )
+        # self.data_warehouse_db_cluster.add_rotation_multi_user(
+        #     id = "LambdaUser",
+        #     secret = rds.DatabaseSecret(
+        #         self, 
+        #         "DBLambdaUserSecret",
+        #         secret_name = f"ft-{env}-datawarehouse-db-lambda-user-secret",
+        #         username=f"ft_{env}_data_warehouse_lambda_user",
+        #         master_secret=self.db_master_user_secret,
+        #         dbname=default_database_name
+        #     )
+        # )
 
         # Create IAM Role for the Bastion Host with Session Manager permissions
         bastion_role = iam.Role(
