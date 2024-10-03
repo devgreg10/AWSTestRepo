@@ -161,7 +161,6 @@ class SfContactSourceModel():
     Merged_Email__c: str
     MDR_NID__c: str
     Ethnicity_Location__c: str
-    AccountIdDUPMatch__c: str
     Background_Check_Exp_bucket__c: str
     Background_Check_Expiration_Date__c: str
     Background_Check_Passed__c: str
