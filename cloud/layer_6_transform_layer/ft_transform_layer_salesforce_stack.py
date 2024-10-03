@@ -144,11 +144,11 @@ class FtTransformLayerSalesforceStack(Stack):
         This step in the Transformation Layer should be invoked across ALL entities.
         '''
         historical_metrics = [
-            {"db_function": "calculate_historical_active_participant_counts", "short_name": "active_participant_counts"},
-            {"db_function": "calculate_historical_ethnic_diversity_percentage", "short_name": "ethnic_diversity_percentage"},
-            {"db_function": "calculate_historical_female_percentage", "short_name": "female_percentage"},
-            {"db_function": "calculate_historical_retention_percentage", "short_name": "retention_percentage"},
-            {"db_function": "calculate_historical_underserved_areas_counts", "short_name": "underserved_areas_counts"}
+            {"db_function": "calculate_historical_active_participant_counts", "short_name": "active-participant-counts"},
+            {"db_function": "calculate_historical_ethnic_diversity_percentage", "short_name": "ethnic-diversity-percentage"},
+            {"db_function": "calculate_historical_female_percentage", "short_name": "female-percentage"},
+            {"db_function": "calculate_historical_retention_percentage", "short_name": "retention-percentage"},
+            {"db_function": "calculate_historical_underserved_areas_counts", "short_name": "underserved-areas-counts"}
         ]
 
         # Historical Metric Functions should be run once per day at 3:00am EST
