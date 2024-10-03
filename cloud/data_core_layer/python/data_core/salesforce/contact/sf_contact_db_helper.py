@@ -229,7 +229,6 @@ class SalesforceContactDbHelper:
                 docebo_is_junior_coach__c,
                 lifetime_gamification_points__c,
                 respect_in_sport_certification__c,
-                docebo_username_randomly_generated__c,
                 dss_ingestion_timestamp
             )
             VALUES
@@ -425,7 +424,6 @@ class SalesforceContactDbHelper:
                 %(docebo_is_junior_coach__c)s,
                 %(lifetime_gamification_points__c)s,
                 %(respect_in_sport_certification__c)s,
-                %(docebo_username_randomly_generated__c)s,
                 %(dss_ingestion_timestamp)s
             )
             ON CONFLICT (id, systemmodstamp)
@@ -620,7 +618,6 @@ class SalesforceContactDbHelper:
                 docebo_is_junior_coach__c = EXCLUDED.docebo_is_junior_coach__c,
                 lifetime_gamification_points__c = EXCLUDED.lifetime_gamification_points__c,
                 respect_in_sport_certification__c = EXCLUDED.respect_in_sport_certification__c,
-                docebo_username_randomly_generated__c = EXCLUDED.docebo_username_randomly_generated__c,
                 dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp
             """
         
@@ -818,7 +815,6 @@ class SalesforceContactDbHelper:
                 "docebo_is_junior_coach__c": contact.docebo_is_junior_coach__c,
                 "lifetime_gamification_points__c": contact.lifetime_gamification_points__c,
                 "respect_in_sport_certification__c": contact.respect_in_sport_certification__c,
-                "docebo_username_randomly_generated__c": contact.docebo_username_randomly_generated__c,
                 "dss_ingestion_timestamp": datetime.now()  # Capture current timestamp
             }
             for contact in new_raw_contacts

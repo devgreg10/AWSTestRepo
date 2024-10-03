@@ -203,7 +203,6 @@ class FtSalesforceContactAppFlowTasks(Construct):
             {"sourceField": "Docebo_Is_Junior_Coach__c", "destinationField": "Docebo_Is_Junior_Coach__c", "sourceDataType": "boolean", "destinationDataType": "boolean"},
             {"sourceField": "Lifetime_Gamification_Points__c", "destinationField": "Lifetime_Gamification_Points__c", "sourceDataType": "double", "destinationDataType": "double"},
             {"sourceField": "Respect_In_Sport_Certification__c", "destinationField": "Respect_In_Sport_Certification__c", "sourceDataType": "string", "destinationDataType": "string"},
-            {"sourceField": "Docebo_Username_Randomly_Generated__c", "destinationField": "Docebo_Username_Randomly_Generated__c", "sourceDataType": "boolean", "destinationDataType": "boolean"}
         ]
 
         # Generate the task mappings in the required format
@@ -416,8 +415,7 @@ class FtSalesforceContactAppFlowTasks(Construct):
                     "Pursuing_Ace__c",
                     "Docebo_Is_Junior_Coach__c",
                     "Lifetime_Gamification_Points__c",
-                    "Respect_In_Sport_Certification__c",
-                    "Docebo_Username_Randomly_Generated__c"
+                    "Respect_In_Sport_Certification__c"
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"

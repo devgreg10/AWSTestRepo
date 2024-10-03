@@ -199,7 +199,6 @@ class SfContactSourceModel():
     Docebo_Is_Junior_Coach__c: str
     Lifetime_Gamification_Points__c: str
     Respect_In_Sport_Certification__c: str
-    Docebo_Username_Randomly_Generated__c: str
 
 @define(kw_only=True)
 class SfContactRawDbModel(DbModel):
@@ -397,7 +396,6 @@ class SfContactRawDbModel(DbModel):
     docebo_is_junior_coach__c: str
     lifetime_gamification_points__c: str
     respect_in_sport_certification__c: str
-    docebo_username_randomly_generated__c: str
 
     # extend the DbModel to ignore extra arguments not included in the model that are passed in by the database view
     def __init__(self, **kwargs):
@@ -604,7 +602,6 @@ def map_sf_contact_source_to_raw(source: SfContactSourceModel) -> SfContactRawDb
         docebo_is_junior_coach__c=source.Docebo_Is_Junior_Coach__c,
         lifetime_gamification_points__c=source.Lifetime_Gamification_Points__c,
         respect_in_sport_certification__c=source.Respect_In_Sport_Certification__c,
-        docebo_username_randomly_generated__c=source.Docebo_Username_Randomly_Generated__c,
         dss_ingestion_timestamp=datetime.now()
     )
 
