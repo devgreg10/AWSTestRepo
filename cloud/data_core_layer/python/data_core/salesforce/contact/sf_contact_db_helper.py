@@ -275,7 +275,6 @@ class SalesforceContactDbHelper:
                 %(contact_id__c)s,
                 %(primary_contact_s_email__c)s,
                 %(region__c)s,
-                %(additional_information__c)s,
                 %(area_of_interest__c)s,
                 %(attended_coach_advanced_training__c)s,
                 %(branded_program_location__c)s,

@@ -34,6 +34,7 @@ def lambda_handler(event, context):
 
         bucket_name = os.environ['BUCKET_NAME']
         bucket_folder = os.environ['BUCKET_FOLDER']
+        bucket_folder = bucket_folder.replace("ingress/", "")
         commit_batch_size = int(os.environ.get('COMMIT_BATCH_SIZE', 1000))  
         error_records = []  # List to store records that fail to process
 

@@ -246,7 +246,6 @@ class SfContactRawDbModel(DbModel):
     contact_id__c: str
     primary_contact_s_email__c: str
     region__c: str
-    additional_information__c: str
     area_of_interest__c: str
     attended_coach_advanced_training__c: str
     branded_program_location__c: str
