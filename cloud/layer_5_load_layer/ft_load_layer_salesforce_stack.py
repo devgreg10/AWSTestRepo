@@ -207,7 +207,7 @@ class FtLoadLayerSalesforceStack(Stack):
                 self, f"FtLoadStateMachineSalesforce{salesforce_object}",
                 state_machine_name=f"ft-{env}-load-layer-salesforce-{entity_name}",
                 definition=definition,
-                timeout=Duration.minutes(120),
+                timeout=Duration.hours(12),
                 logs=sfn.LogOptions(
                     destination=load_layer_log_group,
                     level=sfn.LogLevel.ALL  # Log all events 
