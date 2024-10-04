@@ -47,7 +47,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         '''
         DATA LAKE - S3 Bucket
         '''
-        data_lake_bucket_name = f"ft-{env}-data-lake"
+        data_lake_bucket_name = os.getenv('data_lake_bucket_name')
         
         self.data_lake_bucket = s3.Bucket(self, 
             "FTDevDataLakeBucket",
