@@ -204,7 +204,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
                 publicly_accessible=False
             ),
             serverless_v2_min_capacity=0.5,
-            serverless_v2_max_capacity=2,
+            serverless_v2_max_capacity=64,
             security_groups=[rds_sg],
             storage_encrypted=True,
             backup=rds.BackupProps(
