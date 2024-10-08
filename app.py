@@ -39,6 +39,7 @@ decision_support_persistent_storage_stack = FtDecisionSupportPersistentStorageSt
     app, 
     id = f"ft-{env}-decision-support-persistent-storage-stack",
     env = env,
+    email_addresses_to_alert_on_error=os.getenv('email_addresses_to_alert_on_error'),
     boostrap_stack = decision_support_bootstrap_stack
 )
 

@@ -67,11 +67,17 @@ class FtLoadLayerSalesforceStack(Stack):
         '''
 
         # Create an SNS topic to notify on alarm
-        alarm_topic = sns.Topic(
+        load_layer_alarm_topic = sns.Topic(
             self, 
             "FtLoadLayerSalesforceAlarmTopic",
             topic_name=f"ft-{env}-salesforce-load-layer-alarm"
         )
+
+        # comma-delimited string of email addresses
+        email_addresses = [email.strip() for email in email_addresses_to_alert_on_error.split(",") ]
+        for email in email_addresses:
+            # Add an email subscription to the SNS Topic 
+            load_layer_alarm_topic.add_subscription(subscriptions.EmailSubscription(email))
 
         for salesforce_entity in ingestion_layer_stack.salesforce_entities:
 
@@ -124,18 +130,6 @@ class FtLoadLayerSalesforceStack(Stack):
             # Grant the Lambda function permissions to read the DB Connection Secret
             storage_stack.db_master_user_secret.grant_read(lambda_process_files)
 
-            # Create an SNS Topic for error notifications
-            sns_topic = sns.Topic(self, 
-                                  f"LambdaProcessLoadLayerFilesSalesforce{salesforce_object}ErrorTopic",
-                                  topic_name=f"ft-{env}-load-layer-salesforce-{entity_name}-error",
-                                  display_name="Lambda Error Alerts Topic")
-
-            # comma-delimited string of email addresses
-            email_addresses = [email.strip() for email in email_addresses_to_alert_on_error.split(",") ]
-            for email in email_addresses:
-                # Add an email subscription to the SNS Topic 
-                sns_topic.add_subscription(subscriptions.EmailSubscription(email))
-
             # Create a CloudWatch alarm based on the 'Errors' metric
             error_metric = lambda_process_files.metric_errors()
 
@@ -149,7 +143,7 @@ class FtLoadLayerSalesforceStack(Stack):
                                      datapoints_to_alarm=1)  # Number of data points before triggering alarm
 
             # Add an SNS action to the alarm, so the alarm triggers a notification
-            alarm.add_alarm_action(cloudwatch_actions.SnsAction(sns_topic))
+            alarm.add_alarm_action(cloudwatch_actions.SnsAction(load_layer_alarm_topic))
 
             # Create Tasks for State Machine
             
@@ -244,7 +238,7 @@ class FtLoadLayerSalesforceStack(Stack):
                 id_prefix=f"FtSalesforce{entity_name}Load",
                 alarm_name_prefix=f"ft-{env}-salesforce-{entity_name}_load",
                 log_group=load_layer_log_group,
-                sns_topic=alarm_topic,
+                sns_topic=load_layer_alarm_topic,
                 state_machine=state_machine
             )
 

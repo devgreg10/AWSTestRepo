@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_secretsmanager as secrets,
     aws_cloudwatch_actions as actions,
+    aws_sns_subscriptions as subs,
     aws_s3 as s3,
     aws_logs as logs,
     aws_sns as sns,
@@ -27,6 +28,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
                 scope: Construct, 
                 id: str, 
                 env: str,
+                email_addresses_to_alert_on_error: str,
                 boostrap_stack: FtDecisionSupportBootstrapStack, **kwargs):
         super().__init__(scope, id, **kwargs)
 
@@ -227,9 +229,15 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         alarm_sns_topic = sns.Topic(
             self,
             id="ErrorSnsTopicForDb",
-            topic_name = f"ft-{env}-error-alarm-sns-topic",
+            topic_name = f"ft-{env}-db-error-alarm-sns-topic",
             display_name="Error alarm for DB concerns"
         )
+
+        # comma-delimited string of email addresses
+        email_addresses = [email.strip() for email in email_addresses_to_alert_on_error.split(",") ]
+        for email in email_addresses:
+            # Add subscription to the SNS topic (e.g., email notification)
+            alarm_sns_topic.add_subscription(subs.EmailSubscription(email))
 
         # Add alarm for high CPU
         # 60%
