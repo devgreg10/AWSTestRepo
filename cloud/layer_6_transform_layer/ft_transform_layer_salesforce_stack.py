@@ -154,7 +154,8 @@ class FtTransformLayerSalesforceStack(Stack):
             {"db_function": "calculate_historical_tenure_percentage", "short_name": "tenure-percentage"}
         ]
 
-        # Historical Metric Functions should be run once per day at 3:00am EST
+        # Historical Metric Functions should be run once per day at 3:00am EST, no modulo
+        utc_three = UTCTimeCalculator(hour_in_EST=3).calculate_utc_hour()
         for historical_metric in historical_metrics:
 
             db_function = historical_metric["db_function"]
@@ -169,7 +170,7 @@ class FtTransformLayerSalesforceStack(Stack):
                 db_secret_arn=storage_stack.db_master_user_secret.secret_arn,
                 region=region,
                 cron_schedule=events.Schedule.cron(
-                    minute="0",                 # At the 30th minute of the hour
+                    minute="0",                 # At the 0th minute of the hour
                     hour=f"{str(utc_three)}",   # 3:00 UTC daily, does not repeat
                     day="*",                    # Every day
                     month="*",                  # Every month
