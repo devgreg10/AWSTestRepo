@@ -28,7 +28,7 @@ Data from Salesforce is ingested to AWS S3 as json files via AWS AppFlow . AppFl
 This definition can be written to an output file by including `> (filename).json`, for example
 > aws appflow describe-flow --flow-name ft-dev-ingestion-layer-salesforce-contact --profile FT_DATALAKE_ALL-DataScience-211125359849  > ft-dev-ingestion-layer-salesforce-contact.json
 
-The definition that gets written is a CloudFormation definition and will need to be translated to CDK for python.  **ChatGPT** can can easily assist in generating python code from a CloudFormation defintion.
+The definition that gets written is a CloudFormation definition and will need to be translated to CDK for python.  
 
 The goal is to pull **All** data on the initial AppFlow run, then schedule the flow to run at some frequencey (daily in prod; hourly in dev initially) to pull incremental data based on the **systemmodstamp** field in Salesforce.  This means that subsequent runs will pick up any Salesforce record whose systemmodstamp value has changed since the last time the flow ran.  The issue is that there is not a way to define the flow to trigger to accomplish what we need because the first time an incremental run is triggered, it only picks up the last 30 days of data and not All the data like we need. According to [this explanation and tip from AWS](https://docs.aws.amazon.com/pt_br/appflow/latest/userguide/flow-triggers.html), in order to achieve what we want, the AppFlow flow will initially be set up to be triggered **OnDemand** and then will have to be manually updated to run on an incremental schedule.
 
@@ -39,7 +39,7 @@ The Decision Support Load Layer is comprised of State Machines that orchestrate 
 ### Database Access
 All logic that interacts with the database is isolated to the **data_core_layer** helper classes.  The **data_core_layer** gets packaged up as a Lambda Layer and included with Lambda defintions to allow database authentication and access.
 
-The AppFlow flow defintion from the Ingestion Layer above also contains a list of SourceFields that can be used along with the help of **ChatGPT** again to generate Database Helper classes.  Here's an excerpt from the flow definition containing the field names:
+The AppFlow flow defintion from the Ingestion Layer above also contains a list of SourceFields that can be used to generate Database Helper classes.  Here's an excerpt from the flow definition containing the field names:
 ```
 "tasks": [
         {
