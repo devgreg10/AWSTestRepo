@@ -80,7 +80,6 @@ WHERE
     AND max_capacity IS NOT NULL
     AND chapter_name IS NOT NULL
     AND chapter_id IS NOT NULL
-    AND program_type IS NOT NULL
     AND record_type_id IS NOT NULL
     AND dss_ingestion_timestamp IS NOT NULL
 ;
