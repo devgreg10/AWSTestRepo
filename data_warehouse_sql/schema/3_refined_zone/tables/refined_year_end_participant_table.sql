@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS ft_ds_refined.year_end_participant (
+	PRIMARY KEY(contact_id, year),
+	contact_id VARCHAR(30),
+	first_name VARCHAR(40),
+	last_name VARCHAR(80),
+	program_level VARCHAR(30),
+	birthdate DATE,
+	age INTEGER,
+	gender VARCHAR(50),
+	ethnicity VARCHAR(50),
+	grade_level VARCHAR(50),
+	mailing_zip_postal_code VARCHAR(50),
+	primary_contact_email TEXT,
+	email TEXT,
+	participation_status VARCHAR(50),
+	legacy_participant_user_id TEXT,
+	school_name TEXT,
+	school_name_other TEXT,
+	additional_trade_name_account_name TEXT,
+	chapter_affiliation_account_name TEXT,
+	chapter_id TEXT,
+	year NUMERIC(4,0)
+);

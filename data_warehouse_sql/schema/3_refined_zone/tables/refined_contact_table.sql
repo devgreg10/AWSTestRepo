@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.contact (
     contact_id_18 CHAR(18),
     chapter_id CHAR(18),
     contact_type VARCHAR(100),
-    age INTEGER,
+    --age INTEGER,
     ethnicity VARCHAR(100),
     gender VARCHAR(100),
     grade VARCHAR(100),
