@@ -3,6 +3,11 @@ RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
+
+    --need to get rid of all the data from the temp table before we start in case it still exists from the last run
+    --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
+    DROP TABLE IF EXISTS temp_sf_contact_raw_to_valid;
+
     CREATE TEMP TABLE IF NOT EXISTS temp_sf_contact_raw_to_valid (
         --still import as all text because we want to be able to analyze it for if it will make it to valid based on dtype, and we can assume it will fit in text because that's how it already exists in raw
         contact_id_18 TEXT,
@@ -32,10 +37,6 @@ BEGIN
         required_fields_validated BOOLEAN,
         optional_fields_validated BOOLEAN
     );
-
-    --need to get rid of all the data from the temp table before we start in case it still exists from the last run
-    --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
-    TRUNCATE temp_sf_contact_raw_to_valid;
 
     --this statement places all of the most recently uploaded records into the temp table
     INSERT INTO temp_sf_contact_raw_to_valid
@@ -83,11 +84,11 @@ BEGIN
     WHERE
     --contact_id_18
         contact_id_18 IS NULL
-        AND LENGTH(contact_id_18) <> 18
-        AND contact_id_18 = ''
+        OR LENGTH(contact_id_18) <> 18
+        OR contact_id_18 = ''
     --sf_system_modstamp
-        AND sf_system_modstamp IS NULL
-        AND NOT (SELECT ft_ds_admin.is_coercable_to_numeric(sf_system_modstamp))
+        OR sf_system_modstamp IS NULL
+        OR NOT (SELECT ft_ds_admin.is_coercable_to_timestamptz(sf_system_modstamp))
     ;
 
     --these statements update the optional_fields_validated flag and swap invalid values to NULL
@@ -323,6 +324,10 @@ BEGIN
         OR optional_fields_validated = FALSE
     ;
 
+    --need to get rid of all the data from the temp table before we start in case it still exists from the last run
+    --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
+    DROP TABLE IF EXISTS temp_sf_contact_raw_to_valid_validated;
+
     --now that we've flagged the valid data and set optional invalid fields to NULL, we can cast the values to their valid types
     CREATE TABLE IF NOT EXISTS temp_sf_contact_raw_to_valid_validated (
         contact_id_18 CHAR(18),
@@ -349,10 +354,6 @@ BEGIN
         sf_system_modstamp TIMESTAMPTZ,
         dss_ingestion_timestamp TIMESTAMPTZ
     );
-
-    --need to get rid of all the data from the temp table before we start in case it still exists from the last run
-    --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
-    TRUNCATE temp_sf_contact_raw_to_valid_validated;
 
     --this statement then cleans the data to get the data types correct
     INSERT INTO temp_sf_contact_raw_to_valid_validated

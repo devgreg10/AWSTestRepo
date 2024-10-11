@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION ft_ds_admin.write_valid_to_refined_contact ()
+CREATE OR REPLACE FUNCTION ft_ds_admin.write_contact_valid_to_refined()
 RETURNS void
 LANGUAGE plpgsql
 AS $$

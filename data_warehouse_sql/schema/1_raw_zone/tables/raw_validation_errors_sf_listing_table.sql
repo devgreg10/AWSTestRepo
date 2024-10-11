@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS ft_ds_raw.validation_errors_sf_listing (
+    listing_id_18 TEXT,
+    account_id TEXT,
+    start_date TEXT,
+    end_date TEXT,
+    hosted_by TEXT,
+    listing_location_address TEXT,
+    listing_name TEXT,
+    presented_by TEXT,
+    publish_start_date TEXT,
+    publish_end_date TEXT,
+    is_deleted TEXT,
+    record_type_id TEXT,
+    sf_created_timestamp TEXT,
+    sf_last_modified_timestamp TEXT,
+    sf_system_modstamp TEXT,
+	dss_ingestion_timestamp TIMESTAMPTZ,
+    required_fields_validated BOOLEAN,
+    optional_fields_validated BOOLEAN,
+    fixed_in_source BOOLEAN
+);

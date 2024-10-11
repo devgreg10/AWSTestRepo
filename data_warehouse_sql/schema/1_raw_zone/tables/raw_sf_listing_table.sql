@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS sf_listing (
+CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_listing (
     PRIMARY KEY (id, systemmodstamp),
     id TEXT NOT NULL,
     lastmodifieddate TEXT,

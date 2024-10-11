@@ -18,5 +18,34 @@ and not (
     )
 ;
 
+select count(distinct Id)
+from ft_ds_raw.sf_listing
+;
+--17,796
+
+select count(*)
+from ft_ds_valid.sf_listing
+;
+--17,796
+
+select count(distinct Id)
+from ft_ds_raw.sf_listing_session
+;
+--116,307
+
+select count(*)
+from ft_ds_valid.sf_listing_session
+;
+--116,307
+
+select count(distinct Id)
+from ft_ds_raw.sf_session_registration
+;
+--1,393,496
+
+select count(*)
+from ft_ds_valid.sf_session_registration
+;
+--1,393,496
 --locate a record in raw that has had an actual change happen to it
 -- include a better way of find this

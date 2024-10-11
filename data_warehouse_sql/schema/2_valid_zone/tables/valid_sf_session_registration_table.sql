@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_session_registration (
+    PRIMARY KEY (session_registration_id_18),
+    session_registration_id_18 CHAR(18),
+    original_session_charge_amount NUMERIC(16,2),
+    contact_id_18 CHAR(18),
+    cost_difference NUMERIC(16,2),
+    sf_created_by_id CHAR(18),
+    sf_created_timestamp TIMESTAMPTZ,
+    discount NUMERIC(18,0),
+    item_price NUMERIC(18,0),
+    sf_last_modified_by_id CHAR(18),
+    sf_last_modified_timestamp TIMESTAMPTZ,
+    listing_session_id_18 CHAR(18),
+    membership_registration_id_18 CHAR(18),
+    session_registration_number VARCHAR(20),
+    old_listing_session_id_18 CHAR(18),
+    new_session_cost NUMERIC(16,2),
+    reggie_registration_id VARCHAR(100),
+    session_type VARCHAR(100),
+    status VARCHAR(100), --picklist
+    is_transferred BOOLEAN,
+    waitlist_process BOOLEAN,
+    original_session_registration_number CHAR(18),
+    is_deleted BOOLEAN,
+    sf_system_modstamp TIMESTAMPTZ,
+    dss_ingestion_timestamp TIMESTAMPTZ
+);

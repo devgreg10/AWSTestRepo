@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS sf_session_registration (
+CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_session_registration (
     PRIMARY KEY (id, systemmodstamp),
     id TEXT NOT NULL,
     lastmodifieddate TEXT,

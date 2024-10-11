@@ -21,22 +21,23 @@ SELECT
     household_id,
     sf_created_timestamp,
     sf_last_modified_timestamp,
-    sf_system_modstamp
--- ommitted the is_deleted and dss_ingestion timestamps fields since they are unanalyzable metadata fields.
+    sf_system_modstamp,
+    dss_ingestion_timestamp
+-- ommitted the is_deleted field since it is an unanalyzable metadata field.
 FROM ft_ds_refined.contact
 WHERE
     participation_status = 'Active'
     AND contact_type LIKE '%Participant%'
     --AND age IS NOT NULL
     AND household_id IS NOT NULL
-    AND household_id <> ''
     AND birthdate IS NOT NULL
     AND gender IS NOT NULL
-    AND gender <> ''
     AND ethnicity IS NOT NULL
-    AND ethnicity <> ''
     AND mailing_zip_postal_code IS NOT NULL
-    AND mailing_zip_postal_code <> ''
     AND chapter_id IS NOT NULL
-    AND chapter_id <> ''
+    AND first_name IS NOT NULL
+    AND last_name IS NOT NULL
+    AND participation_status IS NOT NULL
+    AND contact_type IS NOT NULL
+    AND dss_ingestion_timestamp IS NOT NULL
 ;
