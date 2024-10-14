@@ -26,18 +26,16 @@ SELECT
 -- ommitted the is_deleted field since it is an unanalyzable metadata field.
 FROM ft_ds_refined.contact
 WHERE
-    participation_status = 'Active'
-    AND contact_type LIKE '%Participant%'
-    --AND age IS NOT NULL
-    AND household_id IS NOT NULL
-    AND birthdate IS NOT NULL
-    AND gender IS NOT NULL
-    AND ethnicity IS NOT NULL
-    AND mailing_zip_postal_code IS NOT NULL
-    AND chapter_id IS NOT NULL
+    contact_type LIKE '%Participant%'
+    AND participation_status = 'Active'
     AND first_name IS NOT NULL
     AND last_name IS NOT NULL
-    AND participation_status IS NOT NULL
-    AND contact_type IS NOT NULL
+    AND birthdate IS NOT NULL
+    --AND age IS NOT NULL
+    AND gender IS NOT NULL
+    AND ethnicity IS NOT NULL
+    AND household_id IS NOT NULL
+    AND mailing_zip_postal_code IS NOT NULL
+    AND chapter_id IS NOT NULL
     AND dss_ingestion_timestamp IS NOT NULL
 ;
