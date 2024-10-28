@@ -16,6 +16,7 @@ BEGIN
         WHERE year IN (CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC), CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC) - 1)
     )
     ,
+    -- this join has to happen since there are some situations when the participant switches chapters, so we have to know to which chapter to assign the retention, and how many from each chapter were eligible to return the next year
     participant_years_with_chapter_ids AS (
         SELECT
             py.contact_id,
@@ -64,6 +65,7 @@ BEGIN
             participant_years_with_chapter_ids py
         WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
         GROUP BY
+            --the calculation of retention and totals happens separately since retention is credited to the new chapter
             py.curr_chapter_id,
             py.year
     )
@@ -83,6 +85,7 @@ BEGIN
             AND py.year = part_view.year
         WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
         GROUP BY
+            --the calculation of retention and totals happens separately since the total eligible to return is from the old chapter
             py.last_years_chapter_id,
             py.year
     )
