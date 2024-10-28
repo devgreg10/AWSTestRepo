@@ -4,26 +4,78 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     INSERT INTO ft_ds_refined.metric_historical_retention_percentage
+    --this subquery produces a list of contacts, the year that the contact was recorded, and the next year that contact appears as being recorded in one row
     WITH participant_years AS (
         SELECT
-            chapter_id,
             contact_id,
             year,
-            LEAD(year) OVER (PARTITION BY chapter_id, contact_id ORDER BY year) AS next_year
+            LEAD(year) OVER (PARTITION BY contact_id ORDER BY year) AS next_year
         FROM
             ft_ds_refined.current_and_historical_participants_view
+        --this filter ensures that only the last two years are being looked at, so we can get the current retention
         WHERE year IN (CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC), CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC) - 1)
+    )
+    ,
+    participant_years_with_chapter_ids AS (
+        SELECT
+            py.contact_id,
+            curr_chapters.chapter_id as curr_chapter_id,
+            last_years_chapters.chapter_id as last_years_chapter_id,
+            py.year,
+            py.next_year
+        FROM
+            participant_years py
+        LEFT JOIN
+            (
+                SELECT
+                    contact_id,
+                    chapter_id,
+                    year
+                FROM
+                    ft_ds_refined.current_and_historical_participants_view
+                WHERE
+                    year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC)
+            ) curr_chapters
+        ON
+            py.contact_id = curr_chapters.contact_id
+            AND py.next_year = curr_chapters.year
+        LEFT JOIN
+            (
+                SELECT
+                    contact_id,
+                    chapter_id,
+                    year
+                FROM
+                    ft_ds_refined.current_and_historical_participants_view
+                WHERE
+                    year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+            ) last_years_chapters
+        ON
+            py.contact_id = last_years_chapters.contact_id
+            AND py.year = last_years_chapters.year
     )
     ,
     retention AS (
         SELECT
-            py.chapter_id,
+            py.curr_chapter_id,
             py.year,
-            COUNT(DISTINCT CASE WHEN next_year = py.year + 1 THEN py.contact_id END) AS retained_participants,
-            --the filter below only counts those who are under 19 years old last calendar year.
-            COUNT(DISTINCT CASE WHEN part_view.birthdate >= (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM current_date) AS INTEGER) - 19, 1, 1)) THEN py.contact_id END) AS total_participants
+            COUNT(DISTINCT CASE WHEN next_year = py.year + 1 THEN py.contact_id END) AS retained_participants
         FROM
-            participant_years py
+            participant_years_with_chapter_ids py
+        WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+        GROUP BY
+            py.curr_chapter_id,
+            py.year
+    )
+    ,
+    totals_by_chapter AS (
+        SELECT
+            py.last_years_chapter_id,
+            py.year,
+            --the filter below only counts those who are under 19 years old last calendar year.
+            COUNT(DISTINCT CASE WHEN part_view.birthdate >= (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 19, 1, 1)) THEN py.contact_id END) AS total_participants
+        FROM
+            participant_years_with_chapter_ids py
         JOIN
             ft_ds_refined.current_and_historical_participants_view part_view
         ON
@@ -31,22 +83,28 @@ BEGIN
             AND py.year = part_view.year
         WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
         GROUP BY
-            py.chapter_id,
+            py.last_years_chapter_id,
             py.year
     )
     SELECT
         NOW() AS metric_calc_date,
         list_of_all_chapters.chapter_id,
-        (retention.retained_participants * 1.0) / NULLIF(retention.total_participants, 0) AS retention_percentage
+        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS retention_percentage
     FROM
-        retention
-    RIGHT JOIN
         (   
             SELECT
                 DISTINCT chapter_id
             FROM ft_ds_refined.current_and_historical_participants_view
             WHERE year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
         ) list_of_all_chapters
-    ON retention.chapter_id = list_of_all_chapters.chapter_id;
+    LEFT JOIN
+        retention
+    ON
+        list_of_all_chapters.chapter_id = retention.curr_chapter_id
+    LEFT JOIN
+        totals_by_chapter
+    ON
+        list_of_all_chapters.chapter_id = totals_by_chapter.last_years_chapter_id
+    ;
 END;
 $$;
