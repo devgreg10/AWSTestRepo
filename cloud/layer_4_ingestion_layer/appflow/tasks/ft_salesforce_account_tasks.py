@@ -168,5 +168,43 @@ class FtSalesforceAccountAppFlowTasks(Construct):
                 ]
             ) for mapping in full_field_mappings
         ]
-
+        
+        tasks.append(
+            appflow.CfnFlow.TaskProperty(
+                source_fields=[
+                    "Id", "IsDeleted", "MasterRecordId", "Name", "Type", "RecordTypeId", "ParentId",
+                    "BillingStreet", "BillingCity", "BillingState", "BillingPostalCode", "BillingCountry",
+                    "BillingAddress", "ShippingStreet", "ShippingCity", "ShippingState", "ShippingPostalCode",
+                    "ShippingCountry", "ShippingAddress", "Phone", "AccountNumber", "Website", "NumberOfEmployees",
+                    "Ownership", "Description", "OwnerId", "CreatedDate", "CreatedById", "LastModifiedDate",
+                    "LastModifiedById", "SystemModstamp", "LastActivityDate", "LastViewedDate", "LastReferencedDate",
+                    "IsPartner", "IsCustomerPortal", "ChannelProgramName", "ChannelProgramLevelName",
+                    "Chapter_Administrator__c", "Chapter_Affiliation__c", "Territory__c", "Chapter_ID__c",
+                    "Membership_Offered__c", "Payments_Accepted_In_Person__c", "Time_Zone__c",
+                    "Coach_Retention_Rate__c", "Count_Account__c", "Current_Coach_Retention_Percentage__c",
+                    "Performance_Record_Type__c", "YS_Report_Chapter_Affiliation__c", "Insurance_Expires__c",
+                    "Affiliate_Delivery_Partner__c", "Date_Joined__c", "Equipment__c", "Graduate__c",
+                    "Home_School__c", "Kindergarten__c", "Account_ID__c", "Additional_Trade_NameChap_Affiliation__c",
+                    "Additional_Trade_Name_Logo__c", "Parent_Account_ID_18__c", "Account_Inactive_Date__c",
+                    "Legacy_ID__c", "EIN__c", "Governance_Structure__c", "Youth_Population__c",
+                    "Contract_Effective_Date__c", "Active__c", "Chapter_Membership_Price__c", "Chapter_Standing__c",
+                    "Contract_Expiration_Date__c", "Contract_Status__c", "County__c", "HO_Contracted_Location__c",
+                    "Inactive_Date__c", "Legal_Entity_Name__c", "Membership_Active__c", "Membership_Discount_Amount__c",
+                    "Membership_Discount_Percentage__c", "Membership_End_Date__c", "Membership_Start_Date__c",
+                    "Military_Discount_Amount__c", "Military_Discount_Percentage__c", "Primary_Contact_Email__c",
+                    "Primary_Contact__c", "Primary_Contact_email_address__c", "Program_Location_Key__c",
+                    "Program_Location_Type__c", "Reggie_Account_Id__c", "Reggie_Id__c", "Reggie_Location_Id__c",
+                    "Reggie_Name__c", "Region__c", "Secondary_Contact__c", "Location_Type__c",
+                    "Sibling_Discount_Amount__c", "Sibling_Discount_Percentage__c", "Service_Area__c",
+                    "Insurance_Expiration_Date__c", "Former_Trade_Names__c", "Former_Legal_Entity__c",
+                    "Organization_City__c", "Organization_State__c", "Partner_Program_Type__c"
+                ],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
+                    salesforce="PROJECTION"
+                ),
+                task_type="Filter",
+                task_properties=[]
+            )
+        )
+        
         return tasks
