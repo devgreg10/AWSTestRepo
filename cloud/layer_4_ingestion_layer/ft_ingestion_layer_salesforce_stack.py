@@ -11,6 +11,7 @@ from aws_cdk import (
 from datetime import datetime, timedelta
 import pytz
 
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_account_tasks import FtSalesforceAccountAppFlowTasks
 from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_contact_tasks import FtSalesforceContactAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_session_tasks import FtSalesforceListingSessionAppFlowTasks
@@ -44,6 +45,11 @@ class FtIngestionLayerSalesforceStack(Stack):
 
         # Define all Salesforce entities and objects to ingest
         self.salesforce_entities = [
+            {
+               "entity_name": "account", 
+                "salesforce_object": "Account", 
+                "appflow_tasks": FtSalesforceAccountAppFlowTasks(self, "SaleforceAccountTasks")
+            }, 
             {
                 "entity_name": "contact", 
                 "salesforce_object": "Contact", 

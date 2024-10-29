@@ -1,0 +1,2206 @@
+{
+    "flowArn": "arn:aws:appflow:us-east-1:211125359849:flow/ft-accounts-test",
+    "flowName": "ft-accounts-test",
+    "kmsArn": "arn:aws:kms:us-east-1:211125359849:key/3d5b37e1-6c9a-410b-9ee9-be7b7f48505f",
+    "flowStatus": "Active",
+    "sourceFlowConfig": {
+        "connectorType": "Salesforce",
+        "connectorProfileName": "sf-non-prod",
+        "sourceConnectorProperties": {
+            "Salesforce": {
+                "object": "Account",
+                "enableDynamicFieldUpdate": false,
+                "includeDeletedRecords": false,
+                "dataTransferApi": "AUTOMATIC"
+            }
+        }
+    },
+    "destinationFlowConfigList": [
+        {
+            "connectorType": "S3",
+            "destinationConnectorProperties": {
+                "S3": {
+                    "bucketName": "ft-account-bucket",
+                    "s3OutputFormatConfig": {
+                        "fileType": "JSON",
+                        "prefixConfig": {
+                            "pathPrefixHierarchy": [
+                                "EXECUTION_ID"
+                            ]
+                        },
+                        "aggregationConfig": {
+                            "aggregationType": "None"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "triggerConfig": {
+        "triggerType": "OnDemand",
+        "triggerProperties": {}
+    },
+    "tasks": [
+        {
+            "sourceFields": [
+                "Id",
+                "IsDeleted",
+                "MasterRecordId",
+                "Name",
+                "Type",
+                "RecordTypeId",
+                "ParentId",
+                "BillingStreet",
+                "BillingCity",
+                "BillingState",
+                "BillingPostalCode",
+                "BillingCountry",
+                "BillingAddress",
+                "ShippingStreet",
+                "ShippingCity",
+                "ShippingState",
+                "ShippingPostalCode",
+                "ShippingCountry",
+                "ShippingAddress",
+                "Phone",
+                "AccountNumber",
+                "Website",
+                "NumberOfEmployees",
+                "Ownership",
+                "Description",
+                "OwnerId",
+                "CreatedDate",
+                "CreatedById",
+                "LastModifiedDate",
+                "LastModifiedById",
+                "SystemModstamp",
+                "LastActivityDate",
+                "LastViewedDate",
+                "LastReferencedDate",
+                "IsPartner",
+                "IsCustomerPortal",
+                "ChannelProgramName",
+                "ChannelProgramLevelName",
+                "Chapter_Administrator__c",
+                "Chapter_Affiliation__c",
+                "Territory__c",
+                "Chapter_ID__c",
+                "Membership_Offered__c",
+                "Payments_Accepted_In_Person__c",
+                "Time_Zone__c",
+                "Coach_Retention_Rate__c",
+                "Count_Account__c",
+                "Current_Coach_Retention_Percentage__c",
+                "Performance_Record_Type__c",
+                "YS_Report_Chapter_Affiliation__c",
+                "Insurance_Expires__c",
+                "Affiliate_Delivery_Partner__c",
+                "Date_Joined__c",
+                "Equipment__c",
+                "Graduate__c",
+                "Home_School__c",
+                "Kindergarten__c",
+                "Account_ID__c",
+                "Additional_Trade_NameChap_Affiliation__c",
+                "Additional_Trade_Name_Logo__c",
+                "Parent_Account_ID_18__c",
+                "Account_Inactive_Date__c",
+                "Legacy_ID__c",
+                "EIN__c",
+                "Governance_Structure__c",
+                "Youth_Population__c",
+                "Contract_Effective_Date__c",
+                "Active__c",
+                "Chapter_Membership_Price__c",
+                "Chapter_Standing__c",
+                "Contract_Expiration_Date__c",
+                "Contract_Status__c",
+                "County__c",
+                "HO_Contracted_Location__c",
+                "Inactive_Date__c",
+                "Legal_Entity_Name__c",
+                "Membership_Active__c",
+                "Membership_Discount_Amount__c",
+                "Membership_Discount_Percentage__c",
+                "Membership_End_Date__c",
+                "Membership_Start_Date__c",
+                "Military_Discount_Amount__c",
+                "Military_Discount_Percentage__c",
+                "Primary_Contact_Email__c",
+                "Primary_Contact__c",
+                "Primary_Contact_email_address__c",
+                "Program_Location_Key__c",
+                "Program_Location_Type__c",
+                "Reggie_Account_Id__c",
+                "Reggie_Id__c",
+                "Reggie_Location_Id__c",
+                "Reggie_Name__c",
+                "Region__c",
+                "Secondary_Contact__c",
+                "Location_Type__c",
+                "Sibling_Discount_Amount__c",
+                "Sibling_Discount_Percentage__c",
+                "Service_Area__c",
+                "Insurance_Expiration_Date__c",
+                "Former_Trade_Names__c",
+                "Former_Legal_Entity__c",
+                "Organization_City__c",
+                "Organization_State__c",
+                "Partner_Program_Type__c",
+                "Pre_School__c",
+                "Status__c",
+                "Title_I__c",
+                "Enrollment__c",
+                "Market_Size__c",
+                "DCR__c",
+                "Owner_ID__c",
+                "Program_Director__c",
+                "Executive_Director__c",
+                "Board_Chair__c",
+                "MDR_PID__c",
+                "Partner_Program_Type_Validation_Check__c",
+                "Duplicates_Removed__c",
+                "NCES_ID__c",
+                "Currency__c",
+                "Territory_Partner_Acct__c",
+                "Chapter_Country__c",
+                "Financial_Aid_Active__c",
+                "New_Parent_Registration__c",
+                "Additional_Trade_Name__c",
+                "FT_App_Pilot__c",
+                "International_Chapter__c",
+                "Customer_ID__c",
+                "Award_Badges_Enabled__c",
+                "Peer_Group__c",
+                "In_Market_Partners__c",
+                "How_many_holes__c",
+                "If_other_fill_in_how_many__c",
+                "Golf_Course_Type__c",
+                "Course_Features_available_to_First_Tee__c",
+                "Does_the_facility_offer_discounts_to_Fir__c",
+                "Please_describe_discount__c",
+                "Chapter_owns_this_facility__c",
+                "Operates_the_facility_through_a_lease__c",
+                "If_yes_how_long_is_the_lease__c",
+                "Who_is_the_lease_with__c",
+                "Notes_about_the_partnership__c",
+                "Does_this_facility_have_a_dedicated_Firs__c",
+                "Please_describe_the_learning_center__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "PROJECTION"
+            },
+            "taskType": "Filter",
+            "taskProperties": {}
+        },
+        {
+            "sourceFields": [
+                "Id"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Id",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "id",
+                "SOURCE_DATA_TYPE": "id"
+            }
+        },
+        {
+            "sourceFields": [
+                "IsDeleted"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "IsDeleted",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "MasterRecordId"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "MasterRecordId",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Name"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Name",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Type"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Type",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "RecordTypeId"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "RecordTypeId",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "ParentId"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ParentId",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "BillingStreet"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "BillingStreet",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "BillingCity"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "BillingCity",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "BillingState"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "BillingState",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "BillingPostalCode"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "BillingPostalCode",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "BillingCountry"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "BillingCountry",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "BillingAddress"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "BillingAddress",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "address",
+                "SOURCE_DATA_TYPE": "address"
+            }
+        },
+        {
+            "sourceFields": [
+                "ShippingStreet"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ShippingStreet",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "ShippingCity"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ShippingCity",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "ShippingState"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ShippingState",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "ShippingPostalCode"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ShippingPostalCode",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "ShippingCountry"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ShippingCountry",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "ShippingAddress"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ShippingAddress",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "address",
+                "SOURCE_DATA_TYPE": "address"
+            }
+        },
+        {
+            "sourceFields": [
+                "Phone"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Phone",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "phone",
+                "SOURCE_DATA_TYPE": "phone"
+            }
+        },
+        {
+            "sourceFields": [
+                "AccountNumber"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "AccountNumber",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Website"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Website",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "url",
+                "SOURCE_DATA_TYPE": "url"
+            }
+        },
+        {
+            "sourceFields": [
+                "NumberOfEmployees"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "NumberOfEmployees",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "int",
+                "SOURCE_DATA_TYPE": "int"
+            }
+        },
+        {
+            "sourceFields": [
+                "Ownership"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Ownership",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Description"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Description",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "OwnerId"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "OwnerId",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "CreatedDate"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "CreatedDate",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "datetime",
+                "SOURCE_DATA_TYPE": "datetime"
+            }
+        },
+        {
+            "sourceFields": [
+                "CreatedById"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "CreatedById",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "LastModifiedDate"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "LastModifiedDate",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "datetime",
+                "SOURCE_DATA_TYPE": "datetime"
+            }
+        },
+        {
+            "sourceFields": [
+                "LastModifiedById"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "LastModifiedById",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "SystemModstamp"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "SystemModstamp",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "datetime",
+                "SOURCE_DATA_TYPE": "datetime"
+            }
+        },
+        {
+            "sourceFields": [
+                "LastActivityDate"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "LastActivityDate",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "LastViewedDate"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "LastViewedDate",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "datetime",
+                "SOURCE_DATA_TYPE": "datetime"
+            }
+        },
+        {
+            "sourceFields": [
+                "LastReferencedDate"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "LastReferencedDate",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "datetime",
+                "SOURCE_DATA_TYPE": "datetime"
+            }
+        },
+        {
+            "sourceFields": [
+                "IsPartner"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "IsPartner",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "IsCustomerPortal"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "IsCustomerPortal",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "ChannelProgramName"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ChannelProgramName",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "ChannelProgramLevelName"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "ChannelProgramLevelName",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Chapter_Administrator__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Chapter_Administrator__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Chapter_Affiliation__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Chapter_Affiliation__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Territory__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Territory__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Chapter_ID__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Chapter_ID__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Membership_Offered__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Membership_Offered__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Payments_Accepted_In_Person__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Payments_Accepted_In_Person__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Time_Zone__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Time_Zone__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Coach_Retention_Rate__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Coach_Retention_Rate__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "percent",
+                "SOURCE_DATA_TYPE": "percent"
+            }
+        },
+        {
+            "sourceFields": [
+                "Count_Account__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Count_Account__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "double",
+                "SOURCE_DATA_TYPE": "double"
+            }
+        },
+        {
+            "sourceFields": [
+                "Current_Coach_Retention_Percentage__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Current_Coach_Retention_Percentage__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "percent",
+                "SOURCE_DATA_TYPE": "percent"
+            }
+        },
+        {
+            "sourceFields": [
+                "Performance_Record_Type__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Performance_Record_Type__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "YS_Report_Chapter_Affiliation__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "YS_Report_Chapter_Affiliation__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Insurance_Expires__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Insurance_Expires__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Affiliate_Delivery_Partner__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Affiliate_Delivery_Partner__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Date_Joined__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Date_Joined__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Equipment__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Equipment__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Graduate__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Graduate__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Home_School__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Home_School__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Kindergarten__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Kindergarten__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Account_ID__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Account_ID__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Additional_Trade_NameChap_Affiliation__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Additional_Trade_NameChap_Affiliation__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Additional_Trade_Name_Logo__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Additional_Trade_Name_Logo__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "Parent_Account_ID_18__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Parent_Account_ID_18__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Account_Inactive_Date__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Account_Inactive_Date__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Legacy_ID__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Legacy_ID__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "EIN__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "EIN__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Governance_Structure__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Governance_Structure__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Youth_Population__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Youth_Population__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "double",
+                "SOURCE_DATA_TYPE": "double"
+            }
+        },
+        {
+            "sourceFields": [
+                "Contract_Effective_Date__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Contract_Effective_Date__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Active__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Active__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Chapter_Membership_Price__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Chapter_Membership_Price__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "currency",
+                "SOURCE_DATA_TYPE": "currency"
+            }
+        },
+        {
+            "sourceFields": [
+                "Chapter_Standing__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Chapter_Standing__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Contract_Expiration_Date__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Contract_Expiration_Date__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Contract_Status__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Contract_Status__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "County__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "County__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "HO_Contracted_Location__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "HO_Contracted_Location__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Inactive_Date__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Inactive_Date__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Legal_Entity_Name__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Legal_Entity_Name__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Membership_Active__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Membership_Active__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Membership_Discount_Amount__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Membership_Discount_Amount__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "currency",
+                "SOURCE_DATA_TYPE": "currency"
+            }
+        },
+        {
+            "sourceFields": [
+                "Membership_Discount_Percentage__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Membership_Discount_Percentage__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "percent",
+                "SOURCE_DATA_TYPE": "percent"
+            }
+        },
+        {
+            "sourceFields": [
+                "Membership_End_Date__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Membership_End_Date__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Membership_Start_Date__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Membership_Start_Date__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Military_Discount_Amount__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Military_Discount_Amount__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "currency",
+                "SOURCE_DATA_TYPE": "currency"
+            }
+        },
+        {
+            "sourceFields": [
+                "Military_Discount_Percentage__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Military_Discount_Percentage__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "percent",
+                "SOURCE_DATA_TYPE": "percent"
+            }
+        },
+        {
+            "sourceFields": [
+                "Primary_Contact_Email__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Primary_Contact_Email__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Primary_Contact__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Primary_Contact__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Primary_Contact_email_address__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Primary_Contact_email_address__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Program_Location_Key__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Program_Location_Key__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Program_Location_Type__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Program_Location_Type__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Reggie_Account_Id__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Reggie_Account_Id__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Reggie_Id__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Reggie_Id__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Reggie_Location_Id__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Reggie_Location_Id__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Reggie_Name__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Reggie_Name__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Region__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Region__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Secondary_Contact__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Secondary_Contact__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Location_Type__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Location_Type__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Sibling_Discount_Amount__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Sibling_Discount_Amount__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "currency",
+                "SOURCE_DATA_TYPE": "currency"
+            }
+        },
+        {
+            "sourceFields": [
+                "Sibling_Discount_Percentage__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Sibling_Discount_Percentage__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "percent",
+                "SOURCE_DATA_TYPE": "percent"
+            }
+        },
+        {
+            "sourceFields": [
+                "Service_Area__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Service_Area__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "Insurance_Expiration_Date__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Insurance_Expiration_Date__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "date",
+                "SOURCE_DATA_TYPE": "date"
+            }
+        },
+        {
+            "sourceFields": [
+                "Former_Trade_Names__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Former_Trade_Names__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "Former_Legal_Entity__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Former_Legal_Entity__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "Organization_City__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Organization_City__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Organization_State__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Organization_State__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Partner_Program_Type__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Partner_Program_Type__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Pre_School__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Pre_School__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Status__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Status__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Title_I__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Title_I__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Enrollment__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Enrollment__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "double",
+                "SOURCE_DATA_TYPE": "double"
+            }
+        },
+        {
+            "sourceFields": [
+                "Market_Size__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Market_Size__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "DCR__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "DCR__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Owner_ID__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Owner_ID__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Program_Director__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Program_Director__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Executive_Director__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Executive_Director__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "Board_Chair__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Board_Chair__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "MDR_PID__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "MDR_PID__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Partner_Program_Type_Validation_Check__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Partner_Program_Type_Validation_Check__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Duplicates_Removed__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Duplicates_Removed__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "NCES_ID__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "NCES_ID__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Currency__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Currency__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Territory_Partner_Acct__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Territory_Partner_Acct__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Chapter_Country__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Chapter_Country__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Financial_Aid_Active__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Financial_Aid_Active__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "New_Parent_Registration__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "New_Parent_Registration__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Additional_Trade_Name__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Additional_Trade_Name__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "reference",
+                "SOURCE_DATA_TYPE": "reference"
+            }
+        },
+        {
+            "sourceFields": [
+                "FT_App_Pilot__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "FT_App_Pilot__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "International_Chapter__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "International_Chapter__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Customer_ID__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Customer_ID__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Award_Badges_Enabled__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Award_Badges_Enabled__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "boolean",
+                "SOURCE_DATA_TYPE": "boolean"
+            }
+        },
+        {
+            "sourceFields": [
+                "Peer_Group__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Peer_Group__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "In_Market_Partners__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "In_Market_Partners__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "multipicklist",
+                "SOURCE_DATA_TYPE": "multipicklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "How_many_holes__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "How_many_holes__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "If_other_fill_in_how_many__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "If_other_fill_in_how_many__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Golf_Course_Type__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Golf_Course_Type__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Course_Features_available_to_First_Tee__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Course_Features_available_to_First_Tee__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "multipicklist",
+                "SOURCE_DATA_TYPE": "multipicklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Does_the_facility_offer_discounts_to_Fir__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Does_the_facility_offer_discounts_to_Fir__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Please_describe_discount__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Please_describe_discount__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Chapter_owns_this_facility__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Chapter_owns_this_facility__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Operates_the_facility_through_a_lease__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Operates_the_facility_through_a_lease__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "If_yes_how_long_is_the_lease__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "If_yes_how_long_is_the_lease__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Who_is_the_lease_with__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Who_is_the_lease_with__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "string",
+                "SOURCE_DATA_TYPE": "string"
+            }
+        },
+        {
+            "sourceFields": [
+                "Notes_about_the_partnership__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Notes_about_the_partnership__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "textarea",
+                "SOURCE_DATA_TYPE": "textarea"
+            }
+        },
+        {
+            "sourceFields": [
+                "Does_this_facility_have_a_dedicated_Firs__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Does_this_facility_have_a_dedicated_Firs__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        },
+        {
+            "sourceFields": [
+                "Please_describe_the_learning_center__c"
+            ],
+            "connectorOperator": {
+                "Salesforce": "NO_OP"
+            },
+            "destinationField": "Please_describe_the_learning_center__c",
+            "taskType": "Map",
+            "taskProperties": {
+                "DESTINATION_DATA_TYPE": "picklist",
+                "SOURCE_DATA_TYPE": "picklist"
+            }
+        }
+    ],
+    "createdAt": "2024-10-23T10:18:16.373000-04:00",
+    "lastUpdatedAt": "2024-10-24T14:42:27.801000-04:00",
+    "createdBy": "arn:aws:sts::211125359849:assumed-role/AWSReservedSSO_FT_DATALAKE_ALL-DataScience_39f24ff951682f7c/dkearfott@captechconsulting.com",
+    "lastUpdatedBy": "arn:aws:sts::211125359849:assumed-role/AWSReservedSSO_FT_DATALAKE_ALL-DataScience_39f24ff951682f7c/dkearfott@captechconsulting.com",
+    "tags": {},
+    "metadataCatalogConfig": {},
+    "schemaVersion": 3
+}
