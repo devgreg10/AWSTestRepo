@@ -144,15 +144,11 @@ class FtSalesforceAccountAppFlowTasks(Construct):
             {"sourceField": "How_many_holes__c", "destinationField": "How_many_holes__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
             {"sourceField": "If_other_fill_in_how_many__c", "destinationField": "If_other_fill_in_how_many__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Golf_Course_Type__c", "destinationField": "Golf_Course_Type__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
-            {"sourceField": "Course_Features_available_to_First_Tee__c", "destinationField": "Course_Features_available_to_First_Tee__c", "sourceDataType": "multipicklist", "destinationDataType": "multipicklist"},
-            {"sourceField": "Does_the_facility_offer_discounts_to_Fir__c", "destinationField": "Does_the_facility_offer_discounts_to_Fir__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
             {"sourceField": "Please_describe_discount__c", "destinationField": "Please_describe_discount__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Chapter_owns_this_facility__c", "destinationField": "Chapter_owns_this_facility__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
-            {"sourceField": "Operates_the_facility_through_a_lease__c", "destinationField": "Operates_the_facility_through_a_lease__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
             {"sourceField": "If_yes_how_long_is_the_lease__c", "destinationField": "If_yes_how_long_is_the_lease__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Who_is_the_lease_with__c", "destinationField": "Who_is_the_lease_with__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Notes_about_the_partnership__c", "destinationField": "Notes_about_the_partnership__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
-            {"sourceField": "Does_this_facility_have_a_dedicated_Firs__c", "destinationField": "Does_this_facility_have_a_dedicated_Firs__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
             {"sourceField": "Please_describe_the_learning_center__c", "destinationField": "Please_describe_the_learning_center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"}
         ]
 
@@ -207,11 +203,10 @@ class FtSalesforceAccountAppFlowTasks(Construct):
                     "Additional_Trade_Name__c", "FT_App_Pilot__c", "International_Chapter__c", 
                     "Customer_ID__c", "Award_Badges_Enabled__c", "Peer_Group__c", "In_Market_Partners__c", 
                     "How_many_holes__c", "If_other_fill_in_how_many__c", "Golf_Course_Type__c", 
-                    "Course_Features_available_to_First_Tee__c", 
-                    "Does_the_facility_offer_discounts_to_Fir__c", "Please_describe_discount__c", 
-                    "Chapter_owns_this_facility__c", "Operates_the_facility_through_a_lease__c", 
+                    "Please_describe_discount__c", 
+                    "Chapter_owns_this_facility__c", 
                     "If_yes_how_long_is_the_lease__c", "Who_is_the_lease_with__c", 
-                    "Notes_about_the_partnership__c", "Does_this_facility_have_a_dedicated_Firs__c", 
+                    "Notes_about_the_partnership__c", 
                     "Please_describe_the_learning_center__c"
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
