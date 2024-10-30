@@ -98,8 +98,7 @@ transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
     bootstrap_stack = decision_support_bootstrap_stack,
     storage_stack = decision_support_persistent_storage_stack,
     ds_core_stack = decision_support_base_stack,
-    ingestion_layer_stack=ingestion_layer_salesforce_stack,
-    load_layer_stack=load_layer_salesforce_stack
+    ingestion_layer_stack=ingestion_layer_salesforce_stack
 )
 
 '''

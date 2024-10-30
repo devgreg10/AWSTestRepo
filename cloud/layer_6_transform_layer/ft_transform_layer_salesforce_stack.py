@@ -40,8 +40,7 @@ class FtTransformLayerSalesforceStack(Stack):
                  bootstrap_stack: FtDecisionSupportBootstrapStack,
                  storage_stack: FtDecisionSupportPersistentStorageStack,
                  ds_core_stack: FtDecisionSupportCoreStack,
-                 ingestion_layer_stack: FtIngestionLayerSalesforceStack, 
-                 load_layer_stack: FtLoadLayerSalesforceStack, **kwargs) -> None:
+                 ingestion_layer_stack: FtIngestionLayerSalesforceStack, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -52,6 +51,14 @@ class FtTransformLayerSalesforceStack(Stack):
         else:
             load_dotenv(os.path.join(BASEDIR,"../.env.dev"))
 
+        # Define a Lambda Layer for data_core
+        data_core_lambda_layer = lambda_.LayerVersion(
+            self, f'DataCoreLayer',
+            code=lambda_.Code.from_asset('cloud/data_core_layer'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
+            description="A layer for data_core",
+        )
+
         '''
         TRANFORMATION LAYER
         Loop through salesforce_entities
@@ -59,7 +66,7 @@ class FtTransformLayerSalesforceStack(Stack):
         self.lambda_execute_db_function = lambda_.Function(self, f"LambdaExecuteDbFunction",
             runtime=lambda_.Runtime.PYTHON_3_8,
             function_name=f"ft-{env}-execute-db-function",
-            layers=[ds_core_stack.psycopg2_lambda_layer, load_layer_stack.data_core_lambda_layer],
+            layers=[ds_core_stack.psycopg2_lambda_layer, data_core_lambda_layer],
             vpc=bootstrap_stack.decision_support_vpc,
             vpc_subnets=ec2.SubnetSelection(
                 subnets=bootstrap_stack.decision_support_vpc.private_subnets
