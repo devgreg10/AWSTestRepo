@@ -54,7 +54,7 @@ class FtLoadLayerSalesforceStack(Stack):
             load_dotenv(os.path.join(BASEDIR,"../.env.dev"))
 
         # Define a Lambda Layer for data_core
-        self.data_core_lambda_layer = lambda_.LayerVersion(
+        data_core_lambda_layer = lambda_.LayerVersion(
             self, f'DataCoreLayer',
             code=lambda_.Code.from_asset('cloud/data_core_layer'),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_8, lambda_.Runtime.PYTHON_3_9],
@@ -111,7 +111,7 @@ class FtLoadLayerSalesforceStack(Stack):
             lambda_process_files = lambda_.Function(self, f"LambdaProcessLoadLayerFilesSalesforce{salesforce_object}",
                 runtime=lambda_.Runtime.PYTHON_3_8,
                 function_name=f"ft-{env}-salesforce-{entity_name}-load-files",
-                layers=[ds_core_stack.psycopg2_lambda_layer, self.data_core_lambda_layer],
+                layers=[ds_core_stack.psycopg2_lambda_layer, data_core_lambda_layer],
                 vpc=bootstrap_stack.decision_support_vpc,
                 vpc_subnets=ec2.SubnetSelection(
                    subnets=bootstrap_stack.decision_support_vpc.private_subnets
