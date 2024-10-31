@@ -20,7 +20,7 @@ class SalesforceAccountDbHelper:
     @staticmethod
     def insert_sf_raw_accounts(*, 
                             db_connection: connection, 
-                            new_raw_account: List[SfAccountRawDbModel],
+                            new_raw_accounts: List[SfAccountRawDbModel],
                             commit_changes: bool = True):
         """
         Inserts a collection of SfAccountRawDbModel objects into PostgreSQL.
