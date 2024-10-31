@@ -396,6 +396,7 @@ class SfContactRawDbModel(DbModel):
     docebo_is_junior_coach__c: str
     lifetime_gamification_points__c: str
     respect_in_sport_certification__c: str
+    dss_ingestion_timestamp: datetime
 
     # extend the DbModel to ignore extra arguments not included in the model that are passed in by the database view
     def __init__(self, **kwargs):
