@@ -302,7 +302,7 @@ class SfAccountRawDbModel(DbModel):
         """
         DbModel.__init__(self, **kwargs)
 
-def map_account_source_to_raw(source: SfAccountSourceModel) -> SfAccountRawDbModel:
+def map_sf_account_source_to_raw(source: SfAccountSourceModel) -> SfAccountRawDbModel:
     """
     Maps an instance of SfListingSourceModel to SfListingRawDbModel.
     """   
@@ -449,7 +449,7 @@ def map_account_source_to_raw(source: SfAccountSourceModel) -> SfAccountRawDbMod
         dss_ingestion_timestamp=datetime.now()  # Capture current timestamp
         )
     
-def map_account_sources_to_raws(source_list: List[SfAccountSourceModel]) -> List[SfAccountRawDbModel]:
+def map_sf_account_sources_to_raws(source_list: List[SfAccountSourceModel]) -> List[SfAccountRawDbModel]:
     """
     Maps a list of SfAccountSourceModel objects to a list of SfAccountRawDbModel objects.
 
@@ -459,4 +459,4 @@ def map_account_sources_to_raws(source_list: List[SfAccountSourceModel]) -> List
     Returns:
     - List of SfAccountRawDbModel instances.
     """
-    return [map_account_source_to_raw(source) for source in source_list]
+    return [map_sf_account_source_to_raw(source) for source in source_list]

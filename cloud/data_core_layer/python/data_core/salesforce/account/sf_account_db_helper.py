@@ -1,4 +1,4 @@
-from data_core.salesforce.account.sf_account_db_models import SfAccountRawDbModel, SfAccountSourceModel, map_account_sources_to_raws
+from data_core.salesforce.account.sf_account_db_models import SfAccountRawDbModel, SfAccountSourceModel, map_sf_account_sources_to_raws
 from psycopg2.extensions import connection
 from datetime import datetime
 
@@ -9,7 +9,16 @@ import logging
 class SalesforceAccountDbHelper:
 
     @staticmethod
-    def insert_sf_raw_account(*, 
+    def insert_sf_raw_accounts_from_source_accounts(*,
+                                                    db_connection: connection,
+                                                    source_accounts: List[SfAccountSourceModel],
+                                                    commit_changes: bool = True):
+        
+        SalesforceAccountDbHelper.insert_sf_raw_accounts(db_connection = db_connection,
+                                                         new_raw_accounts=map_sf_account_sources_to_raws(source_accounts))
+
+    @staticmethod
+    def insert_sf_raw_accounts(*, 
                             db_connection: connection, 
                             new_raw_account: List[SfAccountRawDbModel],
                             commit_changes: bool = True):
