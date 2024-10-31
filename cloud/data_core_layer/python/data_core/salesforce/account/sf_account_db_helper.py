@@ -107,7 +107,7 @@ class SalesforceAccountDbHelper:
             %(if_yes_how_long_is_the_lease__c)s, %(who_is_the_lease_with__c)s, %(notes_about_the_partnership__c)s,
             %(please_describe_the_learning_center__c)s, %(dss_ingestion_timestamp)s
         )
-        ON CONFLICT (id)
+        ON CONFLICT (id, systemmodstamp)
         DO UPDATE SET
             isdeleted = EXCLUDED.isdeleted,
             masterrecordid = EXCLUDED.masterrecordid,
@@ -138,7 +138,6 @@ class SalesforceAccountDbHelper:
             createdbyid = EXCLUDED.createdbyid,
             lastmodifieddate = EXCLUDED.lastmodifieddate,
             lastmodifiedbyid = EXCLUDED.lastmodifiedbyid,
-            systemmodstamp = EXCLUDED.systemmodstamp,
             lastactivitydate = EXCLUDED.lastactivitydate,
             lastvieweddate = EXCLUDED.lastvieweddate,
             lastreferenceddate = EXCLUDED.lastreferenceddate,
