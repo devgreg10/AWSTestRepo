@@ -8,34 +8,8 @@ BEGIN
     --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
     DROP TABLE IF EXISTS temp_sf_year_end_participant_raw_to_valid;
 
-    CREATE TEMP TABLE IF NOT EXISTS temp_sf_year_end_participant_raw_to_valid (
-        --still import as all text because we want to be able to analyze it for if it will make it to valid based on dtype, and we can assume it will fit in text because that's how it already exists in raw
-        contact_id TEXT,
-        first_name TEXT,
-        last_name TEXT,
-        program_level TEXT,
-        birthdate TEXT,
-        age TEXT,
-        gender TEXT,
-        ethnicity TEXT,
-        grade_level TEXT,
-        mailing_zip_postal_code TEXT,
-        primary_contact_email TEXT,
-        email TEXT,
-        participation_status TEXT,
-        legacy_participant_user_id TEXT,
-        school_name TEXT,
-        school_name_other TEXT,
-        additional_trade_name_account_name TEXT,
-        chapter_affiliation_account_name TEXT,
-        chapter_id TEXT,
-        year TEXT,
-        required_fields_validated BOOLEAN,
-        optional_fields_validated BOOLEAN
-    );
-
-    --this statement places all of the most recently uploaded records into the temp table
-    INSERT INTO temp_sf_year_end_participant_raw_to_valid
+    --imports all information as the source data type, in this case, TEXT, which is important so we can do typing validations on it
+    CREATE TEMP TABLE IF NOT EXISTS temp_sf_year_end_participant_raw_to_valid AS
     SELECT
         "Contact ID" AS contact_id,
         "First Name" AS first_name,
@@ -72,6 +46,8 @@ BEGIN
     --contact_id
         contact_id IS NULL
         OR contact_id = ''
+        --this filter eliminates the international chapters, who do not have almost any relevant fields for metric calculation anyways
+        OR LENGTH(contact_id) <> 18
     --year
         OR year IS NULL
         OR NOT (SELECT ft_ds_admin.is_coercable_to_numeric(year))
