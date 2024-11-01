@@ -608,11 +608,8 @@ class SalesforceAccountDbHelper:
             for account in new_raw_accounts
         ]
 
-        # Convert each dictionary to a tuple of values
-        data = [tuple(record.values()) for record in records]
-
         # Execute the upsert query for all accounts
-        cursor.executemany(upsert_query, data)
+        cursor.executemany(upsert_query, records)
 
         # Commit the transaction
         if commit_changes:
