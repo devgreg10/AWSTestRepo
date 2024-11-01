@@ -602,7 +602,8 @@ class SalesforceAccountDbHelper:
                 "if_yes_how_long_is_the_lease__c": account.if_yes_how_long_is_the_lease__c,
                 "who_is_the_lease_with__c": account.who_is_the_lease_with__c,
                 "notes_about_the_partnership__c": account.notes_about_the_partnership__c,
-                "please_describe_the_learning_center__c": account.please_describe_the_learning_center__c
+                "please_describe_the_learning_center__c": account.please_describe_the_learning_center__c,
+                "dss_ingestion_timestamp": datetime.now()  # Capture current timestamp
             }
             for account in new_raw_accounts
         ]
