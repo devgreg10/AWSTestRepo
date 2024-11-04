@@ -51,7 +51,7 @@ class FtSalesforceListingAppFlowTasks(Construct):
                     "Total_Coaches__c",
                     "test__c",
                     "Count_Listing__c"
-                 ],
+                ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"
                 ),
