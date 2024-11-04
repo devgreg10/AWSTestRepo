@@ -37,19 +37,19 @@ class SalesforceBadgeDbHelper:
             # Define the upsert SQL statement
         upsert_query = """
         INSERT INTO ft_ds_raw.sf_badge (
-            "id", "lastmodifieddate", "isdeleted", "createddate", "name", "recordtypeid", "createdbyid", 
+            "id", "lastmodifieddate", "isdeleted", "createddate", "name", "createdbyid", 
             "lastmodifiedbyid", "systemmodstamp", "lastvieweddate", "lastreferenceddate", 
             "description__c", "category__c", "ownerid", "dss_ingestion_timestamp",
             "badge_type__c", "coaches_app_image_id__c", "coaches_app_image_url__c", "is_active__c", 
             "parent_registration_image_id__c", "parent_registration_image_url__c", 
             "points__c", "sort_order__c", "badge_id__c", "age_group__c", "dss_ingestion_timestamp")            
             VALUES (
-            %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(name)s, %(recordtypeid)s, %(createdbyid)s,
+            %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(name)s, %(createdbyid)s,
             %(lastmodifiedbyid)s, %(systemmodstamp)s, %(lastvieweddate)s, %(lastreferenceddate)s,
-            %(description__c)s, %(category__c)s, %(ownerid__c)s, %(dss_ingestion_timestamp)s,
-            %(Badge_Type__c)s, %(Coaches_App_Image_Id__c)s, %(Coaches_App_Image_URL__c)s, %(Is_Active__c)s,
-            %(Parent_Registration_Image_Id__c)s, %(parent_registration_image_url__c)s,
-            %(Points__c)s, %(Sort_Order__c)s, %(badge_id__c)s, %(age_group__c)s, %(dss_ingestion_timestamp)s
+            %(description__c)s, %(category__c)s, %(ownerid)s, %(dss_ingestion_timestamp)s,
+            %(badge_type__c)s, %(coaches_app_image_id__c)s, %(coaches_app_image_url__c)s, %(is_active__c)s,
+            %(parent_registration_image_id__c)s, %(parent_registration_image_url__c)s,
+            %(points__c)s, %(sort_order__c)s, %(badge_id__c)s, %(age_group__c)s, %(dss_ingestion_timestamp)s
         )
         ON CONFLICT (id, systemmodstamp)
         DO UPDATE SET
@@ -59,22 +59,22 @@ class SalesforceBadgeDbHelper:
             name = EXCLUDED.name,
             createdbyid = EXCLUDED.createdbyid,
             lastmodifiedbyid = EXCLUDED.lastmodifiedbyid,
-            systemmodstamp = EXCLUDED.systemmodstamp,
             lastvieweddate = EXCLUDED.lastvieweddate,
             lastreferenceddate = EXCLUDED.lastreferenceddate,
             description__c = EXCLUDED.description__c,
             category__c = EXCLUDED.category__c,
             ownerid = EXCLUDED.ownerid,
-            Badge_Type__c = EXCLUDED.Badge_Type__c,
-            Coaches_App_Image_Id__c = EXCLUDED.Coaches_App_Image_Id__c,
-            Coaches_App_Image_URL__c = EXCLUDED.Coaches_App_Image_URL__c,
-            Is_Active__c = EXCLUDED.Is_Active__c,
-            Parent_Registration_Image_Id__c = EXCLUDED.Parent_Registration_Image_Id__c,
-            Parent_Registration_Image_URL__c = EXCLUDED.Parent_Registration_Image_URL__c,
-            Points__c = EXCLUDED.Points__c,
-            Sort_Order__c = EXCLUDED.Sort_Order__c,
+            dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp,
+            badge_type__c = EXCLUDED.badge_type__c,
+            coaches_app_image_id__c = EXCLUDED.coaches_app_image_id__c,
+            coaches_app_image_url__c = EXCLUDED.coaches_app_image_url__c,
+            is_active__c = EXCLUDED.is_active__c,
+            parent_registration_image_id__c = EXCLUDED.parent_registration_image_id__c,
+            parent_registration_image_url__c = EXCLUDED.parent_registration_image_url__c,
+            points__c = EXCLUDED.points__c,
+            sort_order__c = EXCLUDED.sort_order__c,
             badge_id__c = EXCLUDED.badge_id__c,
-            Age_Group__c = EXCLUDED.Age_Group__c,
+            age_group__c = EXCLUDED.age_group__c,
             dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp;
         """
 
@@ -91,20 +91,21 @@ class SalesforceBadgeDbHelper:
                 "systemmodstamp": badge.systemmodstamp,
                 "lastvieweddate": badge.lastvieweddate,
                 "lastreferenceddate": badge.lastreferenceddate,
-                "description__c": badge.description,
+                "description__c": badge.description__c,
                 "category__c": badge.category__c,
                 "ownerid": badge.ownerid,
-                "Badge_Type__c": badge.badgetype__c,
-                "Coaches_App_Image_Id__c": badge.coachesappimageid__c,
-                "Coaches_App_Image_URL__c": badge.coachesappimageurl__c,
-                "Is_Active__c": badge.isactive__c,
-                "Parent_Registration_Image_Id__c": badge.parentregistrationimageid__c,
-                "Parent_Registration_Image_URL__c": badge.parentregistrationimageurl__c,
-                "Points__c": badge.points__c,
-                "Sort_Order__c": badge.sortorder__c,
-                "badge_id__c": badge.badgeid__c,
-                "Age_Group__c": badge.age_group__c,
-                "dss_ingestion_timestamp": datetime.now()             }
+                "badge_type__c": badge.badge_type__c,
+                "coaches_app_image_id__c": badge.coaches_app_image_id__c,
+                "coaches_app_image_url__c": badge.coaches_app_image_url__c,
+                "is_active__c": badge.is_active__c,
+                "parent_registration_image_id__c": badge.parent_registration_image_id__c,
+                "parent_registration_image_url__c": badge.parent_registration_image_url__c,
+                "points__c": badge.points__c,
+                "sort_order__c": badge.sort_order__c,
+                "badge_id__c": badge.badge_id__c,
+                "age_group__c": badge.age_group__c,
+                "dss_ingestion_timestamp": datetime.now()
+            }
             for badge in new_raw_badge
         ]
 

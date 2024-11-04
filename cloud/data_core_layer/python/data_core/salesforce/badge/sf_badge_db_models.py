@@ -52,15 +52,15 @@ class SfBadgeRawDbModel(DbModel):
     lastreferenceddate: str
     description: str
     category__c: str
-    badgetype__c: str
-    coachesappimageid__c: str
-    coachesappimageurl__c: str
-    isactive__c: str
-    parentregistrationimageid__c: str
-    parentregistrationimageurl__c: str
+    badge_type__c: str
+    coaches_app_image_id__c: str
+    coaches_app_image_url__c: str
+    is_active__c: str
+    parent_registration_image_id__c: str
+    parent_registration_image_url__c: str
     points__c: str
-    sortorder__c: str
-    badgeid__c: str
+    sort_order__c: str
+    badge_id__c: str
     age_group__c: str
     dss_ingestion_timestamp: datetime
     
@@ -76,7 +76,7 @@ def map_badge_source_to_raw(source: SfBadgeSourceModel) -> SfBadgeRawDbModel:
   
     return SfBadgeRawDbModel(
         id=source.Id,
-        ownerId=source.OwnerId,
+        ownerid=source.OwnerId,
         isdeleted=source.IsDeleted,
         name=source.Name,
         createddate=source.CreatedDate,
@@ -98,7 +98,7 @@ def map_badge_source_to_raw(source: SfBadgeSourceModel) -> SfBadgeRawDbModel:
         sort_order__c=source.Sort_Order__c,
         badge_id__c=source.badge_id__c,
         age_group__c=source.Age_Group__c, 
-        dss_ingestion_timestamp=datetime.now()   
+        dss_ingestion_timestamp=datetime.now()
         )
 def map_badge_sources_to_raws(source_list:List [SfBadgeSourceModel]) -> List[SfBadgeRawDbModel]: 
     """"
