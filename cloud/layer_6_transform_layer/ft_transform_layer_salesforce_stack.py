@@ -158,7 +158,8 @@ class FtTransformLayerSalesforceStack(Stack):
             {"db_function": "calculate_historical_underserved_areas_counts", "short_name": "underserved-areas-counts"},
             {"db_function": "calculate_historical_teen_retention_percentage", "short_name": "teen-retention-percentage"},
             {"db_function": "calculate_historical_twelve_up_engagement_counts", "short_name": "twelve-up-counts"},
-            {"db_function": "calculate_historical_tenure_counts", "short_name": "tenure-counts"}
+            {"db_function": "calculate_historical_tenure_counts", "short_name": "tenure-counts"},
+            {"db_function": "calculate_historical_twelve_plus_retention_percentage", "short_name": "twelve-plus-retention-percentage"}
         ]
 
         # Historical Metric Functions should be run once per day at 3:00am EST, no modulo
