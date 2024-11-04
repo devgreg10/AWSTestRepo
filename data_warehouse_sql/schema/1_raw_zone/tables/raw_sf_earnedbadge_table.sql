@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_earnedbadge(
+    PRIMARY KEY (id, systemmodstamp),
+    id TEXT NOT NULL,
+    isdeleted TEXT,
+    name TEXT,
+    createddate TEXT,
+    createdbyid TEXT,
+    lastmodifieddate TEXT,
+    lastmodifiedbyid TEXT,
+    systemmodstamp TEXT NOT NULL,
+    contact__c TEXT,
+    badge__c TEXT,
+    id__c TEXT,
+    date_earned__c TEXT,
+    listing_session__c TEXT,
+    contact__c TEXT,
+    date_earned__c TEXT,
+    listing_session__c TEXT,
+    pending_aws_callout__c TEXT,
+    points__c TEXT,
+    source_system__c TEXT, 
+    dss_ingestion_timestamp TIMESTAMPTZ);
+    

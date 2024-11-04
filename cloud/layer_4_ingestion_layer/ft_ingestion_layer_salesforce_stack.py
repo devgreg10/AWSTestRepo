@@ -17,6 +17,8 @@ from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_contact_tasks imp
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_session_tasks import FtSalesforceListingSessionAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_tasks import FtSalesforceListingAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_session_registration_tasks import FtSalesforceSessionRegistrationAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_badge_tasks import FtSalesforceBadgeAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_earnedbadges_tasks import FtSalesforceEarnedBadgesAppFlowTasks
 
 from constructs import Construct
 
@@ -45,6 +47,16 @@ class FtIngestionLayerSalesforceStack(Stack):
 
         # Define all Salesforce entities and objects to ingest
         self.salesforce_entities = [
+            {
+                "entity_name": "badge", 
+                "salesforce_object": "Badge", 
+                "appflow_tasks": FtSalesforceEarnedBadgesAppFlowTasks(self, "SaleforceEarnedBadgesTasks") 
+            },
+            {
+               "entity_name": "badge", 
+                "salesforce_object": "Badge", 
+                "appflow_tasks": FtSalesforceBadgeAppFlowTasks(self, "SaleforceBadgeTasks")
+            }, 
             {
                "entity_name": "account", 
                 "salesforce_object": "Account", 
