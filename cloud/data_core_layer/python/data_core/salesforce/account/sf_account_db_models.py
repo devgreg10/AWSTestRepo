@@ -21,13 +21,11 @@ class SfAccountSourceModel():
     BillingState: str
     BillingPostalCode: str
     BillingCountry: str
-    BillingAddress: str
     ShippingStreet: str
     ShippingCity: str
     ShippingState: str
     ShippingPostalCode: str
     ShippingCountry: str
-    ShippingAddress: str
     Phone: str
     AccountNumber: str
     Website: str
@@ -166,13 +164,11 @@ class SfAccountRawDbModel(DbModel):
     billingstate: str
     billingpostalcode: str
     billingcountry: str
-    billingaddress: str
     shippingstreet: str
     shippingcity: str
     shippingstate: str
     shippingpostalcode: str
     shippingcountry: str
-    shippingaddress: str
     phone: str
     accountnumber: str
     website: str
@@ -319,13 +315,11 @@ def map_sf_account_source_to_raw(source: SfAccountSourceModel) -> SfAccountRawDb
         billingstate=source.BillingState,
         billingpostalcode=source.BillingPostalCode,
         billingcountry=source.BillingCountry,
-        billingaddress=source.BillingAddress,
         shippingstreet=source.ShippingStreet,
         shippingcity=source.ShippingCity,
         shippingstate=source.ShippingState,
         shippingpostalcode=source.ShippingPostalCode,
         shippingcountry=source.ShippingCountry,
-        shippingaddress=source.ShippingAddress,
         phone=source.Phone,
         accountnumber=source.AccountNumber,
         website=source.Website,
