@@ -48,24 +48,23 @@ class FtIngestionLayerSalesforceStack(Stack):
         # Define all Salesforce entities and objects to ingest
         self.salesforce_entities = [
             {
-                "entity_name": "badge", 
-                "salesforce_object": "Badge", 
-                "appflow_tasks": FtSalesforceEarnedBadgesAppFlowTasks(self, "SaleforceEarnedBadgesTasks") 
-            },
-            {
-               "entity_name": "badge", 
-                "salesforce_object": "Badge", 
-                "appflow_tasks": FtSalesforceBadgeAppFlowTasks(self, "SaleforceBadgeTasks")
-            }, 
-            {
                "entity_name": "account", 
                 "salesforce_object": "Account", 
                 "appflow_tasks": FtSalesforceAccountAppFlowTasks(self, "SaleforceAccountTasks")
             }, 
             {
+               "entity_name": "badge", 
+                "salesforce_object": "Gamification_Badge__c", 
+                "appflow_tasks": FtSalesforceBadgeAppFlowTasks(self, "SaleforceBadgeTasks")
+            },             {
                 "entity_name": "contact", 
                 "salesforce_object": "Contact", 
                 "appflow_tasks": FtSalesforceContactAppFlowTasks(self, "SaleforceContactTasks")
+            },
+            {
+                "entity_name": "earned-badge", 
+                "salesforce_object": "Earned_Badge__c", 
+                "appflow_tasks": FtSalesforceEarnedBadgesAppFlowTasks(self, "SaleforceEarnedBadgesTasks") 
             },
             {
                 "entity_name": "listing", 
