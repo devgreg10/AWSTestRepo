@@ -17,6 +17,8 @@ from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_contact_tasks imp
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_session_tasks import FtSalesforceListingSessionAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_tasks import FtSalesforceListingAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_session_registration_tasks import FtSalesforceSessionRegistrationAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_badge_tasks import FtSalesforceBadgeAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_earnedbadges_tasks import FtSalesforceEarnedBadgesAppFlowTasks
 
 from constructs import Construct
 
@@ -51,9 +53,18 @@ class FtIngestionLayerSalesforceStack(Stack):
                 "appflow_tasks": FtSalesforceAccountAppFlowTasks(self, "SaleforceAccountTasks")
             }, 
             {
+               "entity_name": "badge", 
+                "salesforce_object": "Gamification_Badge__c", 
+                "appflow_tasks": FtSalesforceBadgeAppFlowTasks(self, "SaleforceBadgeTasks")
+            },             {
                 "entity_name": "contact", 
                 "salesforce_object": "Contact", 
                 "appflow_tasks": FtSalesforceContactAppFlowTasks(self, "SaleforceContactTasks")
+            },
+            {
+                "entity_name": "earned-badge", 
+                "salesforce_object": "Earned_Badge__c", 
+                "appflow_tasks": FtSalesforceEarnedBadgesAppFlowTasks(self, "SaleforceEarnedBadgesTasks") 
             },
             {
                 "entity_name": "listing", 
