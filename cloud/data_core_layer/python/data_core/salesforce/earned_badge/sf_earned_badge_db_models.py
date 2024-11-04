@@ -6,7 +6,7 @@ from typing import List
 @define(kw_only=True)
 class SfEarnedBadgeSourceModel():
     """
-    Base model for Salesforce earnedbadge from S3
+    Base model for Salesforce earned_badge from S3
     """
     Id: str
     IsDeleted: str
@@ -29,7 +29,7 @@ class SfEarnedBadgeSourceModel():
 @define(kw_only=True)
 class SfEarnedBadgeRawDbModel(DbModel):
     """
-    Base model for Raw Salesforce earnedbadge
+    Base model for Raw Salesforce earned_badge
     """
     id: str
     isdeleted: str
@@ -57,7 +57,7 @@ class SfEarnedBadgeRawDbModel(DbModel):
         DbModel.__init__(self, **kwargs)
 
 
-def map_earnedbadge_source_to_raw(source: SfEarnedBadgeSourceModel) -> SfEarnedBadgeRawDbModel:
+def map_earned_badge_source_to_raw(source: SfEarnedBadgeSourceModel) -> SfEarnedBadgeRawDbModel:
   
     return SfEarnedBadgeRawDbModel(
         id=source.Id,
@@ -78,7 +78,7 @@ def map_earnedbadge_source_to_raw(source: SfEarnedBadgeSourceModel) -> SfEarnedB
         source_system__c=source.Source_System__c,
         dss_ingestion_timestamp=datetime.now()   
         )
-def map_earnedbadge_sources_to_raws(source_list:List[SfEarnedBadgeSourceModel]) -> List [SfEarnedBadgeRawDbModel]: 
+def map_earned_badge_sources_to_raws(source_list:List[SfEarnedBadgeSourceModel]) -> List [SfEarnedBadgeRawDbModel]: 
     """"
     Maps a list of SfEarnedBadgeSourceModel objects to a list of SfEarnedBadgeRawDbModel objects.
     Args:
@@ -87,4 +87,4 @@ def map_earnedbadge_sources_to_raws(source_list:List[SfEarnedBadgeSourceModel]) 
     Returns:
     - List of SfEarnedBadgeRawDbModel instances.
     """
-    return [map_earnedbadge_source_to_raw(source) for source in source_list]
+    return [map_earned_badge_source_to_raw(source) for source in source_list]

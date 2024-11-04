@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_earnedbadge(
+CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_earned_badge(
     PRIMARY KEY (id, systemmodstamp),
     id TEXT NOT NULL,
     isdeleted TEXT,
