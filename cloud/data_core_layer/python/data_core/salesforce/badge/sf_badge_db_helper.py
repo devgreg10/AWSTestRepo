@@ -40,14 +40,14 @@ class SalesforceBadgeDbHelper:
             "id", "lastmodifieddate", "isdeleted", "createddate", "name", "createdbyid", 
             "lastmodifiedbyid", "systemmodstamp", "lastvieweddate", "lastreferenceddate", 
             "description__c", "category__c", "ownerid", "dss_ingestion_timestamp",
-            "badge_type__c", "coaches_app_image_id__c", "coaches_app_image_url__c", "is_active__c", 
+            "badge_type__c", "is_active__c", 
             "parent_registration_image_id__c", "parent_registration_image_url__c", 
             "points__c", "sort_order__c", "badge_id__c", "age_group__c", "dss_ingestion_timestamp")            
             VALUES (
             %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(name)s, %(createdbyid)s,
             %(lastmodifiedbyid)s, %(systemmodstamp)s, %(lastvieweddate)s, %(lastreferenceddate)s,
             %(description__c)s, %(category__c)s, %(ownerid)s, %(dss_ingestion_timestamp)s,
-            %(badge_type__c)s, %(coaches_app_image_id__c)s, %(coaches_app_image_url__c)s, %(is_active__c)s,
+            %(badge_type__c)s, %(is_active__c)s,
             %(parent_registration_image_id__c)s, %(parent_registration_image_url__c)s,
             %(points__c)s, %(sort_order__c)s, %(badge_id__c)s, %(age_group__c)s, %(dss_ingestion_timestamp)s
         )
@@ -66,8 +66,6 @@ class SalesforceBadgeDbHelper:
             ownerid = EXCLUDED.ownerid,
             dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp,
             badge_type__c = EXCLUDED.badge_type__c,
-            coaches_app_image_id__c = EXCLUDED.coaches_app_image_id__c,
-            coaches_app_image_url__c = EXCLUDED.coaches_app_image_url__c,
             is_active__c = EXCLUDED.is_active__c,
             parent_registration_image_id__c = EXCLUDED.parent_registration_image_id__c,
             parent_registration_image_url__c = EXCLUDED.parent_registration_image_url__c,
@@ -95,8 +93,6 @@ class SalesforceBadgeDbHelper:
                 "category__c": badge.category__c,
                 "ownerid": badge.ownerid,
                 "badge_type__c": badge.badge_type__c,
-                "coaches_app_image_id__c": badge.coaches_app_image_id__c,
-                "coaches_app_image_url__c": badge.coaches_app_image_url__c,
                 "is_active__c": badge.is_active__c,
                 "parent_registration_image_id__c": badge.parent_registration_image_id__c,
                 "parent_registration_image_url__c": badge.parent_registration_image_url__c,

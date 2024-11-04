@@ -28,8 +28,6 @@ class FtSalesforceBadgeAppFlowTasks(Construct):
                     "Category__c", 
                     "Description__c", 
                     "Badge_Type__c", 
-                    "Coaches_App_Image_Id__c"
-                    "Coaches_App_Image_URL__c",
                     "Is_Active__c",
                     "Parent_Registration_Image_Id__c",
                     "Parent_Registration_Image_URL__c",
@@ -250,38 +248,6 @@ class FtSalesforceBadgeAppFlowTasks(Construct):
                     appflow.CfnFlow.TaskPropertiesObjectProperty(
                         key="SOURCE_DATA_TYPE",
                         value="picklist"
-                    )
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Coaches_App_Image_Id__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
-                destination_field="Coaches_App_Image_Id__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
-                    )
-                ]
-            ),
-            appflow.CfnFlow.TaskProperty(
-                source_fields=["Coaches_App_Image_URL__c"],
-                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
-                destination_field="Coaches_App_Image_URL__c",
-                task_type="Map",
-                task_properties=[
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="DESTINATION_DATA_TYPE",
-                        value="string"
-                    ),
-                    appflow.CfnFlow.TaskPropertiesObjectProperty(
-                        key="SOURCE_DATA_TYPE",
-                        value="string"
                     )
                 ]
             ),

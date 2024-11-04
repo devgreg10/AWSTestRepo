@@ -22,8 +22,6 @@ class SfBadgeSourceModel():
     Description: str    
     Category__c: str
     Badge_Type__c: str
-    Coaches_App_Image_Id__c: str
-    Coaches_App_Image_Url__c: str
     Is_Active__c: str
     Parent_Registration_Image_Id__c: str
     Parent_Registration_Image_Url__c: str
@@ -53,8 +51,6 @@ class SfBadgeRawDbModel(DbModel):
     description: str
     category__c: str
     badge_type__c: str
-    coaches_app_image_id__c: str
-    coaches_app_image_url__c: str
     is_active__c: str
     parent_registration_image_id__c: str
     parent_registration_image_url__c: str
@@ -89,8 +85,6 @@ def map_badge_source_to_raw(source: SfBadgeSourceModel) -> SfBadgeRawDbModel:
         description=source.Description,
         category__c=source.Category__c,
         badge_type__c=source.Badge_Type__c,
-        coaches_app_image_id__c=source.Coaches_App_Image_Id__c,
-        coaches_app_image_url__c=source.Coaches_App_Image_Url__c,
         is_active__c=source.Is_Active__c,
         parent_registration_image_id__c=source.Parent_Registration_Image_Id__c,
         parent_registration_image_url__c=source.Parent_Registration_Image_Url__c,
