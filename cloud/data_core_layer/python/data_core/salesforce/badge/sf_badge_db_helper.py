@@ -37,13 +37,13 @@ class SalesforceBadgeDbHelper:
             # Define the upsert SQL statement
         upsert_query = """
         INSERT INTO ft_ds_raw.sf_badge (
-            "id", "lastmodifieddate", "isdeleted", "createddate", "name", "createdbyid", 
+            "id", "lastmodifieddate", "isdeleted", "createddate", "name", 
             "lastmodifiedbyid", "systemmodstamp", "lastvieweddate", "lastreferenceddate", 
             "description__c", "category__c", "ownerid", "dss_ingestion_timestamp",
             "badge_type__c", "is_active__c", 
             "points__c", "sort_order__c", "badge_id__c", "age_group__c", "dss_ingestion_timestamp")            
             VALUES (
-            %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(name)s, %(createdbyid)s,
+            %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(name)s, 
             %(lastmodifiedbyid)s, %(systemmodstamp)s, %(lastvieweddate)s, %(lastreferenceddate)s,
             %(description__c)s, %(category__c)s, %(ownerid)s, %(dss_ingestion_timestamp)s,
             %(badge_type__c)s, %(is_active__c)s,
@@ -55,7 +55,6 @@ class SalesforceBadgeDbHelper:
             isdeleted = EXCLUDED.isdeleted,
             createddate = EXCLUDED.createddate,
             name = EXCLUDED.name,
-            createdbyid = EXCLUDED.createdbyid,
             lastmodifiedbyid = EXCLUDED.lastmodifiedbyid,
             lastvieweddate = EXCLUDED.lastvieweddate,
             lastreferenceddate = EXCLUDED.lastreferenceddate,
@@ -80,7 +79,6 @@ class SalesforceBadgeDbHelper:
                 "isdeleted": badge.isdeleted,
                 "createddate": badge.createddate,
                 "name": badge.name,
-                "createdbyid": badge.createdbyid,
                 "lastmodifiedbyid": badge.lastmodifiedbyid,
                 "systemmodstamp": badge.systemmodstamp,
                 "lastvieweddate": badge.lastvieweddate,

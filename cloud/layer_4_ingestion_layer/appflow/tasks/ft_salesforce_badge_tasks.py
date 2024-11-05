@@ -19,7 +19,6 @@ class FtSalesforceBadgeAppFlowTasks(Construct):
                     "IsDeleted", 
                     "Name",
                     "CreatedDate", 
-                    "CreatedById", 
                     "LastModifiedDate", 
                     "LastModifiedById", 
                     "SystemModstamp",

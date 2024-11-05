@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_badge (
     isdeleted TEXT,
     name TEXT,
     createddate TEXT,
-    createdbyid TEXT,
     lastmodifieddate TEXT,
     lastmodifiedbyid TEXT,
     systemmodstamp TEXT NOT NULL,

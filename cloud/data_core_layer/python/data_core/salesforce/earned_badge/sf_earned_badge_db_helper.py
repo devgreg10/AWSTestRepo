@@ -38,7 +38,7 @@ class SalesforceEarnedBadgeDbHelper:
         INSERT INTO ft_ds_raw.sf_earned_badge (
            "Id", "IsDeleted", "Name", "CreatedDate", "CreatedById", "LastModifiedDate", "LastModifiedById",
             "SystemModstamp", "Contact__c", "Badge__c", "Id__c", "Date_Earned__c", "Listing_Session__c",
-            "Pending_AWS_Callout__c", "Points__c", "Source_System__c", "dss_ingestion_timestamp"                       
+            "Pending_AWS_Callout__c", "Points__c", "Source_System__c", "dss_ingestion_timestamp")                      
             VALUES (
             %(id)s, %(isdeleted)s, %(name)s, %(createddate)s, %(createdbyid)s, %(lastmodifieddate)s, %(lastmodifiedbyid)s,
             %(systemmodstamp)s, %(contact__c)s, %(badge__c)s, %(id__c)s, %(date_earned__c)s, %(listing_session__c)s,
