@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_badge (
     systemmodstamp TEXT NOT NULL,
     lastvieweddate TEXT,
     lastreferenceddate TEXT,
-    description TEXT,
+    description__c TEXT,
     category__c TEXT,
     badge_type__c TEXT,
     is_active__c TEXT,

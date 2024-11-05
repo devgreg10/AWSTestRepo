@@ -19,7 +19,7 @@ class SfBadgeSourceModel():
     SystemModstamp: str
     LastViewedDate: str
     LastReferencedDate: str
-    Description: str    
+    Description__c: str    
     Category__c: str
     Badge_Type__c: str
     Is_Active__c: str
@@ -48,7 +48,7 @@ class SfBadgeRawDbModel(DbModel):
     systemmodstamp: str
     lastvieweddate: str
     lastreferenceddate: str
-    description: str
+    description__c: str
     category__c: str
     badge_type__c: str
     is_active__c: str
@@ -82,7 +82,7 @@ def map_badge_source_to_raw(source: SfBadgeSourceModel) -> SfBadgeRawDbModel:
         systemmodstamp=source.SystemModstamp,
         lastvieweddate=source.LastViewedDate,
         lastreferenceddate=source.LastReferencedDate,
-        description=source.Description,
+        description__c=source.Description__c,
         category__c=source.Category__c,
         badge_type__c=source.Badge_Type__c,
         is_active__c=source.Is_Active__c,
