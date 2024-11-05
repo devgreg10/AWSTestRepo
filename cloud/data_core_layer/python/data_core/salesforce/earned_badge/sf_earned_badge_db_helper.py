@@ -35,10 +35,10 @@ class SalesforceEarnedBadgeDbHelper:
 
             # Define the upsert SQL statement
         upsert_query = """
-        INSERT INTO ft_ds_raw.sf_earned_badge (
-           "Id", "IsDeleted", "Name", "CreatedDate", "CreatedById", "LastModifiedDate", "LastModifiedById",
-            "SystemModstamp", "Contact__c", "Badge__c", "Id__c", "Date_Earned__c", "Listing_Session__c",
-            "Pending_AWS_Callout__c", "Points__c", "Source_System__c", "dss_ingestion_timestamp")                      
+            INSERT INTO ft_ds_raw.sf_earned_badge (
+                id, isdeleted, name, createddate, createdbyid, lastmodifieddate, lastmodifiedbyid,
+                systemmodstamp, contact__c, badge__c, id__c, date_earned__c, listing_session__c,
+                pending_aws_callout__c, points__c, source_system__c, dss_ingestion_timestamp)
             VALUES (
             %(id)s, %(isdeleted)s, %(name)s, %(createddate)s, %(createdbyid)s, %(lastmodifieddate)s, %(lastmodifiedbyid)s,
             %(systemmodstamp)s, %(contact__c)s, %(badge__c)s, %(id__c)s, %(date_earned__c)s, %(listing_session__c)s,

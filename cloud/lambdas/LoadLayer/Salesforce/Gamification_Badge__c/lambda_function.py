@@ -74,9 +74,9 @@ def lambda_handler(event, context):
                         if len(chunk) == commit_batch_size:
                             
                             logging.info(f"{function_name} - calling SalesforceBadgeDbHelper.insert_sf_raw_badges_from_source_badges for chunk size {commit_batch_size}")
-                            SalesforceBadgeDbHelper.insert_sf_raw_badges_from_source_badges(
+                            SalesforceBadgeDbHelper.insert_sf_raw_badge_from_source_badge(
                                 db_connection = db_connection,
-                                source_badges = chunk,
+                                source_badge = chunk,
                                 commit_changes = True)
                                 
                             # reset chunk upon commit
@@ -85,9 +85,9 @@ def lambda_handler(event, context):
                 # Process any remaining badges that didn't fill the last chunk and close the DB connection
                 if chunk:
                     logging.info(f"{function_name} - calling SalesforceBadgeDbHelper.insert_sf_raw_badges_from_source_badges for chunk size {len(chunk)}")
-                    SalesforceBadgeDbHelper.insert_sf_raw_badges_from_source_badges(
+                    SalesforceBadgeDbHelper.insert_sf_raw_badge_from_source_badge(
                         db_connection = db_connection,
-                        source_badges = chunk,
+                        source_badge = chunk,
                         commit_changes = True)              
                             
             except DbException as ex:
