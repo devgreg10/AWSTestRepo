@@ -15,8 +15,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_badge (
     category__c TEXT,
     badge_type__c TEXT,
     is_active__c TEXT,
-    parent_registration_image_id__c TEXT,
-    parent_registration_image_url__c TEXT,
     points__c TEXT,
     sort_order__c TEXT,
     badge_id__c TEXT,

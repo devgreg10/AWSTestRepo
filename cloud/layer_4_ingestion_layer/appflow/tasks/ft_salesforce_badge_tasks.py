@@ -29,8 +29,6 @@ class FtSalesforceBadgeAppFlowTasks(Construct):
                     "Description__c", 
                     "Badge_Type__c", 
                     "Is_Active__c",
-                    "Parent_Registration_Image_Id__c",
-                    "Parent_Registration_Image_URL__c",
                     "Points__c",
                     "Sort_Order__c",
                     "badge_id__c",
@@ -264,38 +262,6 @@ class FtSalesforceBadgeAppFlowTasks(Construct):
                 appflow.CfnFlow.TaskPropertiesObjectProperty(
                     key="SOURCE_DATA_TYPE",
                     value="boolean"
-                )
-            ]
-        ),
-        appflow.CfnFlow.TaskProperty(
-            source_fields=["Parent_Registration_Image_Id__c"],
-            connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
-            destination_field="Parent_Registration_Image_Id__c",
-            task_type="Map",
-            task_properties=[
-                appflow.CfnFlow.TaskPropertiesObjectProperty(
-                    key="DESTINATION_DATA_TYPE",
-                    value="string"
-                ),
-                appflow.CfnFlow.TaskPropertiesObjectProperty(
-                    key="SOURCE_DATA_TYPE",
-                    value="string"
-                )
-            ]
-        ),
-        appflow.CfnFlow.TaskProperty(
-            source_fields=["Parent_Registration_Image_URL__c"],
-            connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
-            destination_field="Parent_Registration_Image_URL__c",
-            task_type="Map",
-            task_properties=[
-                appflow.CfnFlow.TaskPropertiesObjectProperty(
-                    key="DESTINATION_DATA_TYPE",
-                    value="string"
-                ),
-                appflow.CfnFlow.TaskPropertiesObjectProperty(
-                    key="SOURCE_DATA_TYPE",
-                    value="string"
                 )
             ]
         ),

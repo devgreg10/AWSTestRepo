@@ -79,7 +79,7 @@ class SalesforceEarnedBadgeDbHelper:
                 "dss_ingestion_timestamp": datetime.now()  
             }         
                 
-                for earned_badge in new_raw_badge
+                for earned_badge in new_raw_badges
         ]
 
         # Execute the upsert query for all earned_badge

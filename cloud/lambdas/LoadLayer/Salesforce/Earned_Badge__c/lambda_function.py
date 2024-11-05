@@ -3,8 +3,8 @@ import boto3
 import os
 import logging
 from datetime import datetime
-from data_core.salesforce.earned_badge.sf_earnedbadge_db_helper import SalesforceEarnedBadgeDbHelper
-from data_core.salesforce.earned_badge.sf_earnedbadge_db_models import SfEarnedBadgeSourceModel
+from data_core.salesforce.earned_badge.sf_earned_badge_db_helper import SalesforceEarnedBadgeDbHelper
+from data_core.salesforce.earned_badge.sf_earned_badge_db_models import SfEarnedBadgeSourceModel
 from data_core.util.db_execute_helper import DbExecutorHelper
 from data_core.util.db_exceptions import DbException, DbErrorCode
 
@@ -60,34 +60,34 @@ def lambda_handler(event, context):
                     if line.strip():  # Skip empty lines
 
                         # parse the json line into a dictionary
-                        earnedbadge_json = json.loads(line)
+                        earned_badge_json = json.loads(line)
 
                         # Create the SfEarnedBadgeSourceModel object from the dictionary
-                        sf_source_earnedbadge = SfEarnedBadgeSourceModel(**earnedbadge_json)
+                        sf_source_earned_badge = SfEarnedBadgeSourceModel(**earned_badge_json)
 
-                        # logging.info(f"SfEarnedBadgeSourceModel: {json.dumps(asdict(sf_source_earnedbadge), indent=4)}")
+                        # logging.info(f"SfEarnedBadgeSourceModel: {json.dumps(asdict(sf_source_earned_badge), indent=4)}")
 
-                        # Add the earnedbadge to the current chunk
-                        chunk.append(sf_source_earnedbadge)
+                        # Add the earned_badge to the current chunk
+                        chunk.append(sf_source_earned_badge)
 
                         # Once the commit_batch_size is met, process the chunk and reset the list
                         if len(chunk) == commit_batch_size:
                             
-                            logging.info(f"{function_name} - calling SalesforceEarnedBadgeDbHelper.insert_sf_raw_earnedbadges_from_source_earnedbadges for chunk size {commit_batch_size}")
-                            SalesforceEarnedBadgeDbHelper.insert_sf_raw_earnedbadge_from_source_earnedbadges(
+                            logging.info(f"{function_name} - calling SalesforceEarnedBadgeDbHelper.insert_sf_raw_earned_badges_from_source_earned_badges for chunk size {commit_batch_size}")
+                            SalesforceEarnedBadgeDbHelper.insert_sf_raw_earned_badge_from_source_earned_badges(
                                 db_connection = db_connection,
-                                source_earnedbadges = chunk,
+                                source_badges = chunk,
                                 commit_changes = True)
                                 
                             # reset chunk upon commit
                             chunk = []
                 
-                # Process any remaining earnedbadges that didn't fill the last chunk and close the DB connection
+                # Process any remaining earned_badges that didn't fill the last chunk and close the DB connection
                 if chunk:
-                    logging.info(f"{function_name} - calling SalesforceEarnedBadgeDbHelper.insert_sf_raw_earnedbadges_from_source_earnedbadges for chunk size {len(chunk)}")
-                    SalesforceEarnedBadgeDbHelper.insert_sf_raw_earnedbadge_from_source_earnedbadges(
+                    logging.info(f"{function_name} - calling SalesforceEarnedBadgeDbHelper.insert_sf_raw_earned_badges_from_source_earned_badges for chunk size {len(chunk)}")
+                    SalesforceEarnedBadgeDbHelper.insert_sf_raw_earned_badge_from_source_earned_badges(
                         db_connection = db_connection,
-                        source_earnedbadges = chunk,
+                        source_badges = chunk,
                         commit_changes = True)              
                             
             except DbException as ex:
@@ -115,7 +115,7 @@ def lambda_handler(event, context):
             logging.info(f"{function_name} - File moved to 'Complete' folder: {destination_key}")
             
         except Exception as e:
-            logger.error(f"{function_name} - Error occurred loading S3 earnedbadges to Raw: {e}")
+            logger.error(f"{function_name} - Error occurred loading S3 earned_badges to Raw: {e}")
             if db_connection:
                 db_connection.rollback()
             raise e

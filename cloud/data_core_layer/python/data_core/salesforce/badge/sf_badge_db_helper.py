@@ -41,14 +41,12 @@ class SalesforceBadgeDbHelper:
             "lastmodifiedbyid", "systemmodstamp", "lastvieweddate", "lastreferenceddate", 
             "description__c", "category__c", "ownerid", "dss_ingestion_timestamp",
             "badge_type__c", "is_active__c", 
-            "parent_registration_image_id__c", "parent_registration_image_url__c", 
             "points__c", "sort_order__c", "badge_id__c", "age_group__c", "dss_ingestion_timestamp")            
             VALUES (
             %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(name)s, %(createdbyid)s,
             %(lastmodifiedbyid)s, %(systemmodstamp)s, %(lastvieweddate)s, %(lastreferenceddate)s,
             %(description__c)s, %(category__c)s, %(ownerid)s, %(dss_ingestion_timestamp)s,
             %(badge_type__c)s, %(is_active__c)s,
-            %(parent_registration_image_id__c)s, %(parent_registration_image_url__c)s,
             %(points__c)s, %(sort_order__c)s, %(badge_id__c)s, %(age_group__c)s, %(dss_ingestion_timestamp)s
         )
         ON CONFLICT (id, systemmodstamp)
@@ -67,8 +65,6 @@ class SalesforceBadgeDbHelper:
             dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp,
             badge_type__c = EXCLUDED.badge_type__c,
             is_active__c = EXCLUDED.is_active__c,
-            parent_registration_image_id__c = EXCLUDED.parent_registration_image_id__c,
-            parent_registration_image_url__c = EXCLUDED.parent_registration_image_url__c,
             points__c = EXCLUDED.points__c,
             sort_order__c = EXCLUDED.sort_order__c,
             badge_id__c = EXCLUDED.badge_id__c,
@@ -94,8 +90,6 @@ class SalesforceBadgeDbHelper:
                 "ownerid": badge.ownerid,
                 "badge_type__c": badge.badge_type__c,
                 "is_active__c": badge.is_active__c,
-                "parent_registration_image_id__c": badge.parent_registration_image_id__c,
-                "parent_registration_image_url__c": badge.parent_registration_image_url__c,
                 "points__c": badge.points__c,
                 "sort_order__c": badge.sort_order__c,
                 "badge_id__c": badge.badge_id__c,

@@ -23,8 +23,6 @@ class SfBadgeSourceModel():
     Category__c: str
     Badge_Type__c: str
     Is_Active__c: str
-    Parent_Registration_Image_Id__c: str
-    Parent_Registration_Image_Url__c: str
     Points__c: str
     Sort_Order__c: str
     badge_id__c: str
@@ -52,8 +50,6 @@ class SfBadgeRawDbModel(DbModel):
     category__c: str
     badge_type__c: str
     is_active__c: str
-    parent_registration_image_id__c: str
-    parent_registration_image_url__c: str
     points__c: str
     sort_order__c: str
     badge_id__c: str
@@ -86,8 +82,6 @@ def map_badge_source_to_raw(source: SfBadgeSourceModel) -> SfBadgeRawDbModel:
         category__c=source.Category__c,
         badge_type__c=source.Badge_Type__c,
         is_active__c=source.Is_Active__c,
-        parent_registration_image_id__c=source.Parent_Registration_Image_Id__c,
-        parent_registration_image_url__c=source.Parent_Registration_Image_Url__c,
         points__c=source.Points__c,
         sort_order__c=source.Sort_Order__c,
         badge_id__c=source.badge_id__c,
