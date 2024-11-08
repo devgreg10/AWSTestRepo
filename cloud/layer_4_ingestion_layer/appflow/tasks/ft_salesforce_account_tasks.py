@@ -5,8 +5,17 @@ from aws_cdk import (
 from constructs import Construct
 
 class FtSalesforceAccountAppFlowTasks(Construct):
-    def __init__(self, scope: Construct, id: str) -> None:
+    def __init__(self, 
+                 scope: Construct, 
+                 id: str,
+                 dedicated_first_tee_learning_center_field_name: str,
+                 discounts_offered_to_participants_field_name: str,
+                 operates_the_facility_through_a_lease_field_name: str) -> None:
         super().__init__(scope, id)
+
+        self.dedicated_first_tee_learning_center_field_name = dedicated_first_tee_learning_center_field_name
+        self.discounts_offered_to_participants_field_name = discounts_offered_to_participants_field_name
+        self.operates_the_facility_through_a_lease_field_name = operates_the_facility_through_a_lease_field_name
 
     def get_tasks(self) -> List[appflow.CfnFlow.TaskProperty]:
 
@@ -148,9 +157,9 @@ class FtSalesforceAccountAppFlowTasks(Construct):
             {"sourceField": "Who_is_the_lease_with__c", "destinationField": "Who_is_the_lease_with__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Notes_about_the_partnership__c", "destinationField": "Notes_about_the_partnership__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
             {"sourceField": "Please_describe_the_learning_center__c", "destinationField": "Please_describe_the_learning_center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
-            {"sourceField": "dedicated_First_Tee_Learning_Center__c", "destinationField": "dedicated_First_Tee_Learning_Center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
-            {"sourceField": "Discounts_offered_to_Participants__c", "destinationField": "Discounts_offered_to_Participants__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
-            {"sourceField": "Chapter_Operates_the_facility_through_a__c", "destinationField": "Chapter_Operates_the_facility_through_a__c", "sourceDataType": "picklist", "destinationDataType": "picklist"}
+            {"sourceField": self.dedicated_first_tee_learning_center_field_name, "destinationField": "dedicated_First_Tee_Learning_Center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": self.discounts_offered_to_participants_field_name, "destinationField": "Discounts_offered_to_Participants__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": self.operates_the_facility_through_a_lease_field_name, "destinationField": "Chapter_Operates_the_facility_through_a__c", "sourceDataType": "picklist", "destinationDataType": "picklist"}
         ]
 
         tasks: List[appflow.CfnFlow.TaskProperty] = [
@@ -306,9 +315,9 @@ class FtSalesforceAccountAppFlowTasks(Construct):
                     "Who_is_the_lease_with__c",
                     "Notes_about_the_partnership__c",
                     "Please_describe_the_learning_center__c",
-                    "dedicated_First_Tee_Learning_Center__c",
-                    "Discounts_offered_to_Participants__c",
-                    "Chapter_Operates_the_facility_through_a__c"
+                    self.dedicated_first_tee_learning_center_field_name,
+                    self.discounts_offered_to_participants_field_name,
+                    self.operates_the_facility_through_a_lease_field_name
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"
