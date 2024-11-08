@@ -148,7 +148,9 @@ class FtSalesforceAccountAppFlowTasks(Construct):
             {"sourceField": "Who_is_the_lease_with__c", "destinationField": "Who_is_the_lease_with__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Notes_about_the_partnership__c", "destinationField": "Notes_about_the_partnership__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
             {"sourceField": "Please_describe_the_learning_center__c", "destinationField": "Please_describe_the_learning_center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
-            {"sourceField": "Partner_Org_Demographics__c", "destinationField": "Partner_Org_Demographics__c", "sourceDataType": "reference", "destinationDataType": "reference"}
+            {"sourceField": "dedicated_First_Tee_Learning_Center__c", "destinationField": "dedicated_First_Tee_Learning_Center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Discounts_offered_to_Participants__c", "destinationField": "Discounts_offered_to_Participants__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Chapter_Operates_the_facility_through_a__c", "destinationField": "Chapter_Operates_the_facility_through_a__c", "sourceDataType": "picklist", "destinationDataType": "picklist"}
         ]
 
         tasks: List[appflow.CfnFlow.TaskProperty] = [
@@ -304,7 +306,9 @@ class FtSalesforceAccountAppFlowTasks(Construct):
                     "Who_is_the_lease_with__c",
                     "Notes_about_the_partnership__c",
                     "Please_describe_the_learning_center__c",
-                    "Partner_Org_Demographics__c"
+                    "dedicated_First_Tee_Learning_Center__c",
+                    "Discounts_offered_to_Participants__c",
+                    "Chapter_Operates_the_facility_through_a__c"
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"

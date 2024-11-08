@@ -137,5 +137,8 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_account (
     who_is_the_lease_with__c text,
     notes_about_the_partnership__c text,
     please_describe_the_learning_center__c text,
+    dedicated_first_tee_learning_center__c text,
+    discounts_offered_to_participants__c text,
+    chapter_operates_the_facility_through_a__c text,
     dss_ingestion_timestamp TIMESTAMPTZ
 );

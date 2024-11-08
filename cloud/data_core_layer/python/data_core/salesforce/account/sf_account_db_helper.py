@@ -174,6 +174,9 @@ class SalesforceAccountDbHelper:
             who_is_the_lease_with__c,
             notes_about_the_partnership__c,
             please_describe_the_learning_center__c,
+            dedicated_first_tee_learning_center__c,
+            discounts_offered_to_participants__c,
+            chapter_operates_the_facility_through_a__c,
             dss_ingestion_timestamp
         ) VALUES (
             %(id)s,
@@ -313,6 +316,9 @@ class SalesforceAccountDbHelper:
             %(who_is_the_lease_with__c)s,
             %(notes_about_the_partnership__c)s,
             %(please_describe_the_learning_center__c)s, 
+            %(dedicated_first_tee_learning_center__c)s,
+            %(discounts_offered_to_participants__c)s,
+            %(chapter_operates_the_facility_through_a__c)s,
             %(dss_ingestion_timestamp)s
         )
         ON CONFLICT (id, systemmodstamp)
@@ -452,6 +458,9 @@ class SalesforceAccountDbHelper:
             who_is_the_lease_with__c = EXCLUDED.who_is_the_lease_with__c,
             notes_about_the_partnership__c = EXCLUDED.notes_about_the_partnership__c,
             please_describe_the_learning_center__c = EXCLUDED.please_describe_the_learning_center__c,
+            dedicated_first_tee_learning_center__c = EXCLUDED.dedicated_first_tee_learning_center__c,
+            discounts_offered_to_participants__c = EXCLUDED.discounts_offered_to_participants__c,
+            chapter_operates_the_facility_through_a__c = EXCLUDED.chapter_operates_the_facility_through_a__c,
             dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp;
         """
 
@@ -595,6 +604,9 @@ class SalesforceAccountDbHelper:
                 "who_is_the_lease_with__c": account.who_is_the_lease_with__c,
                 "notes_about_the_partnership__c": account.notes_about_the_partnership__c,
                 "please_describe_the_learning_center__c": account.please_describe_the_learning_center__c,
+                "dedicated_first_tee_learning_center__c": account.dedicated_first_tee_learning_center__c,
+                "discounts_offered_to_participants__c": account.discounts_offered_to_participants__c,
+                "chapter_operates_the_facility_through_a__c": account.chapter_operates_the_facility_through_a__c,
                 "dss_ingestion_timestamp": datetime.now()  # Capture current timestamp
             }
             for account in new_raw_accounts

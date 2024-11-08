@@ -146,6 +146,10 @@ class SfAccountSourceModel():
     Who_is_the_lease_with__c: str
     Notes_about_the_partnership__c: str
     Please_describe_the_learning_center__c: str
+    dedicated_First_Tee_Learning_Center__c: str
+    Discounts_offered_to_Participants__c: str
+    Chapter_Operates_the_facility_through_a__c: str
+
 
 @define(kw_only=True)
 class SfAccountRawDbModel(DbModel):
@@ -289,6 +293,9 @@ class SfAccountRawDbModel(DbModel):
     who_is_the_lease_with__c: str
     notes_about_the_partnership__c: str
     please_describe_the_learning_center__c: str
+    dedicated_first_tee_learning_center__c: str
+    discounts_offered_to_participants__c: str
+    chapter_operates_the_facility_through_a__c: str
     dss_ingestion_timestamp: datetime
 
      # extend the DbModel to ignore extra arguments not included in the model that are passed in by the database view
@@ -440,6 +447,9 @@ def map_sf_account_source_to_raw(source: SfAccountSourceModel) -> SfAccountRawDb
         who_is_the_lease_with__c=source.Who_is_the_lease_with__c,
         notes_about_the_partnership__c=source.Notes_about_the_partnership__c,
         please_describe_the_learning_center__c=source.Please_describe_the_learning_center__c,
+        dedicated_first_tee_learning_center__c=source.dedicated_First_Tee_Learning_Center__c,
+        discounts_offered_to_participants__c=source.Discounts_offered_to_Participants__c,
+        chapter_operates_the_facility_through_a__c=source.Chapter_Operates_the_facility_through_a__c,
         dss_ingestion_timestamp=datetime.now()  # Capture current timestamp
         )
     
