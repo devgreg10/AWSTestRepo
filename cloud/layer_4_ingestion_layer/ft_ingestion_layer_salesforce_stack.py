@@ -11,11 +11,14 @@ from aws_cdk import (
 from datetime import datetime, timedelta
 import pytz
 
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_account_tasks import FtSalesforceAccountAppFlowTasks
 from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_contact_tasks import FtSalesforceContactAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_session_tasks import FtSalesforceListingSessionAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_tasks import FtSalesforceListingAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_session_registration_tasks import FtSalesforceSessionRegistrationAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_badge_tasks import FtSalesforceBadgeAppFlowTasks
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_earned_badges_tasks import FtSalesforceEarnedBadgesAppFlowTasks
 
 from constructs import Construct
 
@@ -45,14 +48,27 @@ class FtIngestionLayerSalesforceStack(Stack):
         # Define all Salesforce entities and objects to ingest
         self.salesforce_entities = [
             {
+               "entity_name": "account", 
+                "salesforce_object": "Account", 
                 "appflow_tasks": FtSalesforceAccountAppFlowTasks(self, 
                                                                  "SaleforceAccountTasks",
                                                                  operates_the_facility_through_a_lease_field_name=os.getenv('operates_the_facility_through_a_lease_field_name'),
                                                                  dedicated_first_tee_learning_center_field_name=os.getenv('dedicated_first_tee_learning_center_field_name'),
                                                                  discounts_offered_to_participants_field_name=os.getenv('discounts_offered_to_participants_field_name'))
+            }, 
+            {
+               "entity_name": "badge", 
+                "salesforce_object": "Gamification_Badge__c", 
+                "appflow_tasks": FtSalesforceBadgeAppFlowTasks(self, "SaleforceBadgeTasks")
+            },             {
                 "entity_name": "contact", 
                 "salesforce_object": "Contact", 
                 "appflow_tasks": FtSalesforceContactAppFlowTasks(self, "SaleforceContactTasks")
+            },
+            {
+                "entity_name": "earned-badge", 
+                "salesforce_object": "Earned_Badge__c", 
+                "appflow_tasks": FtSalesforceEarnedBadgesAppFlowTasks(self, "SaleforceEarnedBadgesTasks") 
             },
             {
                 "entity_name": "listing", 
