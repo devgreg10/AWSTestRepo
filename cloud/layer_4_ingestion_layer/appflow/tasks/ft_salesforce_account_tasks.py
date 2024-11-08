@@ -147,7 +147,8 @@ class FtSalesforceAccountAppFlowTasks(Construct):
             {"sourceField": "If_yes_how_long_is_the_lease__c", "destinationField": "If_yes_how_long_is_the_lease__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Who_is_the_lease_with__c", "destinationField": "Who_is_the_lease_with__c", "sourceDataType": "string", "destinationDataType": "string"},
             {"sourceField": "Notes_about_the_partnership__c", "destinationField": "Notes_about_the_partnership__c", "sourceDataType": "textarea", "destinationDataType": "textarea"},
-            {"sourceField": "Please_describe_the_learning_center__c", "destinationField": "Please_describe_the_learning_center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"}
+            {"sourceField": "Please_describe_the_learning_center__c", "destinationField": "Please_describe_the_learning_center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Partner_Org_Demographics__c", "destinationField": "Partner_Org_Demographics__c", "sourceDataType": "reference", "destinationDataType": "reference"}
         ]
 
         tasks: List[appflow.CfnFlow.TaskProperty] = [
@@ -302,7 +303,8 @@ class FtSalesforceAccountAppFlowTasks(Construct):
                     "If_yes_how_long_is_the_lease__c",
                     "Who_is_the_lease_with__c",
                     "Notes_about_the_partnership__c",
-                    "Please_describe_the_learning_center__c"
+                    "Please_describe_the_learning_center__c",
+                    "Partner_Org_Demographics__c"
                 ],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(
                     salesforce="PROJECTION"
