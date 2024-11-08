@@ -50,7 +50,11 @@ class FtIngestionLayerSalesforceStack(Stack):
             {
                "entity_name": "account", 
                 "salesforce_object": "Account", 
-                "appflow_tasks": FtSalesforceAccountAppFlowTasks(self, "SaleforceAccountTasks")
+                "appflow_tasks": FtSalesforceAccountAppFlowTasks(self, 
+                                                                 "SaleforceAccountTasks",
+                                                                 operates_the_facility_through_a_lease_field_name=os.getenv('operates_the_facility_through_a_lease_field_name'),
+                                                                 dedicated_first_tee_learning_center_field_name=os.getenv('dedicated_first_tee_learning_center_field_name'),
+                                                                 discounts_offered_to_participants_field_name=os.getenv('discounts_offered_to_participants_field_name'))
             }, 
             {
                "entity_name": "badge", 
