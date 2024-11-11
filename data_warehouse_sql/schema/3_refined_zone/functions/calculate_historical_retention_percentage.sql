@@ -84,6 +84,8 @@ BEGIN
             py.contact_id = part_view.contact_id
             AND py.year = part_view.year
         WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+        --this filter excludes non-salesforce contacts from international chapters, which is necessary since they do not have year-over-year common contact IDs
+        AND LENGTH(py.contact_id) = 18
         GROUP BY
             --the calculation of retention and totals happens separately since the total eligible to return is from the old chapter
             py.last_years_chapter_id,

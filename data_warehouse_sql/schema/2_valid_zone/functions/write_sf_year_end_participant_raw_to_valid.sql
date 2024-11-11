@@ -46,8 +46,6 @@ BEGIN
     --contact_id
         contact_id IS NULL
         OR contact_id = ''
-        --this filter eliminates the international chapters, who do not have almost any relevant fields for metric calculation anyways
-        OR LENGTH(contact_id) <> 18
     --year
         OR year IS NULL
         OR NOT (SELECT ft_ds_admin.is_coercable_to_numeric(year))
