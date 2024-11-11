@@ -1,9 +1,9 @@
-CREATE OR REPLACE FUNCTION ft_ds_admin.calculate_historical_teen_retention_percentage()
+CREATE OR REPLACE FUNCTION ft_ds_admin.calculate_historical_twelve_plus_retention_percentage()
 RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    INSERT INTO ft_ds_refined.metric_historical_teen_retention_percentage
+    INSERT INTO ft_ds_refined.metric_historical_twelve_plus_retention_percentage
     --this subquery produces a list of contacts, the year that the contact was recorded, and the next year that contact appears as being recorded in one row
     WITH participant_years AS (
         SELECT
@@ -70,7 +70,7 @@ BEGIN
             AND py.year = part_view.year
         WHERE
             py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
-            AND part_view.birthdate < (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 13, 1, 1))
+            AND part_view.birthdate < (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 12, 1, 1))
         GROUP BY
             --the calculation of retention and totals happens separately since retention is credited to the new chapter
             py.curr_chapter_id,
@@ -92,9 +92,9 @@ BEGIN
             AND py.year = part_view.year
         WHERE
             py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
-            AND part_view.birthdate < (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 13, 1, 1))
+            AND part_view.birthdate < (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 12, 1, 1))
             --this filter excludes non-salesforce contacts from international chapters, which is necessary since they do not have year-over-year common contact IDs
-            AND LENGTH(py.contact_id = 18)
+            AND LENGTH(py.contact_id) = 18
         GROUP BY
             --the calculation of retention and totals happens separately since the total eligible to return is from the old chapter
             py.last_years_chapter_id,
@@ -103,7 +103,7 @@ BEGIN
     SELECT
         NOW() AS metric_calc_date,
         list_of_all_chapters.chapter_id,
-        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS teen_retention_percentage
+        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS twelve_plus_retention_percentage
     FROM
         (   
             SELECT

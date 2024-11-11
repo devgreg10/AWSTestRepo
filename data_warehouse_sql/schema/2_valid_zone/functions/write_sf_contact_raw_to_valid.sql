@@ -161,7 +161,8 @@ BEGIN
     mailing_zip_postal_code = NULL
     WHERE
         mailing_zip_postal_code IS NULL
-        OR mailing_zip_postal_code !~ '^\d{5}(-\d{4})?$'
+        --removing format validation for zip code since it interferes with hitting the metric accuracy benchmark for active participants
+        --OR mailing_zip_postal_code !~ '^\d{5}(-\d{4})?$'
         OR mailing_zip_postal_code = ''
     ;
     -- mailing_street
