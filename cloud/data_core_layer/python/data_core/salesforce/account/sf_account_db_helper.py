@@ -177,6 +177,7 @@ class SalesforceAccountDbHelper:
             dedicated_first_tee_learning_center__c,
             discounts_offered_to_participants__c,
             chapter_operates_the_facility_through_a__c,
+            partner_org_demographics__c,
             dss_ingestion_timestamp
         ) VALUES (
             %(id)s,
@@ -319,6 +320,7 @@ class SalesforceAccountDbHelper:
             %(dedicated_first_tee_learning_center__c)s,
             %(discounts_offered_to_participants__c)s,
             %(chapter_operates_the_facility_through_a__c)s,
+            %(partner_org_demographics__c)s,
             %(dss_ingestion_timestamp)s
         )
         ON CONFLICT (id, systemmodstamp)
@@ -461,6 +463,7 @@ class SalesforceAccountDbHelper:
             dedicated_first_tee_learning_center__c = EXCLUDED.dedicated_first_tee_learning_center__c,
             discounts_offered_to_participants__c = EXCLUDED.discounts_offered_to_participants__c,
             chapter_operates_the_facility_through_a__c = EXCLUDED.chapter_operates_the_facility_through_a__c,
+            partner_org_demographics__c = EXCLUDED.partner_org_demographics__c,
             dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp;
         """
 
@@ -607,6 +610,7 @@ class SalesforceAccountDbHelper:
                 "dedicated_first_tee_learning_center__c": account.dedicated_first_tee_learning_center__c,
                 "discounts_offered_to_participants__c": account.discounts_offered_to_participants__c,
                 "chapter_operates_the_facility_through_a__c": account.chapter_operates_the_facility_through_a__c,
+                "partner_org_demographics__c": account.partner_org_demographics__c,
                 "dss_ingestion_timestamp": datetime.now()  # Capture current timestamp
             }
             for account in new_raw_accounts
