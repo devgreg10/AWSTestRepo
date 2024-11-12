@@ -159,7 +159,8 @@ class FtSalesforceAccountAppFlowTasks(Construct):
             {"sourceField": "Please_describe_the_learning_center__c", "destinationField": "Please_describe_the_learning_center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
             {"sourceField": self.dedicated_first_tee_learning_center_field_name, "destinationField": "dedicated_First_Tee_Learning_Center__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
             {"sourceField": self.discounts_offered_to_participants_field_name, "destinationField": "Discounts_offered_to_Participants__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
-            {"sourceField": self.operates_the_facility_through_a_lease_field_name, "destinationField": "Chapter_Operates_the_facility_through_a__c", "sourceDataType": "picklist", "destinationDataType": "picklist"}
+            {"sourceField": self.operates_the_facility_through_a_lease_field_name, "destinationField": "Chapter_Operates_the_facility_through_a__c", "sourceDataType": "picklist", "destinationDataType": "picklist"},
+            {"sourceField": "Partner_Org_Demographics__c", "destinationField": "Partner_Org_Demographics__c", "sourceDataType": "reference", "destinationDataType": "reference"}
         ]
 
         tasks: List[appflow.CfnFlow.TaskProperty] = [

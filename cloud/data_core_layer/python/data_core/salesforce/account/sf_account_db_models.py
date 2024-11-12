@@ -149,7 +149,7 @@ class SfAccountSourceModel():
     dedicated_First_Tee_Learning_Center__c: str
     Discounts_offered_to_Participants__c: str
     Chapter_Operates_the_facility_through_a__c: str
-
+    Partner_Org_Demographics__c: str
 
 @define(kw_only=True)
 class SfAccountRawDbModel(DbModel):
@@ -296,6 +296,7 @@ class SfAccountRawDbModel(DbModel):
     dedicated_first_tee_learning_center__c: str
     discounts_offered_to_participants__c: str
     chapter_operates_the_facility_through_a__c: str
+    partner_org_demographics__c: str
     dss_ingestion_timestamp: datetime
 
      # extend the DbModel to ignore extra arguments not included in the model that are passed in by the database view
@@ -450,6 +451,7 @@ def map_sf_account_source_to_raw(source: SfAccountSourceModel) -> SfAccountRawDb
         dedicated_first_tee_learning_center__c=source.dedicated_First_Tee_Learning_Center__c,
         discounts_offered_to_participants__c=source.Discounts_offered_to_Participants__c,
         chapter_operates_the_facility_through_a__c=source.Chapter_Operates_the_facility_through_a__c,
+        partner_org_demographics__c=source.Partner_Org_Demographics__c,
         dss_ingestion_timestamp=datetime.now()  # Capture current timestamp
         )
     
