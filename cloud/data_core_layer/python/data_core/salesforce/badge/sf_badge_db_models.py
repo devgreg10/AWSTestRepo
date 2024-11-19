@@ -13,6 +13,7 @@ class SfBadgeSourceModel():
     IsDeleted: str
     Name: str
     CreatedDate: str
+    CreatedById: str
     LastModifiedDate: str
     LastModifiedById: str     
     SystemModstamp: str
@@ -39,6 +40,7 @@ class SfBadgeRawDbModel(DbModel):
     isdeleted: str
     name: str
     createddate: str
+    createdbyid: str
     lastmodifieddate: str
     lastmodifiedbyid: str
     systemmodstamp: str
@@ -70,6 +72,7 @@ def map_badge_source_to_raw(source: SfBadgeSourceModel) -> SfBadgeRawDbModel:
         isdeleted=source.IsDeleted,
         name=source.Name,
         createddate=source.CreatedDate,
+        createdbyid = source.CreatedById,
         lastmodifieddate=source.LastModifiedDate,
         lastmodifiedbyid=source.LastModifiedById,
         systemmodstamp=source.SystemModstamp,

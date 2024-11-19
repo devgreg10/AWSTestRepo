@@ -37,13 +37,13 @@ class SalesforceBadgeDbHelper:
             # Define the upsert SQL statement
         upsert_query = """
         INSERT INTO ft_ds_raw.sf_badge (
-            id, lastmodifieddate, isdeleted, createddate, name, 
+            id, lastmodifieddate, isdeleted, createddate, createdbyid, name, 
             lastmodifiedbyid, systemmodstamp, lastvieweddate, lastreferenceddate, 
             description__c, category__c, ownerid, 
             badge_type__c, is_active__c, 
             points__c, sort_order__c, badge_id__c, age_group__c, dss_ingestion_timestamp)            
             VALUES (
-            %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(name)s, 
+            %(id)s, %(lastmodifieddate)s, %(isdeleted)s, %(createddate)s, %(createdbyid)s, %(name)s, 
             %(lastmodifiedbyid)s, %(systemmodstamp)s, %(lastvieweddate)s, %(lastreferenceddate)s,
             %(description__c)s, %(category__c)s, %(ownerid)s, 
             %(badge_type__c)s, %(is_active__c)s,
@@ -54,6 +54,7 @@ class SalesforceBadgeDbHelper:
             lastmodifieddate = EXCLUDED.lastmodifieddate,
             isdeleted = EXCLUDED.isdeleted,
             createddate = EXCLUDED.createddate,
+            createdbyid = EXCLUDED.createdbyid,
             name = EXCLUDED.name,
             lastmodifiedbyid = EXCLUDED.lastmodifiedbyid,
             lastvieweddate = EXCLUDED.lastvieweddate,
@@ -77,6 +78,7 @@ class SalesforceBadgeDbHelper:
                 "lastmodifieddate": badge.lastmodifieddate,
                 "isdeleted": badge.isdeleted,
                 "createddate": badge.createddate,
+                "createdbyid": badge.createdbyid,
                 "name": badge.name,
                 "lastmodifiedbyid": badge.lastmodifiedbyid,
                 "systemmodstamp": badge.systemmodstamp,
