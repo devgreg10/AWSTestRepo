@@ -53,8 +53,7 @@ class SalesforceEarnedBadgeDbHelper:
             createdbyid = EXCLUDED.createdbyid,
             lastmodifiedbyid = EXCLUDED.lastmodifiedbyid,
             systemmodstamp = EXCLUDED.systemmodstamp,
-            contact__c = EXCLUDED.contact__c, 
-            dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp
+            contact__c = EXCLUDED.contact__c,
             badge__c = EXCLUDED.badge__c,
             badge_type__c = EXCLUDED.badge_type__c,
             category__c = EXCLUDED.category__c,
