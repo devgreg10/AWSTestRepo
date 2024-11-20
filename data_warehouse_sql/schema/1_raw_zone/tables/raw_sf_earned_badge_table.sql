@@ -9,12 +9,16 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_earned_badge(
     lastmodifiedbyid TEXT,
     systemmodstamp TEXT NOT NULL,
     badge__c TEXT,
+    badge_type__c TEXT,
+    category__c TEXT,
+    class__c TEXT,
     id__c TEXT,
     contact__c TEXT,
     date_earned__c TEXT,
     listing_session__c TEXT,
+    listing_session_old__c TEXT,
     pending_aws_callout__c TEXT,
     points__c TEXT,
     source_system__c TEXT, 
-    dss_ingestion_timestamp TIMESTAMPTZ);
-    
+    dss_ingestion_timestamp TIMESTAMPTZ
+);    
