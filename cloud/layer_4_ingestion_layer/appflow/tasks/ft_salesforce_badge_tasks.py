@@ -19,6 +19,7 @@ class FtSalesforceBadgeAppFlowTasks(Construct):
                     "IsDeleted", 
                     "Name",
                     "CreatedDate", 
+                    "CreatedbyId",
                     "LastModifiedDate", 
                     "LastModifiedById", 
                     "SystemModstamp",
@@ -117,6 +118,22 @@ class FtSalesforceBadgeAppFlowTasks(Construct):
                     appflow.CfnFlow.TaskPropertiesObjectProperty(
                         key="SOURCE_DATA_TYPE",
                         value="datetime"
+                    )
+                ]
+            ),
+            appflow.CfnFlow.TaskProperty(
+                source_fields=["CreatedbyId"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
+                destination_field="CreatedbyId",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="DESTINATION_DATA_TYPE",
+                        value="reference"
+                    ),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(
+                        key="SOURCE_DATA_TYPE",
+                        value="reference"
                     )
                 ]
             ),

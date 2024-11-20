@@ -18,9 +18,13 @@ class SfEarnedBadgeSourceModel():
     SystemModstamp: str
     Contact__c: str
     Badge__c: str
+    Badge_Type__c: str
+    Category__c: str
+    Class__c: str
     Id__c: str
     Date_Earned__c: str
     Listing_Session__c: str
+    Listing_Session_OLD__c: str
     Pending_AWS_Callout__c: str
     Points__c: str
     Source_System__c: str   
@@ -41,9 +45,13 @@ class SfEarnedBadgeRawDbModel(DbModel):
     systemmodstamp: str
     contact__c: str
     badge__c: str
+    badge_type__c: str
+    category__c: str
+    class__c: str
     id__c: str
     date_earned__c: str
     listing_session__c: str
+    listing_session_old__c: str
     pending_aws_callout__c: str
     points__c: str
     source_system__c: str    
@@ -70,9 +78,13 @@ def map_earned_badge_source_to_raw(source: SfEarnedBadgeSourceModel) -> SfEarned
         systemmodstamp=source.SystemModstamp,
         contact__c=source.Contact__c,
         badge__c=source.Badge__c,
+        badge_type__c=source.Badge_Type__c,
+        category__c=source.Category__c,
+        class__c=source.Class__c,
         id__c=source.Id__c,
         date_earned__c=source.Date_Earned__c,
         listing_session__c=source.Listing_Session__c,
+        listing_session_old__c=source.Listing_Session_OLD__c,
         pending_aws_callout__c=source.Pending_AWS_Callout__c,
         points__c=source.Points__c,
         source_system__c=source.Source_System__c,

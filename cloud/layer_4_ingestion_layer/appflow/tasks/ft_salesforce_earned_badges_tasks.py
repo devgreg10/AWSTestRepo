@@ -24,9 +24,13 @@ class FtSalesforceEarnedBadgesAppFlowTasks(Construct):
                 "SystemModstamp",
                 "Contact__c",
                 "Badge__c",
+                "Badge_Type__c",
+                "Category__c",
+                "Class__c",
                 "Id__c",
                 "Date_Earned__c",
                 "Listing_Session__c",
+                "Listing_Session_OLD__c"
                 "Pending_AWS_Callout__c",
                 "Points__c",
                 "Source_System__c"
@@ -139,6 +143,36 @@ class FtSalesforceEarnedBadgesAppFlowTasks(Construct):
                 ]
             ),
             appflow.CfnFlow.TaskProperty(
+                source_fields=["Badge_Type__c"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
+                destination_field="Badge_Type__c",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="DESTINATION_DATA_TYPE", value="string"),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="SOURCE_DATA_TYPE", value="string")
+                ]
+            ),
+            appflow.CfnFlow.TaskProperty(
+                source_fields=["Category__c"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
+                destination_field="Category__c",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="DESTINATION_DATA_TYPE", value="string"),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="SOURCE_DATA_TYPE", value="string")
+                ]
+            ),
+            appflow.CfnFlow.TaskProperty(
+                source_fields=["Class_c"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
+                destination_field="Class_c",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="DESTINATION_DATA_TYPE", value="reference"),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="SOURCE_DATA_TYPE", value="reference")
+                ]
+            ),
+            appflow.CfnFlow.TaskProperty(
                 source_fields=["Id__c"],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
                 destination_field="Id__c",
@@ -166,6 +200,16 @@ class FtSalesforceEarnedBadgesAppFlowTasks(Construct):
                 task_properties=[
                     appflow.CfnFlow.TaskPropertiesObjectProperty(key="DESTINATION_DATA_TYPE", value="reference"),
                     appflow.CfnFlow.TaskPropertiesObjectProperty(key="SOURCE_DATA_TYPE", value="reference")
+                ]
+            ),
+            appflow.CfnFlow.TaskProperty(
+                source_fields=["Listing_Session_OLD__c"],
+                connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
+                destination_field="Listing_Session_OLD__c",
+                task_type="Map",
+                task_properties=[
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="DESTINATION_DATA_TYPE", value="string"),
+                    appflow.CfnFlow.TaskPropertiesObjectProperty(key="SOURCE_DATA_TYPE", value="string")
                 ]
             ),
             appflow.CfnFlow.TaskProperty(
