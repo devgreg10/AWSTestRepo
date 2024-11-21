@@ -30,7 +30,7 @@ class FtSalesforceEarnedBadgesAppFlowTasks(Construct):
                 "Id__c",
                 "Date_Earned__c",
                 "Listing_Session__c",
-                "Listing_Session_OLD__c"
+                "Listing_Session_OLD__c",
                 "Pending_AWS_Callout__c",
                 "Points__c",
                 "Source_System__c"
