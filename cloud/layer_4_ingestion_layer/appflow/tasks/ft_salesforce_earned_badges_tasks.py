@@ -163,9 +163,9 @@ class FtSalesforceEarnedBadgesAppFlowTasks(Construct):
                 ]
             ),
             appflow.CfnFlow.TaskProperty(
-                source_fields=["Class_c"],
+                source_fields=["Class__c"],
                 connector_operator=appflow.CfnFlow.ConnectorOperatorProperty(salesforce="NO_OP"),
-                destination_field="Class_c",
+                destination_field="Class__c",
                 task_type="Map",
                 task_properties=[
                     appflow.CfnFlow.TaskPropertiesObjectProperty(key="DESTINATION_DATA_TYPE", value="reference"),
