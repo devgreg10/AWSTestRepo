@@ -1,14 +1,12 @@
-CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_badge (
-    PRIMARY KEY (id, systemmodstamp),
-    id TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS ft_ds_raw.validation_errors_sf_badge (
+    id TEXT,
     ownerid TEXT,
     isdeleted TEXT,
     name TEXT,
     createddate TEXT,
-    createdbyid TEXT,
     lastmodifieddate TEXT,
     lastmodifiedbyid TEXT,
-    systemmodstamp TEXT NOT NULL,
+    systemmodstamp TEXT,
     lastvieweddate TEXT,
     lastreferenceddate TEXT,
     description__c TEXT,
@@ -19,5 +17,8 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.sf_badge (
     sort_order__c TEXT,
     badge_id__c TEXT,
     age_group__c TEXT,
-    dss_ingestion_timestamp TIMESTAMPTZ
+    dss_ingestion_timestamp TIMESTAMPTZ,
+    required_fields_validated BOOLEAN,
+    optional_fields_validated BOOLEAN,
+    fixed_in_source BOOLEAN
 );
