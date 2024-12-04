@@ -18,8 +18,6 @@ BEGIN
         lastmodifieddate AS sf_last_modified_timestamp,
         lastmodifiedbyid AS sf_last_modified_by_id,
         systemmodstamp AS sf_system_modstamp,
-        lastvieweddate AS sf_last_viewed_date,
-        lastreferenceddate AS sf_last_referenced_date,
         description__c AS description,
         category__c AS category,
         badge_type__c AS badge_type,
@@ -128,26 +126,6 @@ BEGIN
         OR LENGTH(sf_last_modified_by_id) <> 18
         OR sf_last_modified_by_id = ''
     ;
-    -- sf_last_viewed_date
-    UPDATE temp_sf_badge_raw_to_valid
-    SET
-    optional_fields_validated = FALSE,
-    sf_last_viewed_date = NULL
-    WHERE
-        sf_last_viewed_date IS NULL
-        OR NOT (ft_ds_admin.is_coercable_to_timestamptz(sf_last_viewed_date))
-        OR sf_last_viewed_date = ''
-    ;
-    -- sf_last_referenced_date
-    UPDATE temp_sf_badge_raw_to_valid
-    SET
-    optional_fields_validated = FALSE,
-    sf_last_viewed_date = NULL
-    WHERE
-        sf_last_viewed_date IS NULL
-        OR NOT (ft_ds_admin.is_coercable_to_timestamptz(sf_last_viewed_date))
-        OR sf_last_viewed_date = ''
-    ;
     -- description
     UPDATE temp_sf_badge_raw_to_valid
     SET
@@ -250,8 +228,6 @@ BEGIN
         sf_last_modified_timestamp,
         sf_last_modified_by_id,
         sf_system_modstamp,
-        sf_last_viewed_date,
-        sf_last_referenced_date,
         description,
         category,
         badge_type,
@@ -285,8 +261,6 @@ BEGIN
         sf_last_modified_timestamp TIMESTAMPTZ,
         sf_last_modified_by_id CHAR(18),
         sf_system_modstamp TIMESTAMPTZ,
-        sf_last_viewed_date TIMESTAMPTZ,
-        sf_last_referenced_date TIMESTAMPTZ,
         description TEXT,
         category TEXT, --picklist
         badge_type TEXT, --picklist
@@ -310,8 +284,6 @@ BEGIN
         CAST(sf_last_modified_timestamp AS TIMESTAMPTZ) AS sf_last_modified_timestamp,
         sf_last_modified_by_id,
         CAST(sf_system_modstamp AS TIMESTAMPTZ) AS sf_system_modstamp,
-        CAST(sf_last_viewed_date AS TIMESTAMPTZ) AS sf_last_viewed_date,
-        CAST(sf_last_referenced_date AS TIMESTAMPTZ) AS sf_last_referenced_date,
         description,
         category,
         badge_type,
@@ -345,8 +317,6 @@ BEGIN
         sf_last_modified_timestamp,
         sf_last_modified_by_id,
         sf_system_modstamp,
-        sf_last_viewed_date,
-        sf_last_referenced_date,
         description,
         category,
         badge_type,
@@ -368,8 +338,6 @@ BEGIN
         sf_last_modified_timestamp,
         sf_last_modified_by_id,
         sf_system_modstamp,
-        sf_last_viewed_date,
-        sf_last_referenced_date,
         description,
         category,
         badge_type,
@@ -407,8 +375,6 @@ BEGIN
         sf_last_modified_timestamp = EXCLUDED.sf_last_modified_timestamp,
         sf_last_modified_by_id = EXCLUDED.sf_last_modified_by_id,
         sf_system_modstamp = EXCLUDED.sf_system_modstamp,
-        sf_last_viewed_date = EXCLUDED.sf_last_viewed_date,
-        sf_last_referenced_date = EXCLUDED.sf_last_referenced_date,
         description = EXCLUDED.description,
         category = EXCLUDED.category,
         badge_type = EXCLUDED.badge_type,

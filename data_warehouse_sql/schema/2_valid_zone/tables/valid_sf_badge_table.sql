@@ -9,8 +9,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_valid.sf_badge (
     sf_last_modified_timestamp TIMESTAMPTZ,
     sf_last_modified_by_id CHAR(18),
     sf_system_modstamp TIMESTAMPTZ,
-    sf_last_viewed_date TIMESTAMPTZ,
-    sf_last_referenced_date TIMESTAMPTZ,
     description TEXT,
     category TEXT, --picklist
     badge_type TEXT, --picklist

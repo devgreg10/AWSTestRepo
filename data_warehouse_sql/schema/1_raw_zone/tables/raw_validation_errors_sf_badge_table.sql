@@ -8,8 +8,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.validation_errors_sf_badge (
     sf_last_modified_timestamp TEXT,
     sf_last_modified_by_id TEXT,
     sf_system_modstamp TEXT,
-    sf_last_viewed_date TEXT,
-    sf_last_referenced_date TEXT,
     description TEXT,
     category TEXT,
     badge_type TEXT,
