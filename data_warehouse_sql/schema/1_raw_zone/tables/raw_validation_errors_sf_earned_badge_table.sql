@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS ft_ds_raw.validation_errors_sf_earned_badge (
+    earned_badge_id TEXT,
+    is_deleted TEXT,
+    sf_created_timestamp TEXT,
+    sf_created_by_id TEXT,
+    sf_last_modified_timestamp TEXT,
+    sf_last_modified_by_id TEXT,
+    sf_system_modstamp TEXT,
+    badge_id TEXT,
+    badge_type TEXT,
+    category TEXT,
+    class_id TEXT,
+    contact_id TEXT,
+    date_earned TEXT,
+    listing_session_id TEXT,
+    is_pending_aws_callout TEXT,
+    points TEXT,
+    source_system TEXT,
+    dss_ingestion_timestamp TIMESTAMPTZ,
+    required_fields_validated BOOLEAN,
+    optional_fields_validated BOOLEAN,
+    fixed_in_source BOOLEAN
+);
