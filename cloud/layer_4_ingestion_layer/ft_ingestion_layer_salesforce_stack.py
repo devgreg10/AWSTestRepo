@@ -65,11 +65,11 @@ class FtIngestionLayerSalesforceStack(Stack):
                 "salesforce_object": "Contact", 
                 "appflow_tasks": FtSalesforceContactAppFlowTasks(self, "SaleforceContactTasks")
             },
-            # {
-            #     "entity_name": "earned-badge", 
-            #     "salesforce_object": "Earned_Badge__c", 
-            #     "appflow_tasks": FtSalesforceEarnedBadgesAppFlowTasks(self, "SaleforceEarnedBadgesTasks") 
-            # },
+            {
+                "entity_name": "earned-badge", 
+                "salesforce_object": "Earned_Badge__c", 
+                "appflow_tasks": FtSalesforceEarnedBadgesAppFlowTasks(self, "SaleforceEarnedBadgesTasks") 
+            },
             {
                 "entity_name": "listing", 
                 "salesforce_object": "Listing__c",
