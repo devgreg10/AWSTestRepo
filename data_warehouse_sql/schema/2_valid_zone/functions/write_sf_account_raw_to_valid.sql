@@ -1356,7 +1356,7 @@ BEGIN
         CAST(title_i AS BOOLEAN) AS title_i,
         type,
         lease_holder,
-        CAST(youth_population AS INTEGER) AS youth_population,
+        CAST(youth_population AS NUMERIC) AS youth_population,
         ys_report_chapter_affiliation,
         CAST(is_deleted AS BOOLEAN) AS is_deleted,
         CAST(sf_created_timestamp AS TIMESTAMPTZ) AS sf_created_timestamp,
