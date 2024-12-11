@@ -7,5 +7,6 @@ BEGIN
     PERFORM ft_ds_admin.write_listing_session_valid_to_refined();
     PERFORM ft_ds_admin.write_session_registration_valid_to_refined();
     PERFORM ft_ds_admin.write_listing_valid_to_refined();
+    PERFORM ft_ds_admin.write_account_valid_to_refined();
 END;
 $$;
