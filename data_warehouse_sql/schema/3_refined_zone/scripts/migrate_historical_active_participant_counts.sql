@@ -47,7 +47,7 @@ ON CONFLICT (metric_calc_date, chapter_id) DO UPDATE SET
 ;
 
 --update table to have the EOY indicator for this current year be correct
-UPDATE TABLE
+UPDATE
     ft_ds_refined.metric_historical_active_participant_counts
 SET
     eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
