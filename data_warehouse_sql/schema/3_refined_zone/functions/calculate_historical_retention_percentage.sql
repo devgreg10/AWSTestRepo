@@ -3,6 +3,14 @@ RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
+    UPDATE
+        ft_ds_refined.metric_historical_retention_percentage
+    SET
+        eoy_indicator = NULL
+    WHERE
+        eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+    ;
+
     INSERT INTO ft_ds_refined.metric_historical_retention_percentage
     --this subquery produces a list of contacts, the year that the contact was recorded, and the next year that contact appears as being recorded in one row
     WITH participant_years AS (
@@ -94,7 +102,8 @@ BEGIN
     SELECT
         NOW() AS metric_calc_date,
         list_of_all_chapters.chapter_id,
-        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS retention_percentage
+        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS retention_percentage,
+        CAST(EXTRACT(YEAR FROM NOW()) AS TEXT) AS eoy_indicator
     FROM
         (   
             SELECT
