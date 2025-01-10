@@ -1,0 +1,48 @@
+CREATE OR REPLACE VIEW ft_ds_refined.partner_organization_account_view
+AS
+SELECT    
+    account_id,
+    account_name,
+    parent_account_id,
+    parent_account,
+    partner_program_type,
+    location_type,
+    title_i,
+    organization_state,
+    organization_city,
+    account_record_type_id,
+    chapter_affiliation_id,
+    territory,
+    enrollment,
+    pre_school AS services_pre_school,
+    kindergarten AS services_kindergarten,
+    --NOT IN RAW AS services_grade_1,
+    --NOT IN RAW AS services_grade_2,
+    --NOT IN RAW AS services_grade_3,
+    --NOT IN RAW AS services_grade_4,
+    --NOT IN RAW AS services_grade_5,
+    --NOT IN RAW AS services_grade_6,
+    --NOT IN RAW AS services_grade_7,
+    --NOT IN RAW AS services_grade_8,
+    --NOT IN RAW AS services_grade_9,
+    --NOT IN RAW AS services_grade_10,
+    --NOT IN RAW AS services_grade_11,
+    --NOT IN RAW AS services_grade_12,
+    --NOT IN RAW AS services_grade_13,
+    billing_street,
+    billing_city,
+    billing_state,
+    billing_postal_code,
+    billing_country,
+    shipping_street,
+    shipping_city,
+    shipping_state,
+    shipping_postal_code,
+    shipping_country,
+    is_active,
+    date_joined,
+    nces_id
+FROM ft_ds_refined.account
+WHERE
+    account_record_type_id = '01236000001M1f7AAC'
+;
