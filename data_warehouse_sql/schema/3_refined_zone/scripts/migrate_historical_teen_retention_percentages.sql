@@ -98,6 +98,7 @@ retention AS (
         AND py.year = part_view.year
     WHERE
         --py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+        --need to include this filter so the cast below works
         py.next_year IS NOT NULL
         AND part_view.birthdate < (SELECT MAKE_DATE(CAST(py.next_year AS INTEGER) - 13, 1, 1))
     GROUP BY
@@ -111,7 +112,7 @@ totals_by_chapter AS (
         py.last_years_chapter_id,
         py.year,
         --the filter below only counts those who are under 19 years old last calendar year.
-        COUNT(DISTINCT CASE WHEN part_view.birthdate >= (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 19, 1, 1)) THEN py.contact_id END) AS total_participants
+        COUNT(DISTINCT CASE WHEN part_view.birthdate >= (SELECT MAKE_DATE(CAST(py.next_year AS INTEGER) - 19, 1, 1)) THEN py.contact_id END) AS total_participants
     FROM
         participant_years_with_chapter_ids py
     JOIN
@@ -120,8 +121,10 @@ totals_by_chapter AS (
         py.contact_id = part_view.contact_id
         AND py.year = part_view.year
     WHERE
-        py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
-        AND part_view.birthdate < (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 13, 1, 1))
+        --py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+        --need to include this filter so the cast below works
+        py.next_year IS NOT NULL
+        AND part_view.birthdate < (SELECT MAKE_DATE(CAST(py.next_year AS INTEGER) - 13, 1, 1))
         --this filter excludes non-salesforce contacts from international chapters, which is necessary since they do not have year-over-year common contact IDs
         AND LENGTH(py.contact_id) = 18
     GROUP BY
@@ -130,24 +133,27 @@ totals_by_chapter AS (
         py.year
 )
 SELECT
-    NOW() AS metric_calc_date,
+    TO_DATE((list_of_all_chapters.year + 1)::TEXT || '-12-31', 'YYYY-MM-DD') AS metric_calc_date,
     list_of_all_chapters.chapter_id,
-    (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS teen_retention_percentage
+    (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS teen_retention_percentage,
+    (list_of_all_chapters.year + 1)::TEXT AS eoy_indicator
 FROM
     (   
         SELECT
-            DISTINCT chapter_id
+            DISTINCT chapter_id, year
         FROM ft_ds_refined.current_and_historical_participants_view
-        WHERE year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+        WHERE year < CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
     ) list_of_all_chapters
 LEFT JOIN
     retention
 ON
     list_of_all_chapters.chapter_id = retention.curr_chapter_id
+    AND list_of_all_chapters.year = retention.year
 LEFT JOIN
     totals_by_chapter
 ON
     list_of_all_chapters.chapter_id = totals_by_chapter.last_years_chapter_id
+    AND list_of_all_chapters.year = totals_by_chapter.year
 ;
 
 --update table to have the EOY indicator for this current year be correct
