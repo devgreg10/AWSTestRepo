@@ -3,6 +3,14 @@ RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
+    UPDATE
+        ft_ds_refined.metric_historical_teen_retention_percentage
+    SET
+        eoy_indicator = NULL
+    WHERE
+        eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+    ;
+
     INSERT INTO ft_ds_refined.metric_historical_teen_retention_percentage
     --this subquery produces a list of contacts, the year that the contact was recorded, and the next year that contact appears as being recorded in one row
     WITH participant_years AS (
