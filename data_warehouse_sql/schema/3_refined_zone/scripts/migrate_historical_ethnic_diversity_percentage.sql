@@ -50,13 +50,13 @@ ON CONFLICT (metric_calc_date, chapter_id) DO UPDATE SET
 
 --update table to have the EOY indicator for this current year be correct
 UPDATE
-    ft_ds_refined.metric_historical_active_participant_counts
+    ft_ds_refined.metric_historical_ethnic_diversity_percentage
 SET
     eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
 WHERE
     metric_calc_date = (
         SELECT
             MAX(metric_calc_date)
-        FROM ft_ds_refined.metric_historical_active_participant_counts
+        FROM ft_ds_refined.metric_historical_ethnic_diversity_percentage
     )
 ;
