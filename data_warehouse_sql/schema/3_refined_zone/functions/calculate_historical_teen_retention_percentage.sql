@@ -111,7 +111,8 @@ BEGIN
     SELECT
         NOW() AS metric_calc_date,
         list_of_all_chapters.chapter_id,
-        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS teen_retention_percentage
+        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS teen_retention_percentage,
+        CAST(EXTRACT(YEAR FROM NOW()) AS TEXT) AS eoy_indicator
     FROM
         (   
             SELECT
