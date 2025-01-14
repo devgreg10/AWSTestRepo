@@ -3,6 +3,14 @@ RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
+    UPDATE
+        ft_ds_refined.metric_historical_female_percentage
+    SET
+        eoy_indicator = NULL
+    WHERE
+        eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+    ;
+
     INSERT INTO ft_ds_refined.metric_historical_female_percentage
     SELECT
         NOW() as metric_calc_date,
