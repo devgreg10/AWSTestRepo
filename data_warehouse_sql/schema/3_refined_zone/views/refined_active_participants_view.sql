@@ -5,6 +5,7 @@ SELECT
     chapter_id,
     contact_type,
     --age,
+    EXTRACT(YEAR from AGE(NOW(), CAST(birthdate AS TIMESTAMP))) AS calculated_age,
     ethnicity,
     gender,
     grade,
