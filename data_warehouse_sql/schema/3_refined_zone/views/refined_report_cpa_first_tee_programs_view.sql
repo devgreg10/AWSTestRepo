@@ -102,7 +102,6 @@ FROM
             eoy_indicator,
             SUM(participant_count) AS ages_14_plus
         FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
-        --this is an inclusive range according to PostGRESQL logic documentation
         WHERE age >= 14
         GROUP BY chapter_id, eoy_indicator
     ) ages_14_plus
@@ -209,8 +208,8 @@ FROM
                     chapter_id,
                     SUM(participant_count) AS ages_10_to_14
                 FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
-                --this is an inclusive range according to PostGRESQL logic documentation
                 WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
                 AND age BETWEEN 10 AND 14
                 GROUP BY chapter_id
             ) ages_10_to_14
@@ -221,8 +220,8 @@ FROM
                     chapter_id,
                     SUM(participant_count) AS ages_7_to_9
                 FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
-                --this is an inclusive range according to PostGRESQL logic documentation
                 WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
                 AND age BETWEEN 7 AND 9
                 GROUP BY chapter_id
             ) ages_7_to_9
@@ -233,8 +232,8 @@ FROM
                     chapter_id,
                     SUM(participant_count) AS ages_10_to_11
                 FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
-                --this is an inclusive range according to PostGRESQL logic documentation
                 WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
                 AND age BETWEEN 10 AND 11
                 GROUP BY chapter_id
             ) ages_10_to_11
@@ -245,8 +244,8 @@ FROM
                     chapter_id,
                     SUM(participant_count) AS ages_12_to_13
                 FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
-                --this is an inclusive range according to PostGRESQL logic documentation
                 WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
                 AND age BETWEEN 12 AND 13
                 GROUP BY chapter_id
             ) ages_12_to_13
