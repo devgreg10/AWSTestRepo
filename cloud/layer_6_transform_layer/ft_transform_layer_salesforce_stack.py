@@ -161,7 +161,8 @@ class FtTransformLayerSalesforceStack(Stack):
             {"db_function": "calculate_historical_tenure_counts", "short_name": "tenure-counts"},
             {"db_function": "calculate_historical_twelve_plus_retention_percentage", "short_name": "twelve-plus-retention-percentage"},
             {"db_function": "calculate_historical_non_male_percentage", "short_name": "non-male-percentage"},
-            {"db_function": "calculate_historical_active_participant_counts_by_age", "short_name": "active-counts-by-age"}
+            {"db_function": "calculate_historical_active_participant_counts_by_age", "short_name": "active-counts-by-age"},
+            {"db_function": "calculate_historical_teen_percentage", "short_name": "teen-percentage"}
         ]
 
         # Historical Metric Functions should be run once per day at 3:00am EST, no modulo
