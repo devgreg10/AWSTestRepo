@@ -11,6 +11,7 @@ SELECT
     averages_info.ages_7_to_9,
     averages_info.ages_10_to_11,
     averages_info.ages_12_to_13,
+    averages_info.ages_14_plus,
     averages_info.eoy_indicator
 FROM
 --this subquery contains the information about the EOY information for each of the chapters, for each year
@@ -29,6 +30,7 @@ FROM
         ages_7_to_9.ages_7_to_9,
         ages_10_to_11.ages_10_to_11,
         ages_12_to_13.ages_12_to_13,
+        ages_14_plus.ages_14_plus,
         counts.eoy_indicator
     FROM ft_ds_refined.metric_historical_active_participant_counts counts
     LEFT JOIN ft_ds_refined.metric_historical_retention_percentage retention
@@ -94,6 +96,18 @@ FROM
     ) ages_12_to_13
         ON counts.chapter_id = ages_12_to_13.chapter_id
         AND counts.eoy_indicator = ages_12_to_13.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_14_plus
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        --this is an inclusive range according to PostGRESQL logic documentation
+        WHERE age >= 14
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_14_plus
+        ON counts.chapter_id = ages_14_plus.chapter_id
+        AND counts.eoy_indicator = ages_14_plus.eoy_indicator
     --this part will be the peer group averages of the current year. It needs to include all the metrics that are listed above
     UNION
     (
@@ -116,6 +130,7 @@ FROM
             peer_group_averages.ages_7_to_9,
             peer_group_averages.ages_10_to_11,
             peer_group_averages.ages_12_to_13,
+            peer_group_averages.ages_14_plus,
             'Curr Yr Peer Grp Avg' AS eoy_indicator
         FROM
         (
@@ -130,7 +145,8 @@ FROM
                 AVG(ages_10_to_14.ages_10_to_14) AS ages_10_to_14,
                 AVG(ages_7_to_9.ages_7_to_9) AS ages_7_to_9,
                 AVG(ages_10_to_11.ages_10_to_11) AS ages_10_to_11,
-                AVG(ages_12_to_13.ages_12_to_13) AS ages_12_to_13
+                AVG(ages_12_to_13.ages_12_to_13) AS ages_12_to_13,
+                AVG(ages_14_plus.ages_14_plus) AS ages_14_plus
             FROM
             peer_group_map
             LEFT JOIN
@@ -235,6 +251,17 @@ FROM
                 GROUP BY chapter_id
             ) ages_12_to_13
                 ON peer_group_map.account_id = ages_12_to_13.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_14_plus
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                AND age >= 14
+                GROUP BY chapter_id
+            ) ages_14_plus
+                ON peer_group_map.account_id = ages_14_plus.chapter_id
             GROUP BY peer_group_map.peer_group_level
         ) peer_group_averages
         JOIN 
