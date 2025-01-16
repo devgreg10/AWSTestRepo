@@ -8,6 +8,7 @@ SELECT
     averages_info.percent_female,
     averages_info.percent_non_male,
     averages_info.ages_10_to_14,
+    averages_info.ages_7_to_9,
     averages_info.eoy_indicator
 FROM
 --this subquery contains the information about the EOY information for each of the chapters, for each year
@@ -23,6 +24,7 @@ FROM
         female.female_percentage AS percent_female,
         non_male.non_male_percentage AS percent_non_male,
         ages_10_to_14.ages_10_to_14,
+        ages_7_to_9.ages_7_to_9,
         counts.eoy_indicator
     FROM ft_ds_refined.metric_historical_active_participant_counts counts
     LEFT JOIN ft_ds_refined.metric_historical_retention_percentage retention
@@ -52,6 +54,18 @@ FROM
     ) ages_10_to_14
         ON counts.chapter_id = ages_10_to_14.chapter_id
         AND counts.eoy_indicator = ages_10_to_14.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_7_to_9
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        --this is an inclusive range according to PostGRESQL logic documentation
+        WHERE age BETWEEN 7 AND 9
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_7_to_9
+        ON counts.chapter_id = ages_7_to_9.chapter_id
+        AND counts.eoy_indicator = ages_7_to_9.eoy_indicator
     --this part will be the peer group averages of the current year. It needs to include all the metrics that are listed above
     UNION
     (
@@ -71,6 +85,7 @@ FROM
             peer_group_averages.female_percentage AS percent_female,
             peer_group_averages.non_male_percentage AS percent_non_male,
             peer_group_averages.ages_10_to_14,
+            peer_group_averages.ages_7_to_9,
             'Curr Yr Peer Grp Avg' AS eoy_indicator
         FROM
         (
@@ -82,7 +97,8 @@ FROM
                 AVG(ethnic_diversity_percentage_info.ethnic_diversity_percentage) AS ethnic_diversity_percentage,
                 AVG(female_percentage_info.female_percentage) AS female_percentage,
                 AVG(non_male_percentage_info.non_male_percentage) AS non_male_percentage,
-                AVG(ages_10_to_14.ages_10_to_14) AS ages_10_to_14
+                AVG(ages_10_to_14.ages_10_to_14) AS ages_10_to_14,
+                AVG(ages_7_to_9.ages_7_to_9) AS ages_7_to_9
             FROM
             peer_group_map
             LEFT JOIN
@@ -151,6 +167,18 @@ FROM
                 GROUP BY chapter_id
             ) ages_10_to_14
                 ON peer_group_map.account_id = ages_10_to_14.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_7_to_9
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                --this is an inclusive range according to PostGRESQL logic documentation
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                AND age BETWEEN 7 AND 9
+                GROUP BY chapter_id
+            ) ages_7_to_9
+                ON peer_group_map.account_id = ages_7_to_9.chapter_id
             GROUP BY peer_group_map.peer_group_level
         ) peer_group_averages
         JOIN 
