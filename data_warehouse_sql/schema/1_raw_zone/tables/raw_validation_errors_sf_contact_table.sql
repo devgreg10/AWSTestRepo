@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.validation_errors_sf_contact (
     last_name TEXT,
     birthdate TEXT,
     household_id TEXT,
+    program_level TEXT,
     is_deleted TEXT,
     sf_created_timestamp TEXT,
     sf_last_modified_timestamp TEXT,

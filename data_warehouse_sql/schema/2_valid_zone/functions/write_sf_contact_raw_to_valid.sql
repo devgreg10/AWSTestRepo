@@ -8,38 +8,8 @@ BEGIN
     --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
     DROP TABLE IF EXISTS temp_sf_contact_raw_to_valid;
 
-    CREATE TEMP TABLE IF NOT EXISTS temp_sf_contact_raw_to_valid (
-        --still import as all text because we want to be able to analyze it for if it will make it to valid based on dtype, and we can assume it will fit in text because that's how it already exists in raw
-        contact_id_18 TEXT,
-        chapter_id TEXT,
-        contact_type TEXT,
-        age TEXT,
-        ethnicity TEXT,
-        gender TEXT,
-        grade TEXT,
-        participation_status TEXT,
-        mailing_zip_postal_code TEXT,
-        mailing_street TEXT,
-        mailing_city TEXT,
-        mailing_state TEXT,
-        school_name TEXT,
-        school_name_other TEXT,
-        first_name TEXT,
-        last_name TEXT,
-        birthdate TEXT,
-        household_id TEXT,
-        is_deleted TEXT,
-        sf_created_timestamp TEXT,
-        sf_last_modified_timestamp TEXT,
-        sf_system_modstamp TEXT,
-        --dss_ingestion_timestamp can be assumed to still be timestamp because that's how it exists in raw
-        dss_ingestion_timestamp TIMESTAMPTZ,
-        required_fields_validated BOOLEAN,
-        optional_fields_validated BOOLEAN
-    );
-
     --this statement places all of the most recently uploaded records into the temp table
-    INSERT INTO temp_sf_contact_raw_to_valid
+    CREATE TEMP TABLE IF NOT EXISTS temp_sf_contact_raw_to_valid AS
     SELECT
         Id AS contact_id_18,
         Chapter_Affiliation__c AS chapter_id,
@@ -59,6 +29,7 @@ BEGIN
         LastName AS last_name,
         Birthdate AS birthdate,
         AccountId AS household_id,
+        program_level__c AS program_level,
         IsDeleted AS is_deleted,
         CreatedDate AS sf_created_timestamp,
         LastModifiedDate AS sf_last_modified_timestamp,
@@ -248,6 +219,16 @@ BEGIN
         OR LENGTH(household_id) <> 18
         OR household_id = ''
     ;
+    --program_level
+    UPDATE temp_sf_contact_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    program_level = NULL
+    WHERE
+        program_level IS NULL
+        OR program_level NOT IN ('TARGET Registered','PLAYer','PLAYer Certified','Par','Par Certified','Birdie','Birdie Certified','Eagle','Eagle Certified','Ace','Ace Certified')
+        OR program_level = ''
+    ;
     -- is_deleted
     UPDATE temp_sf_contact_raw_to_valid
     SET
@@ -311,6 +292,7 @@ BEGIN
         last_name,
         birthdate,
         household_id,
+        program_level,
         is_deleted,
         sf_created_timestamp,
         sf_last_modified_timestamp,
@@ -349,6 +331,7 @@ BEGIN
         last_name VARCHAR(80),
         birthdate VARCHAR(100),
         household_id CHAR(18),
+        program_level VARCHAR(20),
         is_deleted BOOLEAN,
         sf_created_timestamp TIMESTAMPTZ,
         sf_last_modified_timestamp TIMESTAMPTZ,
@@ -377,6 +360,7 @@ BEGIN
         last_name,
         birthdate,
         household_id,
+        program_level,
         CAST(is_deleted AS BOOLEAN) AS is_deleted,
         CAST(sf_created_timestamp AS TIMESTAMPTZ) AS sf_created_timestamp,
         CAST(sf_last_modified_timestamp AS TIMESTAMPTZ) AS sf_last_modified_timestamp,
@@ -415,6 +399,7 @@ BEGIN
         last_name,
         birthdate,
         household_id,
+        program_level,
         is_deleted,
         sf_created_timestamp,
         sf_last_modified_timestamp,
@@ -446,6 +431,7 @@ BEGIN
         last_name,
         birthdate,
         household_id,
+        program_level,
         is_deleted,
         sf_created_timestamp,
         sf_last_modified_timestamp,
@@ -489,6 +475,7 @@ BEGIN
         last_name = EXCLUDED.last_name,
         birthdate = EXCLUDED.birthdate,
         household_id = EXCLUDED.household_id,
+        program_level = EXCLUDED.program_level,
         is_deleted = EXCLUDED.is_deleted,
         sf_created_timestamp = EXCLUDED.sf_created_timestamp,
         sf_last_modified_timestamp = EXCLUDED.sf_last_modified_timestamp,
