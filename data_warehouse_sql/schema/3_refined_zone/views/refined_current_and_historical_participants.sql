@@ -34,7 +34,7 @@ UNION
         contact_id_18 AS contact_id,
         first_name,
         last_name,
-        NULL AS program_level,
+        program_level,
         CAST(birthdate AS DATE) AS birthdate,
         NULL AS recorded_age,
         calculated_age,

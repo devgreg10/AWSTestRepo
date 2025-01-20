@@ -20,6 +20,7 @@ SELECT
     last_name,
     birthdate,
     household_id,
+    program_level,
     sf_created_timestamp,
     sf_last_modified_timestamp,
     sf_system_modstamp,
