@@ -14,6 +14,7 @@ SELECT
     averages_info.ages_14_plus,
     averages_info.ages_under_7,
     averages_info.percent_teens,
+    averages_info.ACE_participants,
     averages_info.eoy_indicator
 FROM
 --this subquery contains the information about the EOY information for each of the chapters, for each year
@@ -35,6 +36,7 @@ FROM
         ages_14_plus.ages_14_plus,
         ages_under_7.ages_under_7,
         percent_teens.teen_percentage AS percent_teens,
+        ace_counts.ACE_participant_count AS ACE_participants,
         counts.eoy_indicator
     FROM ft_ds_refined.metric_historical_active_participant_counts counts
     LEFT JOIN ft_ds_refined.metric_historical_retention_percentage retention
@@ -125,6 +127,9 @@ FROM
     LEFT JOIN ft_ds_refined.metric_historical_teen_percentage percent_teens
         ON counts.chapter_id = percent_teens.chapter_id
         AND counts.eoy_indicator = percent_teens.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_ACE_participant_counts ace_counts
+        ON counts.chapter_id = ace_counts.chapter_id
+        AND counts.eoy_indicator = ace_counts.eoy_indicator
     --this part will be the peer group averages of the current year. It needs to include all the metrics that are listed above
     UNION
     (
@@ -150,6 +155,7 @@ FROM
             peer_group_averages.ages_14_plus,
             peer_group_averages.ages_under_7,
             peer_group_averages.teen_percentage AS percent_teens,
+            peer_group_averages.ACE_participant_count AS ACE_participants,
             'Curr Yr Peer Grp Avg' AS eoy_indicator
         FROM
         (
@@ -167,7 +173,8 @@ FROM
                 AVG(ages_12_to_13.ages_12_to_13) AS ages_12_to_13,
                 AVG(ages_14_plus.ages_14_plus) AS ages_14_plus,
                 AVG(ages_under_7.ages_under_7) AS ages_under_7,
-                AVG(teen_percentage_info.teen_percentage) AS teen_percentage
+                AVG(teen_percentage_info.teen_percentage) AS teen_percentage,
+                AVG(ace_counts_info.ACE_participant_count) AS ACE_participant_count
             FROM
             peer_group_map
             LEFT JOIN
@@ -303,6 +310,15 @@ FROM
                 WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
             ) teen_percentage_info
                 ON peer_group_map.account_id = non_male_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    ACE_participant_count
+                FROM ft_ds_refined.metric_historical_ACE_participant_counts
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) ace_counts_info
+                ON peer_group_map.account_id = ace_counts_info.chapter_id
             GROUP BY peer_group_map.peer_group_level
         ) peer_group_averages
         JOIN 
