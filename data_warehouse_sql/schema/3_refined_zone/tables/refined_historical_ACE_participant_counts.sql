@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS ft_ds_refined.metric_historical_ACE_participant_counts (
+    PRIMARY KEY(metric_calc_date, chapter_id),
+    metric_calc_date TIMESTAMPTZ,
+    chapter_id CHAR(18),
+    ACE_participant_count INTEGER,
+    eoy_indicator VARCHAR(20)
+);
