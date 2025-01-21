@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_raw.validation_errors_service_area_diversity_re
     white_or_caucasian_count TEXT,
     youth_population_count TEXT,
     market_diversity_percentage TEXT,
-    upload_date TEXT,
     required_fields_validated BOOLEAN,
     optional_fields_validated BOOLEAN,
     fixed_in_source BOOLEAN

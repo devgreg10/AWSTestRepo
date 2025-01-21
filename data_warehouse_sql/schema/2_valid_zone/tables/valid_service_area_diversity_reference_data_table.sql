@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS ft_ds_valid.service_area_diversity_reference_data (
-    PRIMARY KEY (chapter_id, upload_date),
+    PRIMARY KEY (chapter_id),
     chapter_id CHAR(18),
     chapter_name VARCHAR(100),
     asian_count INTEGER,
@@ -10,6 +10,5 @@ CREATE TABLE IF NOT EXISTS ft_ds_valid.service_area_diversity_reference_data (
     pacific_islander_count INTEGER,
     white_or_caucasian_count INTEGER,
     youth_population_count INTEGER,
-    market_diversity_percentage NUMERIC(5,3),
-    upload_date DATE
+    market_diversity_percentage NUMERIC(5,3)
 );
