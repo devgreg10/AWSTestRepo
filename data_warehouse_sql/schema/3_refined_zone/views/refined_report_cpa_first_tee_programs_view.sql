@@ -5,6 +5,7 @@ SELECT
     averages_info.percent_annual_retention,
     averages_info.percent_annual_teen_retention,
     averages_info.percent_diverse,
+    averages_info.percent_diversity_variance_from_service_area,
     averages_info.percent_female,
     averages_info.percent_non_male,
     averages_info.ages_10_to_14,
@@ -28,6 +29,7 @@ FROM
         retention.retention_percentage AS percent_annual_retention,
         teen_retention.teen_retention_percentage AS percent_annual_teen_retention,
         ethnic_diversity.ethnic_diversity_percentage AS percent_diverse,
+        service_area_diversity_variance.service_area_diversity_variance_percentage AS percent_diversity_variance_from_service_area,
         female.female_percentage AS percent_female,
         non_male.non_male_percentage AS percent_non_male,
         ages_10_to_14.ages_10_to_14,
@@ -50,6 +52,9 @@ FROM
     LEFT JOIN ft_ds_refined.metric_historical_ethnic_diversity_percentage ethnic_diversity
         ON counts.chapter_id = ethnic_diversity.chapter_id
         AND counts.eoy_indicator = ethnic_diversity.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_service_area_diversity_variance_percentage service_area_diversity_variance
+        ON counts.chapter_id = service_area_diversity_variance.chapter_id
+        AND counts.eoy_indicator = service_area_diversity_variance.eoy_indicator
     LEFT JOIN ft_ds_refined.metric_historical_female_percentage female
         ON counts.chapter_id = female.chapter_id
         AND counts.eoy_indicator = female.eoy_indicator
@@ -151,6 +156,7 @@ FROM
             peer_group_averages.retention_percentage AS percent_annual_retention,
             peer_group_averages.teen_retention_percentage AS percent_annual_teen_retention,
             peer_group_averages.ethnic_diversity_percentage AS percent_diverse,
+            peer_group_averages.service_area_diversity_variance_percentage AS percent_diversity_variance_from_service_area,
             peer_group_averages.female_percentage AS percent_female,
             peer_group_averages.non_male_percentage AS percent_non_male,
             peer_group_averages.ages_10_to_14,
@@ -171,6 +177,7 @@ FROM
                 AVG(retention_percentage_info.retention_percentage) AS retention_percentage,
                 AVG(teen_retention_percentage_info.teen_retention_percentage) AS teen_retention_percentage,
                 AVG(ethnic_diversity_percentage_info.ethnic_diversity_percentage) AS ethnic_diversity_percentage,
+                AVG(service_area_diversity_variance_info.service_area_diversity_variance_percentage) AS service_area_diversity_variance_percentage,
                 AVG(female_percentage_info.female_percentage) AS female_percentage,
                 AVG(non_male_percentage_info.non_male_percentage) AS non_male_percentage,
                 AVG(ages_10_to_14.ages_10_to_14) AS ages_10_to_14,
@@ -220,6 +227,15 @@ FROM
                 WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
             ) ethnic_diversity_percentage_info
                 ON peer_group_map.account_id = ethnic_diversity_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    service_area_diversity_variance_percentage
+                FROM ft_ds_refined.metric_historical_service_area_diversity_variance_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) service_area_diversity_variance_info
+                ON peer_group_map.account_id = service_area_diversity_variance_info.chapter_id
             LEFT JOIN
             (
                 SELECT
