@@ -11,7 +11,7 @@ FROM (
         birthdate,
         age AS recorded_age,
         --the calculation method here is to minimize differences between recorded age and calculated age on birthdays of Jan 1, which there are dozens of thousands of. We assume that their age is correct, and that the birthdate was extrapolated from that
-        EXTRACT(YEAR from AGE(MAKE_DATE(CAST(year AS INTEGER) + 1, 1, 1), CAST(birthdate AS TIMESTAMP))) AS calculated_age,
+        EXTRACT(YEAR from AGE(MAKE_DATE(CAST(year AS INTEGER), 12, 31), CAST(birthdate AS TIMESTAMP))) AS calculated_age,
         gender,
         ethnicity,
         grade_level,

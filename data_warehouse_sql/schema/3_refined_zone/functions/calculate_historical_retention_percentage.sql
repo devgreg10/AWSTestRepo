@@ -12,97 +12,40 @@ BEGIN
     ;
 
     INSERT INTO ft_ds_refined.metric_historical_retention_percentage
-    --this subquery produces a list of contacts, the year that the contact was recorded, and the next year that contact appears as being recorded in one row
-    WITH participant_years AS (
+    WITH retained_participant_counts AS (
         SELECT
-            contact_id,
-            year,
-            LEAD(year) OVER (PARTITION BY contact_id ORDER BY year) AS next_year
-        FROM
-            ft_ds_refined.current_and_historical_participants_view
-        --this filter ensures that only the last two years are being looked at, so we can get the current retention
-        WHERE year IN (CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC), CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC) - 1)
-    )
-    ,
-    -- this join has to happen since there are some situations when the participant switches chapters, so we have to know to which chapter to assign the retention, and how many from each chapter were eligible to return the next year
-    participant_years_with_chapter_ids AS (
-        SELECT
-            py.contact_id,
-            curr_chapters.chapter_id as curr_chapter_id,
-            last_years_chapters.chapter_id as last_years_chapter_id,
-            py.year,
-            py.next_year
-        FROM
-            participant_years py
-        LEFT JOIN
-            (
+            chapter_id,
+            COUNT(*) as retained_participant_count
+        FROM (
+            SELECT
+                contact_id_18,
+                chapter_id
+            FROM ft_ds_refined.active_participants_view
+            --this where clause limits it to the participants that were also active last year
+            WHERE contact_id_18 IN (
                 SELECT
-                    contact_id,
-                    chapter_id,
-                    year
-                FROM
-                    ft_ds_refined.current_and_historical_participants_view
-                WHERE
-                    year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC)
-            ) curr_chapters
-        ON
-            py.contact_id = curr_chapters.contact_id
-            AND py.next_year = curr_chapters.year
-        LEFT JOIN
-            (
-                SELECT
-                    contact_id,
-                    chapter_id,
-                    year
-                FROM
-                    ft_ds_refined.current_and_historical_participants_view
-                WHERE
-                    year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
-            ) last_years_chapters
-        ON
-            py.contact_id = last_years_chapters.contact_id
-            AND py.year = last_years_chapters.year
-    )
-    ,
-    retention AS (
-        SELECT
-            py.curr_chapter_id,
-            py.year,
-            COUNT(DISTINCT CASE WHEN next_year = py.year + 1 THEN py.contact_id END) AS retained_participants
-        FROM
-            participant_years_with_chapter_ids py
-        WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+                    DISTINCT contact_id
+                FROM ft_ds_refined.year_end_participant
+                WHERE year = DATE_PART('year', CURRENT_DATE) - 1
+            )
+        ) retained_participants
         GROUP BY
-            --the calculation of retention and totals happens separately since retention is credited to the new chapter
-            py.curr_chapter_id,
-            py.year
-    )
-    ,
-    totals_by_chapter AS (
+            chapter_id
+    ),
+    participants_eligible_to_return_counts AS (
         SELECT
-            py.last_years_chapter_id,
-            py.year,
-            --the filter below only counts those who are under 19 years old last calendar year.
-            COUNT(DISTINCT CASE WHEN part_view.birthdate >= (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 19, 1, 1)) THEN py.contact_id END) AS total_participants
-        FROM
-            participant_years_with_chapter_ids py
-        JOIN
-            ft_ds_refined.current_and_historical_participants_view part_view
-        ON
-            py.contact_id = part_view.contact_id
-            AND py.year = part_view.year
-        WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
-        --this filter excludes non-salesforce contacts from international chapters, which is necessary since they do not have year-over-year common contact IDs
-        AND LENGTH(py.contact_id) = 18
-        GROUP BY
-            --the calculation of retention and totals happens separately since the total eligible to return is from the old chapter
-            py.last_years_chapter_id,
-            py.year
+            chapter_id,
+            COUNT(*) AS participants_eligible_to_return_count
+        FROM ft_ds_refined.current_and_historical_participants_view
+        WHERE
+            year = DATE_PART('year', CURRENT_DATE) - 1
+            AND calculated_age <= 18
+        GROUP BY chapter_id
     )
     SELECT
         NOW() AS metric_calc_date,
         list_of_all_chapters.chapter_id,
-        (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS retention_percentage,
+        (retained_participant_counts.retained_participant_count * 1.0) / NULLIF(participants_eligible_to_return_counts.participants_eligible_to_return_count, 0) AS retention_percentage,
         CAST(EXTRACT(YEAR FROM NOW()) AS TEXT) AS eoy_indicator
     FROM
         (   
@@ -111,14 +54,122 @@ BEGIN
             FROM ft_ds_refined.current_and_historical_participants_view
             WHERE year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
         ) list_of_all_chapters
-    LEFT JOIN
-        retention
-    ON
-        list_of_all_chapters.chapter_id = retention.curr_chapter_id
-    LEFT JOIN
-        totals_by_chapter
-    ON
-        list_of_all_chapters.chapter_id = totals_by_chapter.last_years_chapter_id
+    LEFT JOIN retained_participant_counts
+        ON list_of_all_chapters.chapter_id = retained_participant_counts.chapter_id
+    LEFT JOIN participants_eligible_to_return_counts
+        ON list_of_all_chapters.chapter_id = participants_eligible_to_return_counts.chapter_id
     ;
+
+
+    -- COMMENTING OUT THIS CODE FOR NOW, NEED SLT BUY-IN ON CHANGE IN CALCULATION METHOD. MAY RETURN TO THIS EVENTUALLY
+    -- INSERT INTO ft_ds_refined.metric_historical_retention_percentage
+    -- --this subquery produces a list of contacts, the year that the contact was recorded, and the next year that contact appears as being recorded in one row
+    -- WITH participant_years AS (
+    --     SELECT
+    --         contact_id,
+    --         year,
+    --         LEAD(year) OVER (PARTITION BY contact_id ORDER BY year) AS next_year
+    --     FROM
+    --         ft_ds_refined.current_and_historical_participants_view
+    --     --this filter ensures that only the last two years are being looked at, so we can get the current retention
+    --     WHERE year IN (CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC), CAST(DATE_PART('year', CURRENT_DATE) AS NUMERIC) - 1)
+    -- )
+    -- ,
+    -- -- this join has to happen since there are some situations when the participant switches chapters, so we have to know to which chapter to assign the retention, and how many from each chapter were eligible to return the next year
+    -- participant_years_with_chapter_ids AS (
+    --     SELECT
+    --         py.contact_id,
+    --         curr_chapters.chapter_id as curr_chapter_id,
+    --         last_years_chapters.chapter_id as last_years_chapter_id,
+    --         py.year,
+    --         py.next_year
+    --     FROM
+    --         participant_years py
+    --     LEFT JOIN
+    --         (
+    --             SELECT
+    --                 contact_id,
+    --                 chapter_id,
+    --                 year
+    --             FROM
+    --                 ft_ds_refined.current_and_historical_participants_view
+    --             WHERE
+    --                 year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC)
+    --         ) curr_chapters
+    --     ON
+    --         py.contact_id = curr_chapters.contact_id
+    --         AND py.next_year = curr_chapters.year
+    --     LEFT JOIN
+    --         (
+    --             SELECT
+    --                 contact_id,
+    --                 chapter_id,
+    --                 year
+    --             FROM
+    --                 ft_ds_refined.current_and_historical_participants_view
+    --             WHERE
+    --                 year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+    --         ) last_years_chapters
+    --     ON
+    --         py.contact_id = last_years_chapters.contact_id
+    --         AND py.year = last_years_chapters.year
+    -- )
+    -- ,
+    -- retention AS (
+    --     SELECT
+    --         py.curr_chapter_id,
+    --         py.year,
+    --         COUNT(DISTINCT CASE WHEN next_year = py.year + 1 THEN py.contact_id END) AS retained_participants
+    --     FROM
+    --         participant_years_with_chapter_ids py
+    --     WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+    --     GROUP BY
+    --         --the calculation of retention and totals happens separately since retention is credited to the new chapter
+    --         py.curr_chapter_id,
+    --         py.year
+    -- )
+    -- ,
+    -- totals_by_chapter AS (
+    --     SELECT
+    --         py.last_years_chapter_id,
+    --         py.year,
+    --         --the filter below only counts those who are under 19 years old last calendar year.
+    --         COUNT(DISTINCT CASE WHEN part_view.birthdate >= (SELECT MAKE_DATE(CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INTEGER) - 19, 1, 1)) THEN py.contact_id END) AS total_participants
+    --     FROM
+    --         participant_years_with_chapter_ids py
+    --     JOIN
+    --         ft_ds_refined.current_and_historical_participants_view part_view
+    --     ON
+    --         py.contact_id = part_view.contact_id
+    --         AND py.year = part_view.year
+    --     WHERE py.year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+    --     --this filter excludes non-salesforce contacts from international chapters, which is necessary since they do not have year-over-year common contact IDs
+    --     AND LENGTH(py.contact_id) = 18
+    --     GROUP BY
+    --         --the calculation of retention and totals happens separately since the total eligible to return is from the old chapter
+    --         py.last_years_chapter_id,
+    --         py.year
+    -- )
+    -- SELECT
+    --     NOW() AS metric_calc_date,
+    --     list_of_all_chapters.chapter_id,
+    --     (retention.retained_participants * 1.0) / NULLIF(totals_by_chapter.total_participants, 0) AS retention_percentage,
+    --     CAST(EXTRACT(YEAR FROM NOW()) AS TEXT) AS eoy_indicator
+    -- FROM
+    --     (   
+    --         SELECT
+    --             DISTINCT chapter_id
+    --         FROM ft_ds_refined.current_and_historical_participants_view
+    --         WHERE year = CAST(date_part('year', CURRENT_DATE) AS NUMERIC) - 1
+    --     ) list_of_all_chapters
+    -- LEFT JOIN
+    --     retention
+    -- ON
+    --     list_of_all_chapters.chapter_id = retention.curr_chapter_id
+    -- LEFT JOIN
+    --     totals_by_chapter
+    -- ON
+    --     list_of_all_chapters.chapter_id = totals_by_chapter.last_years_chapter_id
+    -- ;
 END;
 $$;
