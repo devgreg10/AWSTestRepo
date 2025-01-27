@@ -36,6 +36,13 @@ BEGIN
     FROM ft_ds_raw.sf_year_end_participant
     ;
 
+    --needed to add in this missing data from the original CSVs
+    UPDATE temp_sf_year_end_participant_raw_to_valid t
+    SET program_level = supplement."Program Level"
+    FROM ft_ds_raw."2023_Ace_Participants" supplement
+    WHERE t.contact_id = supplement."Contact ID"
+    AND t.year = '2023';
+
     --this statement updates the required_fields_validated flag
     --they must meet the conditions for coercing into the datatype of the next table, not be empty or NULL, and match the values/format if a picklist or formatted field
     --it is structured this way because if the required fields do not meet data quality, then they are not passed to valid and therefore do not need to be transformed further. Therefore, only the required_fields_validated flag needs to be updated.
@@ -252,6 +259,9 @@ BEGIN
         required_fields_validated = FALSE
         OR optional_fields_validated = FALSE
     ;
+
+    --in practice of updating reference data it makes the most sense to truncate it here to clear off the old data
+    TRUNCATE ft_ds_valid.sf_year_end_participant;
 
     --this statement then cleans the data to get the data types correct
     INSERT INTO ft_ds_valid.sf_year_end_participant
