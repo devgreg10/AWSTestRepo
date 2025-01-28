@@ -3,7 +3,7 @@ SELECT
     TO_DATE(year::TEXT || '-12-31', 'YYYY-MM-DD') AS metric_calc_date,
     chapter_id,
     --numerator is all those active participants 13+, cast to a float by * 1.0
-    (COUNT(CASE WHEN calculated_age >= 13 THEN 1 END) * 1.0)/
+    (COUNT(CASE WHEN calculated_age BETWEEN 13 AND 19 THEN 1 END) * 1.0)/
     --denominator is all active participants
     COUNT(*)
     AS teen_percentage,
