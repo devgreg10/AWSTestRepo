@@ -37,11 +37,18 @@ BEGIN
     ;
 
     --needed to add in this missing data from the original CSVs
+    --program level is no longer pulled and stored at the end of the year, but a separate pull of Ace and Ace Certified participants is performed and now needs to be integrated into the year end participant data. Hopefully this no longer needs to happen going forward since the info will be pulled and logged automatically
     UPDATE temp_sf_year_end_participant_raw_to_valid t
     SET program_level = supplement."Program Level"
     FROM ft_ds_raw."2023_Ace_Participants" supplement
     WHERE t.contact_id = supplement."Contact ID"
     AND t.year = '2023';
+
+    UPDATE temp_sf_year_end_participant_raw_to_valid t
+    SET program_level = supplement."Program Level"
+    FROM ft_ds_raw."EOY 2024 ACE participants" supplement
+    WHERE t.contact_id = supplement."Contact ID"
+    AND t.year = '2024';
 
     --this statement updates the required_fields_validated flag
     --they must meet the conditions for coercing into the datatype of the next table, not be empty or NULL, and match the values/format if a picklist or formatted field
