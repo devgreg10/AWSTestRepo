@@ -14,13 +14,25 @@ BEGIN
     INSERT INTO ft_ds_refined.metric_historical_ACE_certified_participant_counts
     SELECT
         NOW() as metric_calc_date,
-        chapter_id,
-        COUNT(*) AS ACE_certified_participant_count,
+        list_of_all_chapters.chapter_id,
+        COALESCE(ACE_certified_participant_count, 0) AS ACE_certified_participant_count,
         CAST(EXTRACT(YEAR FROM NOW()) AS TEXT) AS eoy_indicator
-    FROM ft_ds_refined.active_participants_view
-    WHERE program_level = 'Ace Certified'
-    GROUP BY
-    chapter_id
+    FROM (
+        SELECT
+            DISTINCT chapter_id
+        FROM ft_ds_refined.active_participants_view
+    ) list_of_all_chapters
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            COUNT(*) AS ACE_certified_participant_count
+        FROM ft_ds_refined.active_participants_view
+        WHERE program_level = 'Ace Certified'
+        GROUP BY
+        chapter_id
+    ) ACE_certified_counts
+    ON
+        list_of_all_chapters.chapter_id = ACE_certified_counts.chapter_id
     ;
 END;
 $$;
