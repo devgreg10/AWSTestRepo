@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.service_area_diversity_reference_data (
     pacific_islander_count INTEGER,
     white_or_caucasian_count INTEGER,
     youth_population_count INTEGER,
-    market_diversity_percentage NUMERIC(5,3)
+    market_diversity_percentage NUMERIC(5,3),
+    upload_date TIMESTAMPTZ
 );
