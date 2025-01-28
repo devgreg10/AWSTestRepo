@@ -157,6 +157,9 @@ BEGIN
         OR market_diversity_percentage = ''
     ;
 
+    --truncating the table in valid since we'd also be including previous versions of the raw data in this load, and we dont want to repeat it in valid
+     TRUNCATE ft_ds_valid.service_area_diversity_reference_data;
+
     --copy all records where required_fields_validated = FALSE OR optional_fields_validated = FALSE to a permanent errored table
     --this can be reported on later to let data source owners fix the data upstream, where it will be re-ingested and fixed throughout all zones of the data warehouse
     --the fixed_in_source field can be updated when a data owner fixes the record in the source.
