@@ -27,6 +27,8 @@ BEGIN
     ) diverse_metric
     LEFT JOIN ft_ds_refined.service_area_diversity_reference_data ref_data
         ON diverse_metric.chapter_id = ref_data.chapter_id
+        --ensure that the calculation is using the most recent version of the reference data
+        AND ref_data.upload_date = (SELECT MAX(upload_date) FROM ft_ds_refined.service_area_diversity_reference_data)
     LEFT JOIN ft_ds_refined.chapter_account_view chapter_info
         ON diverse_metric.chapter_id = chapter_info.account_id
     ;
