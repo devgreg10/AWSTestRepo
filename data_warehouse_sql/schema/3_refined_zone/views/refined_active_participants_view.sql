@@ -6,6 +6,7 @@ SELECT
     contact.chapter_id,
     contact.contact_type,
     --contact.age,
+    EXTRACT(YEAR from AGE(NOW(), CAST(contact.birthdate AS TIMESTAMP))) AS calculated_age,
     contact.ethnicity,
     contact.gender,
     contact.grade,

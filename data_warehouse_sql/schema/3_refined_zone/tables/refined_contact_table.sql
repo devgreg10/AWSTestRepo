@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS ft_ds_refined.contact (
     last_name VARCHAR(100),
     birthdate VARCHAR(100),
     household_id CHAR(18),
+    program_level VARCHAR(20),
     is_deleted BOOLEAN,
     sf_created_timestamp TIMESTAMPTZ,
     sf_last_modified_timestamp TIMESTAMPTZ,
