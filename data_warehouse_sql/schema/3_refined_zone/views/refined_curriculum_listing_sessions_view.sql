@@ -1,85 +1,91 @@
 CREATE OR REPLACE VIEW ft_ds_refined.curriculum_listing_sessions_view
 AS
 SELECT
-    listing_session_id_18,
-    additional_trade_name,
-    age_eligibility_date,
-    age_restriction,
-    allow_early_registration,
-    base_price,
-    coach_assigned,
-    curriculum_hours,
-    days_offered,
-    event_coordinator,
-    event_hours,
-    full_description,
-    gender_restriction,
-    lesson_plan,
-    listing_session_location_address,
-    program_location_id,
-    program_location_name,
-    listing_id,
-    max_capacity,
-    maximum_age,
-    membership_discount_active,
-    membership_id,
-    membership_required,
-    military_discount_active,
-    minimum_age,
-    listing_session_name,
-    number_of_classes,
-    parent_communication_french,
-    parent_communication_spanish,
-    parent_communication,
-    chapter_name,
-    chapter_id,
-    primary_program_level_restriction,
-    priority,
-    private_event,
-    program_coordinator,
-    program_level,
-    program_sub_level,
-    program_type,
-    publish_end_date_time,
-    publish_start_date_time,
-    record_type_id,
-    register_end_date_time,
-    register_start_date_time,
-    season,
-    secondary_program_level_restriction,
-    session_end_date_time,
-    session_id,
-    session_start_date_time,
-    session_start_date,
-    session_status,
-    sibling_discount_active,
-    support_coach_1,
-    support_coach_2,
-    support_coach_3,
-    support_coach_4,
-    support_coach_5,
-    support_coach_6,
-    third_program_level_restriction,
-    total_registrations,
-    total_space_available,
-    waitlist_space_available,
-    waitlist_capacity,
-    waitlist_counter_new,
-    sf_created_timestamp,
-    sf_last_modified_timestamp,
-    sf_system_modstamp,
-    dss_ingestion_timestamp
+    listing_session.listing_session_id_18,
+    listing_session.additional_trade_name,
+    listing_session.age_eligibility_date,
+    listing_session.age_restriction,
+    listing_session.allow_early_registration,
+    listing_session.base_price,
+    listing_session.coach_assigned,
+    contact_coach.first_name || ' ' || contact_coach.last_name as coach_name, 
+    listing_session.curriculum_hours,
+    listing_session.days_offered,
+    listing_session.event_coordinator,
+    listing_session.event_hours,
+    listing_session.full_description,
+    listing_session.gender_restriction,
+    listing_session.lesson_plan,
+    listing_session.listing_session_location_address,
+    listing_session.program_location_id,
+    listing_session.program_location_name,
+    listing_session.listing_id,
+    listing.listing_name,
+    listing_session.max_capacity,
+    listing_session.maximum_age,
+    listing_session.membership_discount_active,
+    listing_session.membership_id,
+    listing_session.membership_required,
+    listing_session.military_discount_active,
+    listing_session.minimum_age,
+    listing_session.listing_session_name,
+    listing_session.number_of_classes,
+    listing_session.parent_communication_french,
+    listing_session.parent_communication_spanish,
+    listing_session.parent_communication,
+    listing_session.chapter_name,
+    listing_session.chapter_id,
+    listing_session.primary_program_level_restriction,
+    listing_session.priority,
+    listing_session.private_event,
+    listing_session.program_coordinator,
+    listing_session.program_level,
+    listing_session.program_sub_level,
+    listing_session.program_type,
+    listing_session.publish_end_date_time,
+    listing_session.publish_start_date_time,
+    listing_session.record_type_id,
+    listing_session.register_end_date_time,
+    listing_session.register_start_date_time,
+    listing_session.season,
+    listing_session.secondary_program_level_restriction,
+    listing_session.session_end_date_time,
+    listing_session.session_id,
+    listing_session.session_start_date_time,
+    listing_session.session_start_date,
+    listing_session.session_status,
+    listing_session.sibling_discount_active,
+    listing_session.support_coach_1,
+    listing_session.support_coach_2,
+    listing_session.support_coach_3,
+    listing_session.support_coach_4,
+    listing_session.support_coach_5,
+    listing_session.support_coach_6,
+    listing_session.third_program_level_restriction,
+    listing_session.total_registrations,
+    listing_session.total_space_available,
+    listing_session.waitlist_space_available,
+    listing_session.waitlist_capacity,
+    listing_session.waitlist_counter_new,
+    listing_session.sf_created_timestamp,
+    listing_session.sf_last_modified_timestamp,
+    listing_session.sf_system_modstamp,
+    listing_session.dss_ingestion_timestamp
 -- ommitted the is_deleted field since it is an unanalyzable metadata field.
-FROM ft_ds_refined.listing_session
+FROM ft_ds_refined.listing_session listing_session
+left join ft_ds_refined.contact contact_coach
+	on listing_session.coach_assigned = contact_coach.contact_id_18
+left join ft_ds_refined.listing listing 
+	on listing_session.listing_id = listing.listing_id_18
 WHERE
     --this is the id representing the Curriculum type
-    record_type_id = '01236000000nmeLAAQ'
+    listing_session.record_type_id = '01236000000nmeLAAQ'
     --the remainder of fields cannot be NULL since they are soft-required.
-    AND base_price IS NOT NULL
-    AND sf_created_timestamp IS NOT NULL
-    AND max_capacity IS NOT NULL
-    AND chapter_name IS NOT NULL
-    AND chapter_id IS NOT NULL
-    AND record_type_id IS NOT NULL
-    AND dss_ingestion_timestamp IS NOT NULL
+    AND listing_session.base_price IS NOT NULL
+    AND listing_session.sf_created_timestamp IS NOT NULL
+    AND listing_session.max_capacity IS NOT NULL
+    AND listing_session.chapter_name IS NOT NULL
+    AND listing_session.chapter_id IS NOT NULL
+    AND listing_session.record_type_id IS NOT NULL
+    AND listing_session.dss_ingestion_timestamp IS NOT NULL
 ;

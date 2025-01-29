@@ -2,6 +2,7 @@ CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_teen_retention_perc
     SELECT
         dates.metric_calc_date,
         info.chapter_id,
+        account.account_name as chapter_name,
         info.teen_retention_percentage
     FROM (
         SELECT
@@ -19,4 +20,6 @@ CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_teen_retention_perc
     ON
         dates.latest_calc_timestamp = info.metric_calc_date
         AND dates.chapter_id = info.chapter_id
+    left join ft_ds_refined.account account 
+    	on info.chapter_id = account.account_id
 ;
