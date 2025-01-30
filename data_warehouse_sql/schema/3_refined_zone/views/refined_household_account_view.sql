@@ -5,6 +5,8 @@ SELECT
     account.chapter_affiliation_id,
     account_chapter.account_name as chapter_name,
     --NOT IN RAW AS number_of_active_participants,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.primary_contact_id,
     contact.first_name || ' ' || contact.last_name as primary_contact_name,
@@ -14,6 +16,7 @@ SELECT
     account.parent_account,
     account_parent_account.account_name as parent_account_name,
     --NOT IN RAW AS fmp_id,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     account.reggie_id,
     account.reggie_account_id
     --NOT IN RAW AS fmp_chapter_code,

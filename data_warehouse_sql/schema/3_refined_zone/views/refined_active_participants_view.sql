@@ -19,6 +19,7 @@ SELECT
     contact.school_name_other,
     contact.first_name,
     contact.last_name,
+    contact.program_level,
     contact.birthdate,
     household.account_name as household_name,
     contact.household_id,

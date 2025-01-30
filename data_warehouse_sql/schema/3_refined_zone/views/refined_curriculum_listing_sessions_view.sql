@@ -24,6 +24,7 @@ SELECT
     listing_session.max_capacity,
     listing_session.maximum_age,
     listing_session.membership_discount_active,
+    --no information as to what this is an id for since all values are NULL
     listing_session.membership_id,
     listing_session.membership_required,
     listing_session.military_discount_active,
@@ -44,12 +45,15 @@ SELECT
     listing_session.program_type,
     listing_session.publish_end_date_time,
     listing_session.publish_start_date_time,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     listing_session.record_type_id,
     listing_session.register_end_date_time,
     listing_session.register_start_date_time,
     listing_session.season,
     listing_session.secondary_program_level_restriction,
     listing_session.session_end_date_time,
+    --no information as to what this is an id for since all values are NULL
     listing_session.session_id,
     listing_session.session_start_date_time,
     listing_session.session_start_date,

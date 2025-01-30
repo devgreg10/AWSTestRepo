@@ -5,6 +5,7 @@ drop view if exists ft_ds_refined.partner_organization_account_view;
 --4 (depends on partner_organization_account_view)
 drop view if exists ft_ds_refined.chapter_account_view;
 --3
+drop view if exists ft_ds_refined.current_and_historical_participants_view;
 drop VIEW if exists ft_ds_refined.active_participants_view;
 --2
 drop view if exists ft_ds_refined.program_location_account_view;
@@ -49,19 +50,26 @@ SELECT
     session_registration.contact_id_18,
     contact.first_name || ' ' || contact.last_name as contact_name,
     session_registration.cost_difference,
+    --created_by_user_ids.created_by_user_name,
+    --this User object is not imported to DSS yet
     session_registration.sf_created_by_id,
     session_registration.sf_created_timestamp,
     session_registration.discount,
     session_registration.item_price,
+    --last_modified_by_user_ids.last_modified_by_user_name,
+    --this User object is not imported to DSS yet
     session_registration.sf_last_modified_by_id,
     session_registration.sf_last_modified_timestamp,
     session_registration.listing_session_id_18,
     listing_session.listing_session_name as listing_session_name,
+    --membership_registration_ids.membership_registration_name,
+    --this Membership Registration object is not imported to DSS yet
     session_registration.membership_registration_id_18,
     session_registration.session_registration_number,
     session_registration.old_listing_session_id_18,
     old_listing_session.listing_session_name as old_listing_session_name,
     session_registration.new_session_cost,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     session_registration.reggie_registration_id,
     session_registration.session_type,
     session_registration.status,
@@ -101,6 +109,8 @@ SELECT
     account.partner_program_type,
     account.location_type,
     --NOT IN VALID AS affiliate_delivery_partner,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.chapter_affiliation_id,
     account_chapter.account_name as chapter_affiliation_name,
@@ -110,9 +120,11 @@ SELECT
     account.is_active,
     account.account_id,
     --NOT IN RAW AS fmp_id,
+    --MDR information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of MDR information, supplement this view with information based on the below ID
     account.mdr_pid,
     account.ys_report_chapter_affiliation,
     account.date_joined,
+    --nces does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of National Center for Education Statistics data, supplement this view with information based on the below ID
     account.nces_id,
     account.billing_street,
     account.billing_city,
@@ -144,8 +156,11 @@ SELECT
     account.primary_contact_id,
     contact.first_name || ' ' || contact.last_name as primary_contact_name,
     --NOT IN RAW AS county,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.type,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     account.reggie_name,
     account.reggie_id,
     account.reggie_account_id,
@@ -224,6 +239,8 @@ SELECT
     account.chapter_affiliation_id,
     account_chapter.account_name as chapter_name,
     --NOT IN RAW AS number_of_active_participants,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.primary_contact_id,
     contact.first_name || ' ' || contact.last_name as primary_contact_name,
@@ -233,6 +250,7 @@ SELECT
     account.parent_account,
     account_parent_account.account_name as parent_account_name,
     --NOT IN RAW AS fmp_id,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     account.reggie_id,
     account.reggie_account_id
     --NOT IN RAW AS fmp_chapter_code,
@@ -333,36 +351,28 @@ CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_twelve_plus_retenti
 ;
 
 --F
-CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_tenure_counts_view AS
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_tenure_counts_view AS
     SELECT
-        dates.metric_calc_date,
-        info.chapter_id,
-        account.account_name as chapter_name,
-        info.one_year_tenure_count,
-        info.two_year_tenure_count,
-        info.three_year_tenure_count,
-        info.four_year_tenure_count,
-        info.five_year_tenure_count,
-        info.six_plus_year_tenure_count,
-        info.total_count
+        account.account_name AS chapter_name,
+        info.*
     FROM (
         SELECT
-            MAX(metric_calc_date) AS latest_calc_timestamp,
+            metric_calc_date,
             chapter_id,
-            CAST(metric_calc_date AS DATE) as metric_calc_date
-        FROM
-        	ft_ds_refined.metric_historical_tenure_counts_view
+            MIN(CASE WHEN years_tenured = '1' THEN tenure_count END) AS one_year_tenure_count,
+            MIN(CASE WHEN years_tenured = '2' THEN tenure_count END) AS two_year_tenure_count,
+            MIN(CASE WHEN years_tenured = '3' THEN tenure_count END) AS three_year_tenure_count,
+            MIN(CASE WHEN years_tenured = '4' THEN tenure_count END) AS four_year_tenure_count,
+            MIN(CASE WHEN years_tenured = '5' THEN tenure_count END) AS five_year_tenure_count,
+            MIN(CASE WHEN years_tenured = '6+' THEN tenure_count END) AS six_plus_year_tenure_count,
+            MIN(CASE WHEN years_tenured = 'Total' THEN tenure_count END) AS total_count
+        FROM ft_ds_refined.metric_historical_tenure_counts
         GROUP BY
-            CAST(metric_calc_date AS DATE),
+            metric_calc_date,
             chapter_id
-    ) dates
-    JOIN
-        ft_ds_refined.metric_historical_tenure_counts_view info
-    ON
-        dates.latest_calc_timestamp = info.metric_calc_date
-        AND dates.chapter_id = info.chapter_id
-    left join ft_ds_refined.account account 
-    	on info.chapter_id = account.account_id
+    ) info
+    LEFT JOIN ft_ds_refined.account account
+    ON info.chapter_id = account.account_id
 ;
 
 --E
@@ -510,6 +520,8 @@ SELECT
     additional_trade_name_account.parent_account,
     additional_trade_name_chapter_affiliation_ids.account_name AS additional_trade_name_chapter_affiliation_name,
     additional_trade_name_account.additional_trade_name_chapter_affiliation_id,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     additional_trade_name_account.account_record_type_id,
     additional_trade_name_account.territory,
     additional_trade_name_account.region,
@@ -533,6 +545,7 @@ LEFT JOIN ft_ds_refined.account additional_trade_name_chapter_affiliation_ids
     ON additional_trade_name_account.additional_trade_name_chapter_affiliation_id = additional_trade_name_chapter_affiliation_ids.account_id
 WHERE
     additional_trade_name_account.account_record_type_id = '01236000001HyD0AAK'
+;
 
 --2
 CREATE OR REPLACE VIEW ft_ds_refined.program_location_account_view
@@ -581,6 +594,7 @@ SELECT
     contact.chapter_id,
     contact.contact_type,
     --contact.age,
+    EXTRACT(YEAR from AGE(NOW(), CAST(contact.birthdate AS TIMESTAMP))) AS calculated_age,
     contact.ethnicity,
     contact.gender,
     contact.grade,
@@ -593,6 +607,7 @@ SELECT
     contact.school_name_other,
     contact.first_name,
     contact.last_name,
+    contact.program_level,
     contact.birthdate,
     household.account_name as household_name,
     contact.household_id,
@@ -620,6 +635,63 @@ WHERE
     AND contact.chapter_id IS NOT NULL
     AND contact.dss_ingestion_timestamp IS NOT NULL
 ;
+CREATE OR REPLACE VIEW ft_ds_refined.current_and_historical_participants_view
+AS
+SELECT
+    *
+FROM (
+    SELECT
+        contact_id,
+        first_name,
+        last_name,
+        program_level,
+        birthdate,
+        age AS recorded_age,
+        --the calculation method here is to minimize differences between recorded age and calculated age on birthdays of Jan 1, which there are dozens of thousands of. We assume that their age is correct, and that the birthdate was extrapolated from that
+        EXTRACT(YEAR from AGE(MAKE_DATE(CAST(year AS INTEGER), 12, 31), CAST(birthdate AS TIMESTAMP))) AS calculated_age,
+        gender,
+        ethnicity,
+        grade_level,
+        mailing_zip_postal_code,
+        primary_contact_email,
+        email,
+        participation_status,
+        legacy_participant_user_id,
+        school_name,
+        school_name_other,
+        additional_trade_name_account_name,
+        chapter_affiliation_account_name,
+        chapter_id,
+        year
+    FROM ft_ds_refined.year_end_participant
+) historical_participants
+UNION
+(
+    SELECT
+        contact_id_18 AS contact_id,
+        first_name,
+        last_name,
+        program_level,
+        CAST(birthdate AS DATE) AS birthdate,
+        NULL AS recorded_age,
+        calculated_age,
+        gender,
+        ethnicity,
+        grade AS grade_level,
+        mailing_zip_postal_code,
+        NULL AS primary_contact_email,
+        NULL AS email,
+        participation_status,
+        NULL AS legacy_participant_user_id,
+        school_name,
+        school_name_other,
+        NULL AS additional_trade_name_account_name,
+        NULL AS chapter_affiliation_account_name,
+        chapter_id,
+        CAST(date_part('year', CURRENT_DATE) AS NUMERIC) AS year
+    FROM ft_ds_refined.active_participants_view
+)
+;
 
 -- 4
 CREATE OR REPLACE VIEW ft_ds_refined.chapter_account_view
@@ -638,6 +710,8 @@ SELECT
     account.international_chapter,
     account.ft_app_pilot,
     --NOT IN VALID AS award_badges_enabled,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.is_active,
     account.contract_status,
@@ -688,6 +762,7 @@ SELECT
     --NOT IN RAW AS mrm_id,
     --NOT IN RAW AS legacy_account_holder_id,
     --NOT IN RAW AS legacy_participant_user_id,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     account.reggie_location_id,
     account.reggie_account_id,
     account.reggie_id
@@ -788,6 +863,7 @@ SELECT
     listing_session.max_capacity,
     listing_session.maximum_age,
     listing_session.membership_discount_active,
+    --no information as to what this is an id for since all values are NULL
     listing_session.membership_id,
     listing_session.membership_required,
     listing_session.military_discount_active,
@@ -808,12 +884,15 @@ SELECT
     listing_session.program_type,
     listing_session.publish_end_date_time,
     listing_session.publish_start_date_time,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     listing_session.record_type_id,
     listing_session.register_end_date_time,
     listing_session.register_start_date_time,
     listing_session.season,
     listing_session.secondary_program_level_restriction,
     listing_session.session_end_date_time,
+    --no information as to what this is an id for since all values are NULL
     listing_session.session_id,
     listing_session.session_start_date_time,
     listing_session.session_start_date,

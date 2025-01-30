@@ -14,6 +14,8 @@ SELECT
     account.international_chapter,
     account.ft_app_pilot,
     --NOT IN VALID AS award_badges_enabled,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.is_active,
     account.contract_status,
@@ -64,6 +66,7 @@ SELECT
     --NOT IN RAW AS mrm_id,
     --NOT IN RAW AS legacy_account_holder_id,
     --NOT IN RAW AS legacy_participant_user_id,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     account.reggie_location_id,
     account.reggie_account_id,
     account.reggie_id

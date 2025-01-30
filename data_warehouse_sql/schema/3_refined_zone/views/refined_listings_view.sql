@@ -16,6 +16,8 @@ SELECT
     account_presented_by.account_name as presented_by_name,
     listing.publish_start_date,
     listing.publish_end_date,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     listing.record_type_id,
     listing.sf_created_timestamp,
     listing.sf_last_modified_timestamp,

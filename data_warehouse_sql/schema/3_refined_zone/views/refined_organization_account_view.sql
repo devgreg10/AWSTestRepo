@@ -7,8 +7,11 @@ SELECT
     account.primary_contact_id,
     contact.first_name || ' ' || contact.last_name as primary_contact_name,
     --NOT IN RAW AS county,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.type,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     account.reggie_name,
     account.reggie_id,
     account.reggie_account_id,

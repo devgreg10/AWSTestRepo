@@ -6,19 +6,26 @@ SELECT
     session_registration.contact_id_18,
     contact.first_name || ' ' || contact.last_name as contact_name,
     session_registration.cost_difference,
+    --created_by_user_ids.created_by_user_name,
+    --this User object is not imported to DSS yet
     session_registration.sf_created_by_id,
     session_registration.sf_created_timestamp,
     session_registration.discount,
     session_registration.item_price,
+    --last_modified_by_user_ids.last_modified_by_user_name,
+    --this User object is not imported to DSS yet
     session_registration.sf_last_modified_by_id,
     session_registration.sf_last_modified_timestamp,
     session_registration.listing_session_id_18,
     listing_session.listing_session_name as listing_session_name,
+    --membership_registration_ids.membership_registration_name,
+    --this Membership Registration object is not imported to DSS yet
     session_registration.membership_registration_id_18,
     session_registration.session_registration_number,
     session_registration.old_listing_session_id_18,
     old_listing_session.listing_session_name as old_listing_session_name,
     session_registration.new_session_cost,
+    --reggie information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of reggie information, supplement this view with information based on the below ID
     session_registration.reggie_registration_id,
     session_registration.session_type,
     session_registration.status,

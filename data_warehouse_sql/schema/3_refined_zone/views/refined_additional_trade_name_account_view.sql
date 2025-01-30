@@ -6,6 +6,8 @@ SELECT
     additional_trade_name_account.parent_account,
     additional_trade_name_chapter_affiliation_ids.account_name AS additional_trade_name_chapter_affiliation_name,
     additional_trade_name_account.additional_trade_name_chapter_affiliation_id,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     additional_trade_name_account.account_record_type_id,
     additional_trade_name_account.territory,
     additional_trade_name_account.region,

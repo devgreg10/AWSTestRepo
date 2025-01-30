@@ -6,6 +6,8 @@ SELECT
     account.partner_program_type,
     account.location_type,
     --NOT IN VALID AS affiliate_delivery_partner,
+    --record_type_ids.account_record_type_name,
+    --this record type object is not imported to DSS yet
     account.account_record_type_id,
     account.chapter_affiliation_id,
     account_chapter.account_name as chapter_affiliation_name,
@@ -15,9 +17,11 @@ SELECT
     account.is_active,
     account.account_id,
     --NOT IN RAW AS fmp_id,
+    --MDR information does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of MDR information, supplement this view with information based on the below ID
     account.mdr_pid,
     account.ys_report_chapter_affiliation,
     account.date_joined,
+    --nces does not seem to be a Salesforce object, so it will not be joined as of now. Upon import of National Center for Education Statistics data, supplement this view with information based on the below ID
     account.nces_id,
     account.billing_street,
     account.billing_city,
