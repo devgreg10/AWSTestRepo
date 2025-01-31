@@ -1,3 +1,5 @@
+--7 this is the highest level view we've made so it should be dropped first
+drop view if exists ft_ds_refined.report_cpa_first_tee_programs;
 --6
 drop view if exists ft_ds_refined.curriculum_listing_sessions_view;
 --5
@@ -24,6 +26,7 @@ drop VIEW if exists ft_ds_refined.metric_historical_daily_retention_percentage_v
 drop VIEW if exists ft_ds_refined.metric_historical_daily_teen_retention_percentage_view;
 --F
 drop VIEW if exists ft_ds_refined.metric_historical_daily_tenure_counts_view;
+drop VIEW if exists ft_ds_refined.metric_historical_tenure_counts_view;
 --G
 drop VIEW if exists ft_ds_refined.metric_historical_daily_twelve_plus_retention_percentage_view;
 --H
@@ -40,7 +43,164 @@ drop view if exists ft_ds_refined.organization_account_view;
 drop view if exists ft_ds_refined.parent_partner_organization_account_view;
 --N
 drop view if exists ft_ds_refined.registered_session_registrations_view;
+--O
+drop view if exists ft_ds_refined.metric_historical_daily_ACE_certified_participant_counts_view;
+--Q
+drop view if exists ft_ds_refined.metric_historical_daily_ACE_participant_counts_view;
+--R
+drop view if exists ft_ds_refined.metric_historical_daily_active_participant_counts_by_age_view;
+--S
+drop view if exists ft_ds_refined.metric_historical_daily_non_male_percentage_view;
+--T
+drop view if exists ft_ds_refined.metric_historical_daily_service_area_diversity_variance_percentage_view;
+--U
+drop view if exists t_ds_refined.metric_historical_daily_teen_percentage_view;
+--V
+--V
 
+--U
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_teen_percentage_view AS
+    SELECT
+        dates.metric_calc_date,
+        info.chapter_id,
+        info.teen_percentage
+    FROM (
+        SELECT
+            MAX(metric_calc_date) AS latest_calc_timestamp,
+            chapter_id,
+            CAST(metric_calc_date AS DATE) as metric_calc_date
+        FROM
+        	ft_ds_refined.metric_historical_teen_percentage
+        GROUP BY
+            CAST(metric_calc_date AS DATE),
+            chapter_id
+    ) dates
+    JOIN
+        ft_ds_refined.metric_historical_teen_percentage info
+    ON
+        dates.latest_calc_timestamp = info.metric_calc_date
+        AND dates.chapter_id = info.chapter_id
+;
+--T
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_service_area_diversity_variance_percentage_view AS
+    SELECT
+        dates.metric_calc_date,
+        info.chapter_id,
+        info.service_area,
+        info.service_area_diversity_variance_percentage
+    FROM (
+        SELECT
+            MAX(metric_calc_date) AS latest_calc_timestamp,
+            chapter_id,
+            CAST(metric_calc_date AS DATE) as metric_calc_date
+        FROM
+        	ft_ds_refined.metric_historical_service_area_diversity_variance_percentage
+        GROUP BY
+            CAST(metric_calc_date AS DATE),
+            chapter_id
+    ) dates
+    JOIN
+        ft_ds_refined.metric_historical_service_area_diversity_variance_percentage info
+    ON
+        dates.latest_calc_timestamp = info.metric_calc_date
+        AND dates.chapter_id = info.chapter_id
+;
+--S
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_non_male_percentage_view AS
+    SELECT
+        dates.metric_calc_date,
+        info.chapter_id,
+        info.non_male_percentage
+    FROM (
+        SELECT
+            MAX(metric_calc_date) AS latest_calc_timestamp,
+            chapter_id,
+            CAST(metric_calc_date AS DATE) as metric_calc_date
+        FROM
+        	ft_ds_refined.metric_historical_non_male_percentage
+        GROUP BY
+            CAST(metric_calc_date AS DATE),
+            chapter_id
+    ) dates
+    JOIN
+        ft_ds_refined.metric_historical_non_male_percentage info
+    ON
+        dates.latest_calc_timestamp = info.metric_calc_date
+        AND dates.chapter_id = info.chapter_id
+;
+--R
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_active_participant_counts_by_age_view AS
+    SELECT
+        dates.metric_calc_date,
+        info.chapter_id,
+        info.age,
+        info.participant_count
+    FROM (
+        SELECT
+            MAX(metric_calc_date) AS latest_calc_timestamp,
+            chapter_id,
+            age,
+            CAST(metric_calc_date AS DATE) as metric_calc_date
+        FROM
+        	ft_ds_refined.metric_historical_active_participant_counts_by_age
+        GROUP BY
+            CAST(metric_calc_date AS DATE),
+            chapter_id,
+            age
+    ) dates
+    LEFT JOIN
+        ft_ds_refined.metric_historical_active_participant_counts_by_age info
+    ON
+        dates.latest_calc_timestamp = info.metric_calc_date
+        AND dates.chapter_id = info.chapter_id
+        AND dates.age = info.age
+;
+--Q
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_ACE_participant_counts_view AS
+    SELECT
+        dates.metric_calc_date,
+        info.chapter_id,
+        info.ACE_participant_count
+    FROM (
+        SELECT
+            MAX(metric_calc_date) AS latest_calc_timestamp,
+            chapter_id,
+            CAST(metric_calc_date AS DATE) as metric_calc_date
+        FROM
+        	ft_ds_refined.metric_historical_ACE_participant_counts
+        GROUP BY
+            CAST(metric_calc_date AS DATE),
+            chapter_id
+    ) dates
+    LEFT JOIN
+        ft_ds_refined.metric_historical_ACE_participant_counts info
+    ON
+        dates.latest_calc_timestamp = info.metric_calc_date
+        AND dates.chapter_id = info.chapter_id
+;
+--O
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_ACE_certified_participant_counts_view AS
+    SELECT
+        dates.metric_calc_date,
+        info.chapter_id,
+        info.ACE_certified_participant_count
+    FROM (
+        SELECT
+            MAX(metric_calc_date) AS latest_calc_timestamp,
+            chapter_id,
+            CAST(metric_calc_date AS DATE) as metric_calc_date
+        FROM
+        	ft_ds_refined.metric_historical_ACE_certified_participant_counts
+        GROUP BY
+            CAST(metric_calc_date AS DATE),
+            chapter_id
+    ) dates
+    LEFT JOIN
+        ft_ds_refined.metric_historical_ACE_certified_participant_counts info
+    ON
+        dates.latest_calc_timestamp = info.metric_calc_date
+        AND dates.chapter_id = info.chapter_id
+;
 --N
 CREATE OR REPLACE VIEW ft_ds_refined.registered_session_registrations_view
 AS
@@ -373,6 +533,38 @@ CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_tenure_counts_view AS
     ) info
     LEFT JOIN ft_ds_refined.account account
     ON info.chapter_id = account.account_id
+;
+
+CREATE OR REPLACE VIEW ft_ds_refined.metric_historical_daily_tenure_counts_view AS
+    SELECT
+        dates.metric_calc_date,
+        info.chapter_id,
+        account.account_name as chapter_name,
+        info.one_year_tenure_count,
+        info.two_year_tenure_count,
+        info.three_year_tenure_count,
+        info.four_year_tenure_count,
+        info.five_year_tenure_count,
+        info.six_plus_year_tenure_count,
+        info.total_count
+    FROM (
+        SELECT
+            MAX(metric_calc_date) AS latest_calc_timestamp,
+            chapter_id,
+            CAST(metric_calc_date AS DATE) as metric_calc_date
+        FROM
+        	ft_ds_refined.metric_historical_tenure_counts_view
+        GROUP BY
+            CAST(metric_calc_date AS DATE),
+            chapter_id
+    ) dates
+    JOIN
+        ft_ds_refined.metric_historical_tenure_counts_view info
+    ON
+        dates.latest_calc_timestamp = info.metric_calc_date
+        AND dates.chapter_id = info.chapter_id
+    left join ft_ds_refined.account account 
+    	on info.chapter_id = account.account_id
 ;
 
 --E
@@ -931,4 +1123,369 @@ WHERE
     AND listing_session.chapter_id IS NOT NULL
     AND listing_session.record_type_id IS NOT NULL
     AND listing_session.dss_ingestion_timestamp IS NOT NULL
+;
+--7
+CREATE OR REPLACE VIEW ft_ds_refined.report_cpa_first_tee_programs AS
+SELECT
+    chapter_info.account_name as chapter_name,
+    averages_info.first_tee_program_participants,
+    averages_info.percent_annual_retention,
+    averages_info.percent_annual_teen_retention,
+    averages_info.percent_diverse,
+    averages_info.percent_diversity_variance_from_service_area,
+    averages_info.percent_female,
+    averages_info.percent_non_male,
+    averages_info.ages_10_to_14,
+    averages_info.ages_7_to_9,
+    averages_info.ages_10_to_11,
+    averages_info.ages_12_to_13,
+    averages_info.ages_14_plus,
+    averages_info.ages_under_7,
+    averages_info.percent_teens,
+    averages_info.ACE_participants,
+    averages_info.ACE_certified_participants,
+    averages_info.eoy_indicator
+FROM
+--this subquery contains the information about the EOY information for each of the chapters, for each year
+(
+    --include each metric that will be on the report in this select statement, along with a LEFT JOIN to the table that contains that metric
+    --the base table everything else is LEFT JOINED to is the active participant counts since it is the most basic metric
+    SELECT
+        counts.chapter_id,
+        counts.participant_count AS first_tee_program_participants,
+        retention.retention_percentage AS percent_annual_retention,
+        teen_retention.teen_retention_percentage AS percent_annual_teen_retention,
+        ethnic_diversity.ethnic_diversity_percentage AS percent_diverse,
+        service_area_diversity_variance.service_area_diversity_variance_percentage AS percent_diversity_variance_from_service_area,
+        female.female_percentage AS percent_female,
+        non_male.non_male_percentage AS percent_non_male,
+        ages_10_to_14.ages_10_to_14,
+        ages_7_to_9.ages_7_to_9,
+        ages_10_to_11.ages_10_to_11,
+        ages_12_to_13.ages_12_to_13,
+        ages_14_plus.ages_14_plus,
+        ages_under_7.ages_under_7,
+        percent_teens.teen_percentage AS percent_teens,
+        ace_counts.ACE_participant_count AS ACE_participants,
+        ace_certified_counts.ACE_certified_participant_count AS ACE_certified_participants,
+        counts.eoy_indicator
+    FROM ft_ds_refined.metric_historical_active_participant_counts counts
+    LEFT JOIN ft_ds_refined.metric_historical_retention_percentage retention
+        ON counts.chapter_id = retention.chapter_id
+        AND counts.eoy_indicator = retention.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_teen_retention_percentage teen_retention
+        ON counts.chapter_id = teen_retention.chapter_id
+        AND counts.eoy_indicator = teen_retention.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_ethnic_diversity_percentage ethnic_diversity
+        ON counts.chapter_id = ethnic_diversity.chapter_id
+        AND counts.eoy_indicator = ethnic_diversity.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_service_area_diversity_variance_percentage service_area_diversity_variance
+        ON counts.chapter_id = service_area_diversity_variance.chapter_id
+        AND counts.eoy_indicator = service_area_diversity_variance.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_female_percentage female
+        ON counts.chapter_id = female.chapter_id
+        AND counts.eoy_indicator = female.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_non_male_percentage non_male
+        ON counts.chapter_id = non_male.chapter_id
+        AND counts.eoy_indicator = non_male.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_10_to_14
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        --this is an inclusive range according to PostGRESQL logic documentation
+        WHERE age BETWEEN 10 AND 14
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_10_to_14
+        ON counts.chapter_id = ages_10_to_14.chapter_id
+        AND counts.eoy_indicator = ages_10_to_14.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_7_to_9
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        --this is an inclusive range according to PostGRESQL logic documentation
+        WHERE age BETWEEN 7 AND 9
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_7_to_9
+        ON counts.chapter_id = ages_7_to_9.chapter_id
+        AND counts.eoy_indicator = ages_7_to_9.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_10_to_11
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        --this is an inclusive range according to PostGRESQL logic documentation
+        WHERE age BETWEEN 10 AND 11
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_10_to_11
+        ON counts.chapter_id = ages_10_to_11.chapter_id
+        AND counts.eoy_indicator = ages_10_to_11.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_12_to_13
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        --this is an inclusive range according to PostGRESQL logic documentation
+        WHERE age BETWEEN 12 AND 13
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_12_to_13
+        ON counts.chapter_id = ages_12_to_13.chapter_id
+        AND counts.eoy_indicator = ages_12_to_13.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_14_plus
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        WHERE age >= 14
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_14_plus
+        ON counts.chapter_id = ages_14_plus.chapter_id
+        AND counts.eoy_indicator = ages_14_plus.eoy_indicator
+    LEFT JOIN (
+        SELECT
+            chapter_id,
+            eoy_indicator,
+            SUM(participant_count) AS ages_under_7
+        FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+        WHERE age < 7
+        GROUP BY chapter_id, eoy_indicator
+    ) ages_under_7
+        ON counts.chapter_id = ages_under_7.chapter_id
+        AND counts.eoy_indicator = ages_under_7.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_teen_percentage percent_teens
+        ON counts.chapter_id = percent_teens.chapter_id
+        AND counts.eoy_indicator = percent_teens.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_ACE_participant_counts ace_counts
+        ON counts.chapter_id = ace_counts.chapter_id
+        AND counts.eoy_indicator = ace_counts.eoy_indicator
+    LEFT JOIN ft_ds_refined.metric_historical_ACE_certified_participant_counts ace_certified_counts
+        ON counts.chapter_id = ace_certified_counts.chapter_id
+        AND counts.eoy_indicator = ace_certified_counts.eoy_indicator
+    --this part will be the peer group averages of the current year. It needs to include all the metrics that are listed above
+    UNION
+    (
+        WITH peer_group_map AS
+        (
+            SELECT
+                account_id,
+                peer_group_level
+            FROM ft_ds_refined.chapter_account_view
+        )
+        SELECT
+            peer_group_map.account_id AS chapter_id,
+            peer_group_averages.participant_count AS first_tee_program_particpants,
+            peer_group_averages.retention_percentage AS percent_annual_retention,
+            peer_group_averages.teen_retention_percentage AS percent_annual_teen_retention,
+            peer_group_averages.ethnic_diversity_percentage AS percent_diverse,
+            peer_group_averages.service_area_diversity_variance_percentage AS percent_diversity_variance_from_service_area,
+            peer_group_averages.female_percentage AS percent_female,
+            peer_group_averages.non_male_percentage AS percent_non_male,
+            peer_group_averages.ages_10_to_14,
+            peer_group_averages.ages_7_to_9,
+            peer_group_averages.ages_10_to_11,
+            peer_group_averages.ages_12_to_13,
+            peer_group_averages.ages_14_plus,
+            peer_group_averages.ages_under_7,
+            peer_group_averages.teen_percentage AS percent_teens,
+            peer_group_averages.ACE_participant_count AS ACE_participants,
+            peer_group_averages.ACE_certified_participant_count AS ACE_certified_participants,
+            'Curr Yr Peer Grp Avg' AS eoy_indicator
+        FROM
+        (
+            SELECT
+                peer_group_map.peer_group_level,
+                AVG(active_participants_counts_info.participant_count) AS participant_count,
+                AVG(retention_percentage_info.retention_percentage) AS retention_percentage,
+                AVG(teen_retention_percentage_info.teen_retention_percentage) AS teen_retention_percentage,
+                AVG(ethnic_diversity_percentage_info.ethnic_diversity_percentage) AS ethnic_diversity_percentage,
+                AVG(service_area_diversity_variance_info.service_area_diversity_variance_percentage) AS service_area_diversity_variance_percentage,
+                AVG(female_percentage_info.female_percentage) AS female_percentage,
+                AVG(non_male_percentage_info.non_male_percentage) AS non_male_percentage,
+                AVG(ages_10_to_14.ages_10_to_14) AS ages_10_to_14,
+                AVG(ages_7_to_9.ages_7_to_9) AS ages_7_to_9,
+                AVG(ages_10_to_11.ages_10_to_11) AS ages_10_to_11,
+                AVG(ages_12_to_13.ages_12_to_13) AS ages_12_to_13,
+                AVG(ages_14_plus.ages_14_plus) AS ages_14_plus,
+                AVG(ages_under_7.ages_under_7) AS ages_under_7,
+                AVG(teen_percentage_info.teen_percentage) AS teen_percentage,
+                AVG(ace_counts_info.ACE_participant_count) AS ACE_participant_count,
+                AVG(ace_certified_counts_info.ACE_certified_participant_count) AS ACE_certified_participant_count
+            FROM
+            peer_group_map
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    participant_count
+                FROM ft_ds_refined.metric_historical_active_participant_counts
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) active_participants_counts_info
+                ON peer_group_map.account_id = active_participants_counts_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    retention_percentage
+                FROM ft_ds_refined.metric_historical_retention_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) retention_percentage_info
+                ON peer_group_map.account_id = retention_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    teen_retention_percentage
+                FROM ft_ds_refined.metric_historical_teen_retention_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) teen_retention_percentage_info
+                ON peer_group_map.account_id = teen_retention_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    ethnic_diversity_percentage
+                FROM ft_ds_refined.metric_historical_ethnic_diversity_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) ethnic_diversity_percentage_info
+                ON peer_group_map.account_id = ethnic_diversity_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    service_area_diversity_variance_percentage
+                FROM ft_ds_refined.metric_historical_service_area_diversity_variance_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) service_area_diversity_variance_info
+                ON peer_group_map.account_id = service_area_diversity_variance_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    female_percentage
+                FROM ft_ds_refined.metric_historical_female_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) female_percentage_info
+                ON peer_group_map.account_id = female_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    non_male_percentage
+                FROM ft_ds_refined.metric_historical_non_male_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) non_male_percentage_info
+                ON peer_group_map.account_id = non_male_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_10_to_14
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
+                AND age BETWEEN 10 AND 14
+                GROUP BY chapter_id
+            ) ages_10_to_14
+                ON peer_group_map.account_id = ages_10_to_14.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_7_to_9
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
+                AND age BETWEEN 7 AND 9
+                GROUP BY chapter_id
+            ) ages_7_to_9
+                ON peer_group_map.account_id = ages_7_to_9.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_10_to_11
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
+                AND age BETWEEN 10 AND 11
+                GROUP BY chapter_id
+            ) ages_10_to_11
+                ON peer_group_map.account_id = ages_10_to_11.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_12_to_13
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                --this is an inclusive range according to PostGRESQL logic documentation
+                AND age BETWEEN 12 AND 13
+                GROUP BY chapter_id
+            ) ages_12_to_13
+                ON peer_group_map.account_id = ages_12_to_13.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_14_plus
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                AND age >= 14
+                GROUP BY chapter_id
+            ) ages_14_plus
+                ON peer_group_map.account_id = ages_14_plus.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    SUM(participant_count) AS ages_under_7
+                FROM ft_ds_refined.metric_historical_active_participant_counts_by_age
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+                AND age < 7
+                GROUP BY chapter_id
+            ) ages_under_7
+                ON peer_group_map.account_id = ages_under_7.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    teen_percentage
+                FROM ft_ds_refined.metric_historical_teen_percentage
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) teen_percentage_info
+                ON peer_group_map.account_id = non_male_percentage_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    ACE_participant_count
+                FROM ft_ds_refined.metric_historical_ACE_participant_counts
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) ace_counts_info
+                ON peer_group_map.account_id = ace_counts_info.chapter_id
+            LEFT JOIN
+            (
+                SELECT
+                    chapter_id,
+                    ACE_certified_participant_count
+                FROM ft_ds_refined.metric_historical_ACE_certified_participant_counts
+                WHERE eoy_indicator = CAST(EXTRACT(YEAR FROM NOW()) AS TEXT)
+            ) ace_certified_counts_info
+                ON peer_group_map.account_id = ace_counts_info.chapter_id
+            GROUP BY peer_group_map.peer_group_level
+        ) peer_group_averages
+        JOIN 
+        peer_group_map
+        ON peer_group_map.peer_group_level = peer_group_averages.peer_group_level
+    )
+) averages_info
+--this join merely adds the chapter names to the view for better human readability/BI use
+JOIN ft_ds_refined.chapter_account_view chapter_info
+    ON averages_info.chapter_id = chapter_info.account_id
 ;
