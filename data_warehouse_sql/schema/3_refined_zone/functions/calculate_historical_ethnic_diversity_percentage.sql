@@ -4,7 +4,7 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     UPDATE
-        ft_ds_refined.metric_historical_active_participant_counts
+        ft_ds_refined.metric_historical_ethnic_diversity_percentage
     SET
         eoy_indicator = NULL
     WHERE
