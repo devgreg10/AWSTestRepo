@@ -12,7 +12,6 @@ from aws_cdk import (
     Stack,
     RemovalPolicy
 )
-
 from constructs import Construct
 from dotenv import load_dotenv
 from cdk_ec2_key_pair import KeyPair
@@ -174,7 +173,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             )
         )
 
-        default_database_name = "postgres"
+        self.default_database_name = "postgres"
 
         # Aurora PostgreSQL Database Cluster
         self.data_warehouse_db_cluster = rds.DatabaseCluster(
@@ -188,7 +187,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             engine=rds.DatabaseClusterEngine.aurora_postgres(
                 version=rds.AuroraPostgresEngineVersion.VER_15_3 
             ),
-            default_database_name=default_database_name,
+            default_database_name=self.default_database_name,
             readers=[
                 rds.ClusterInstance.serverless_v2(
                     f"ft-{env}-reader-instance-1", 
@@ -301,7 +300,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         #         self, 
         #         "DBLambdaUserSecret",
         #         secret_name = f"ft-{env}-datawarehouse-db-lambda-user-secret",
-        #         username=f"ft_{env}_data_warehouse_lambda_user",
+        #         username=f"ft_{env}_data_warehouse__lambdauser",
         #         master_secret=self.db_master_user_secret,
         #         dbname=default_database_name
         #     )
@@ -329,5 +328,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             role=bastion_role,
             key_name=bastion_key_pair.key_pair_name
         )
+
+
 
 

@@ -1,6 +1,6 @@
 import os
 
-import aws_cdk as cdk
+from aws_cdk import App,Tags
 
 from cloud.layer_1_bootstrap.ft_decision_support_bootstrap_stack import FtDecisionSupportBootstrapStack
 from cloud.layer_2_storage.ft_decision_support_persistent_storage_stack import FtDecisionSupportPersistentStorageStack
@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 env = os.environ.get('env')
 
-app = cdk.App()
+app = App()
 
 if (env=='prod'):
     load_dotenv(".env.prod")
@@ -50,7 +50,8 @@ decision_support_base_stack = FtDecisionSupportCoreStack(
     app, 
     id=f"ft-{env}-decision-support-base-stack", 
     env=env, 
-    version_number=os.getenv('version_number')
+    version_number=os.getenv('version_number'),
+    storage_stack=decision_support_persistent_storage_stack,
 )
 
 '''
@@ -104,8 +105,8 @@ transform_layer_salesforce_stack = FtTransformLayerSalesforceStack(
 '''
 TAGS
 '''
-cdk.Tags.of(app).add("Project", "First Tee Decision Support")
-cdk.Tags.of(app).add("Deployment", "CDK")
-cdk.Tags.of(app).add("Repo", "FT-decision-support-cloud")
+Tags.of(app).add("Project", "First Tee Decision Support")
+Tags.of(app).add("Deployment", "CDK")
+Tags.of(app).add("Repo", "FT-decision-support-cloud")
 
 app.synth()
