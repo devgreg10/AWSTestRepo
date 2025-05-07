@@ -1,7 +1,7 @@
 from aws_cdk import (
     aws_lambda as lambda_,
     aws_secretsmanager as secrets,
-    aws_s3 as s3,
+    aws_ec2 as ec2,
     aws_iam as iam,
     custom_resources as cr,
     Stack,
@@ -22,6 +22,7 @@ class FtDecisionSupportCoreStack(Stack):
                  id: str, 
                  env: str, 
                  version_number: str, 
+                 bootstrap_stack: FtDecisionSupportBootstrapStack,
                  storage_stack: FtDecisionSupportPersistentStorageStack,
                  **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -87,6 +88,10 @@ class FtDecisionSupportCoreStack(Stack):
             "CreateDbUsersLambda",
             function_name=f"ft-{env}-create-db-users-lambda",
             runtime=lambda_.Runtime.PYTHON_3_8,
+            vpc=bootstrap_stack.decision_support_vpc,
+            vpc_subnets=ec2.SubnetSelection(
+                subnets=bootstrap_stack.decision_support_vpc.private_subnets
+            ),
             layers=[self.psycopg2_lambda_layer],
             code=lambda_.Code.from_asset('cloud/lambdas/DbUsers'),
             handler='lambda_function.lambda_handler',

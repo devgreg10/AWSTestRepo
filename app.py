@@ -51,6 +51,7 @@ decision_support_base_stack = FtDecisionSupportCoreStack(
     id=f"ft-{env}-decision-support-base-stack", 
     env=env, 
     version_number=os.getenv('version_number'),
+    bootstrap_stack=decision_support_bootstrap_stack,
     storage_stack=decision_support_persistent_storage_stack,
 )
 
