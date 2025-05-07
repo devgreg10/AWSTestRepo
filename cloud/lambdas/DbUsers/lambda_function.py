@@ -1,3 +1,4 @@
+import os
 import json
 import boto3
 import psycopg2
@@ -7,8 +8,7 @@ def get_secret(secret_arn):
     client = boto3.client('secretsmanager')
     try:
         response = client.get_secret_value(SecretId=secret_arn)
-        secret = json.loads(response['SecretString'])
-        return secret
+        return json.loads(response['SecretString'])
     except ClientError as e:
         print(f"Error fetching secret {secret_arn}: {e}")
         raise
@@ -38,7 +38,6 @@ def lambda_handler(event, context):
     master_user = master_secret["username"]
     master_password = master_secret["password"]
 
-    # Connect to DB
     try:
         conn = psycopg2.connect(
             host=host,
@@ -50,64 +49,60 @@ def lambda_handler(event, context):
         conn.autocommit = True
         cur = conn.cursor()
 
-        for user in [bi_user_secret, dev_user_secret]:
-            username = user["username"]
-            password = user["password"]
+        # Create or update BI Dashboard User
+        bi_username = bi_user_secret["username"]
+        bi_password = bi_user_secret["password"]
 
-            print(f"Creating or updating user: {username}")
+        print(f"Creating or updating BI user: {bi_username}")
+        cur.execute(f"""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT FROM pg_catalog.pg_roles WHERE rolname = '{bi_username}'
+                ) THEN
+                    CREATE ROLE {bi_username} WITH LOGIN PASSWORD %s;
+                ELSE
+                    ALTER ROLE {bi_username} WITH PASSWORD %s;
+                END IF;
+            END
+            $$;
+        """, (bi_password, bi_password))
 
-            # Create or update the user
-            cur.execute(f"""
-                DO $$
-                BEGIN
-                    IF NOT EXISTS (
-                        SELECT FROM pg_catalog.pg_roles WHERE rolname = '{username}'
-                    ) THEN
-                        CREATE ROLE {username} WITH LOGIN PASSWORD %s;
-                    ELSE
-                        ALTER ROLE {username} WITH PASSWORD %s;
-                    END IF;
-                END
-                $$;
-            """, (password, password))
+        # Grant read-only role
+        print(f"Granting rds_read_only to {bi_username}")
+        cur.execute(f"GRANT rds_read_only TO {bi_username};")
 
-            if "bi" in username:
-                print(f"Granting read-only permissions to {username}")
-                # Grant connect on the database
-                cur.execute(f"GRANT CONNECT ON DATABASE {dbname} TO {username};")
+        # Create or update Dev User
+        dev_username = dev_user_secret["username"]
+        dev_password = dev_user_secret["password"]
 
-                # Grant usage and SELECT on all schemas and tables
-                cur.execute(f"""
-                    DO $$
-                    DECLARE
-                        r RECORD;
-                    BEGIN
-                        FOR r IN SELECT nspname FROM pg_namespace WHERE nspname NOT IN ('pg_catalog', 'information_schema') LOOP
-                            EXECUTE format('GRANT USAGE ON SCHEMA %I TO {username}', r.nspname);
-                            EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO {username}', r.nspname);
-                            EXECUTE format('GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA %I TO {username}', r.nspname);
-                        END LOOP;
-                    END
-                    $$;
-                """)
+        print(f"Creating or updating Dev user: {dev_username}")
+        cur.execute(f"""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT FROM pg_catalog.pg_roles WHERE rolname = '{dev_username}'
+                ) THEN
+                    CREATE ROLE {dev_username} WITH LOGIN PASSWORD %s;
+                ELSE
+                    ALTER ROLE {dev_username} WITH PASSWORD %s;
+                END IF;
+            END
+            $$;
+        """, (dev_password, dev_password))
 
-            elif "dev" in username:
-                print(f"Granting full privileges to {username}")
-                cur.execute(f"GRANT rds_superuser TO {username};")
-
-
-            # Grant full privileges
-            cur.execute(f"GRANT rds_superuser TO {username};")
+        print(f"Granting rds_superuser to {dev_username}")
+        cur.execute(f"GRANT rds_superuser TO {dev_username};")
 
         cur.close()
         conn.close()
 
     except Exception as e:
-        print(f"Error connecting to DB or creating users: {e}")
+        print(f"Error creating users: {e}")
         raise
 
     return {
         "Status": "SUCCESS",
         "Reason": "DB users created successfully",
-        "PhysicalResourceId": f"{host}-db-user-setup",
+        "PhysicalResourceId": f"{host}-db-user-setup"
     }
