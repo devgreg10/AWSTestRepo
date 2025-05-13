@@ -19,7 +19,7 @@ from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_listing_tasks imp
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_session_registration_tasks import FtSalesforceSessionRegistrationAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_badge_tasks import FtSalesforceBadgeAppFlowTasks
 from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_earned_badges_tasks import FtSalesforceEarnedBadgesAppFlowTasks
-
+from cloud.layer_4_ingestion_layer.appflow.tasks.ft_salesforce_waitlist_tasks import FtSalesforceWaitlistAppFlowTasks
 from constructs import Construct
 
 from dotenv import load_dotenv
@@ -84,6 +84,11 @@ class FtIngestionLayerSalesforceStack(Stack):
                 "entity_name": "session-registration", 
                 "salesforce_object": "Session_Registration__c",
                 "appflow_tasks": FtSalesforceSessionRegistrationAppFlowTasks(self, "SaleforceSessionRegistrationTasks")
+            },
+            {
+                "entity_name": "waitlist",
+                "salesforce_object": "Waitlist__c",
+                "appflow_tasks": FtSalesforceWaitlistAppFlowTasks(self, "SaleforceWaitlistTasks")
             }
         ]
     
