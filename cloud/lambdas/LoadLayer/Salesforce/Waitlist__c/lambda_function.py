@@ -4,7 +4,7 @@ import os
 import logging
 from datetime import datetime
 from data_core.salesforce.waitlist.sf_waitlist_db_helper import SalesforceWaitlistDbHelper
-from data_core.salesforce.waitlist.sf_waitlist_db_models import SfWaitlistDbHelperSourceModel
+from data_core.salesforce.waitlist.sf_waitlist_db_models import SfWaitlistSourceModel
 from data_core.util.db_execute_helper import DbExecutorHelper
 from data_core.util.db_exceptions import DbException, DbErrorCode
 
