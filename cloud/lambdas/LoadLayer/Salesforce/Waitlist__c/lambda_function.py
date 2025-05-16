@@ -74,9 +74,9 @@ def lambda_handler(event, context):
                         if len(chunk) == commit_batch_size:
                             
                             logging.info(f"{function_name} - calling SalesforceWaitlistDbHelper.insert_sf_raw_waitlist_from_source_waitlist for chunk size {commit_batch_size}")
-                            SalesforceWaitlistDbHelper.insert_sf_raw_waitlist_from_source_waitlist(
+                            SalesforceWaitlistDbHelper.insert_sf_raw_waitlists_from_source_waitlists(
                                 db_connection = db_connection,
-                                source_waitlist = chunk,
+                                source_waitlists = chunk,
                                 commit_changes = True)
                                 
                             # reset chunk upon commit
@@ -85,9 +85,9 @@ def lambda_handler(event, context):
                 # Process any remaining waitlist that didn't fill the last chunk and close the DB connection
                 if chunk:
                     logging.info(f"{function_name} - calling SalesforceWaitilistDbHelper.insert_sf_raw_waitlist_from_source_waitlist for chunk size {len(chunk)}")
-                    SalesforceWaitlistDbHelper.insert_sf_raw_waitlist_from_source_waitlist(
+                    SalesforceWaitlistDbHelper.insert_sf_raw_waitlists_from_source_waitlists(
                         db_connection = db_connection,
-                        source_waitlist = chunk,
+                        source_waitlists = chunk,
                         commit_changes = True)              
                             
             except DbException as ex:
