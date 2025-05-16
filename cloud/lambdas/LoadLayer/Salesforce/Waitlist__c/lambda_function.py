@@ -62,12 +62,12 @@ def lambda_handler(event, context):
                         # parse the json line into a dictionary
                         waitlist_json = json.loads(line)
 
-                        # Create the SfBadgeSourceModel object from the dictionary
-                        sf_source_waitlist = SfWaitlistDbHelperSourceModel(**waitlist_json)
+                        # Create the SfWaitlistSourceModel object from the dictionary
+                        sf_source_waitlist = SfWaitlistSourceModel(**waitlist_json)
 
-                        # logging.info(f"SfBadgeSourceModel: {json.dumps(asdict(sf_source_badge), indent=4)}")
+                        # logging.info(f"SfWaitlistSourceModel: {json.dumps(asdict(sf_source_badge), indent=4)}")
 
-                        # Add the badge to the current chunk
+                        # Add the waitlist to the current chunk
                         chunk.append(sf_source_waitlist)
 
                         # Once the commit_batch_size is met, process the chunk and reset the list
@@ -82,9 +82,9 @@ def lambda_handler(event, context):
                             # reset chunk upon commit
                             chunk = []
                 
-                # Process any remaining badges that didn't fill the last chunk and close the DB connection
+                # Process any remaining waitlist that didn't fill the last chunk and close the DB connection
                 if chunk:
-                    logging.info(f"{function_name} - calling SalesforceBadgeDbHelper.insert_sf_raw_waitlist_from_source_waitlist for chunk size {len(chunk)}")
+                    logging.info(f"{function_name} - calling SalesforceWaitilistDbHelper.insert_sf_raw_waitlist_from_source_waitlist for chunk size {len(chunk)}")
                     SalesforceWaitlistDbHelper.insert_sf_raw_waitlist_from_source_waitlist(
                         db_connection = db_connection,
                         source_waitlist = chunk,
