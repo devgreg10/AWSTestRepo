@@ -1,0 +1,475 @@
+BEGIN
+
+    --need to get rid of all the data from the temp table before we start in case it still exists from the last run
+    --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
+    DROP TABLE IF EXISTS temp_sf_waitlist_raw_to_valid;
+
+    --this statement places all of the most recently uploaded records into the temp table
+    CREATE TEMP TABLE IF NOT EXISTS temp_sf_waitlist_raw_to_valid AS
+    SELECT
+        id AS waitlist_id,
+        name AS waitlist_name,
+        chapterid__c AS chapter_id,
+        chapter_name__c AS chapter_name,
+        contact__c AS contact,
+        listing_session_location_name__c AS listing_session_location_name,
+        listing_session_name__c AS listing_session_name,
+        --membership_end_date__c AS membership_end_date,
+        --membership_start_date__c AS membership_start_date,
+        --membership_price__c AS membership_price,
+        --membership_required__c AS membership_required,
+        parent_contact__c AS parent_contact,
+        status__c AS status,
+        waitlist_participant_order__c AS waitlist_participant_order,
+        waitlist_unique_key__c AS waitlist_unique_key,
+        status_is_in_process_or_selected__c AS status_is_in_process_or_selected,
+        isdeleted AS is_deleted,
+        createddate AS sf_created_timestamp,
+        lastmodifieddate AS sf_last_modified_timestamp,
+        systemmodstamp AS sf_system_modstamp,
+        listing_session__c AS listing_session,
+        dss_ingestion_timestamp,
+        TRUE AS required_fields_validated,
+        TRUE AS optional_fields_validated
+    FROM ft_ds_raw.sf_waitlist
+    WHERE
+        dss_ingestion_timestamp >
+        CASE
+            WHEN load_threshold_timestamp IS NULL THEN 
+            COALESCE((SELECT MAX(execution_timestamp) from ft_ds_valid.raw_to_valid_execution_log WHERE entity = 'sf_waitlist'), 
+                     '1900-01-01'::timestamptz)  -- Use a very old date when NULL
+        ELSE load_threshold_timestamp
+        END
+    ;
+
+    --this statement updates the required_fields_validated flag
+    --they must meet the conditions for coercing into the datatype of the next table, not be empty or NULL, and match the values/format if a picklist or formatted field
+    --it is structured this way because if the required fields do not meet data quality, then they are not passed to valid and therefore do not need to be transformed further. Therefore, only the required_fields_validated flag needs to be updated.
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    required_fields_validated = FALSE
+    WHERE
+    --waitlist_id
+        waitlist_id IS NULL
+        OR LENGTH(waitlist_id) <> 18
+        OR waitlist_id = ''
+    --sf_system_modstamp
+        OR sf_system_modstamp IS NULL
+        OR NOT (SELECT ft_ds_admin.is_coercable_to_timestamptz(sf_system_modstamp))
+    ;
+
+    --these statements update the optional_fields_validated flag and swap invalid values to NULL
+    --they must meet the conditions for coercing into the datatype of the next table, not be empty or NULL, and match the values/format if a picklist or formatted field
+    -- chapter_id
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    chapter_id = NULL
+    WHERE
+        chapter_id IS NULL
+        OR LENGTH(chapter_id) <> 15
+        OR chapter_id = ''
+    ;
+    -- is_deleted
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    is_deleted = NULL
+    WHERE
+        is_deleted IS NULL
+        OR NOT (ft_ds_admin.is_coercable_to_boolean(is_deleted))
+        OR is_deleted = ''
+    ;
+    
+    -- waitlist_name
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    waitlist_name = NULL
+    WHERE
+        waitlist_name IS NULL
+        OR waitlist_name = ''
+    ;
+
+    -- listing_session
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    listing_session = NULL
+    WHERE
+        listing_session IS NULL
+        OR listing_session = ''
+    ;
+
+    -- chapter_name
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    chapter_name = NULL
+    WHERE
+        chapter_name IS NULL
+        OR chapter_name = ''
+    ;
+
+    -- contact
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    contact = NULL
+    WHERE
+        contact IS NULL
+        OR contact = ''
+    ;
+
+    -- listing_session_location_name
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    listing_session_location_name = NULL
+    WHERE
+        listing_session_location_name IS NULL
+        OR listing_session_location_name = ''
+    ;
+
+    -- listing_session_name
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    listing_session_name = NULL
+    WHERE
+        listing_session_name IS NULL
+        OR listing_session_name = ''
+    ;
+
+    -- membership_end_date
+    --UPDATE temp_sf_waitlist_raw_to_valid
+    --SET
+    --optional_fields_validated = FALSE,
+    --membership_end_date = NULL
+    --WHERE
+    --    membership_end_date IS NULL
+    --    OR NOT (ft_ds_admin.is_coercable_to_date(membership_end_date))
+    --    OR membership_end_date = ''
+    --;
+
+    -- membership_start_date
+    --UPDATE temp_sf_waitlist_raw_to_valid
+   -- SET
+    --optional_fields_validated = FALSE,
+    --membership_start_date = NULL
+    --WHERE
+    --    membership_start_date IS NULL
+    --    OR NOT (ft_ds_admin.is_coercable_to_date(membership_start_date))
+    --    OR membership_start_date = ''
+    --;
+
+    -- membership_price
+    --UPDATE temp_sf_waitlist_raw_to_valid
+    --SET
+    --optional_fields_validated = FALSE,
+    --membership_price = NULL
+    --WHERE
+    --    membership_price IS NULL
+     --   OR NOT (ft_ds_admin.is_coercable_to_numeric(membership_price))
+    --    OR membership_price = ''
+    --;
+
+    -- membership_required
+    --UPDATE temp_sf_waitlist_raw_to_valid
+    --SET
+    --optional_fields_validated = FALSE,
+    --membership_required = NULL
+    --WHERE
+    --    membership_required IS NULL
+    --    OR membership_required = ''
+    --;
+
+    -- parent_contact
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    parent_contact = NULL
+    WHERE
+        parent_contact IS NULL
+        OR parent_contact = ''
+    ;
+
+    -- status
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    status = NULL
+    WHERE
+        status IS NULL
+        OR status = ''
+    ;
+
+    -- waitlist_participant_order
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    waitlist_participant_order = NULL
+    WHERE
+        waitlist_participant_order IS NULL
+        OR waitlist_participant_order = ''
+    ;
+
+    -- waitlist_unique_key
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    waitlist_unique_key = NULL
+    WHERE
+        waitlist_unique_key IS NULL
+        OR waitlist_unique_key = ''
+    ;
+
+    -- status_is_in_process_or_selected
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    status_is_in_process_or_selected = NULL
+    WHERE
+        status_is_in_process_or_selected IS NULL
+        OR status_is_in_process_or_selected = ''
+    ;
+
+    -- sf_created_timestamp
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    sf_created_timestamp = NULL
+    WHERE
+        sf_created_timestamp IS NULL
+        OR NOT (ft_ds_admin.is_coercable_to_timestamptz(sf_created_timestamp))
+        OR sf_created_timestamp = ''
+    ;
+    -- sf_last_modified_timestamp
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    sf_last_modified_timestamp = NULL
+    WHERE
+        sf_last_modified_timestamp IS NULL
+        OR NOT (ft_ds_admin.is_coercable_to_timestamptz(sf_last_modified_timestamp))
+        OR sf_last_modified_timestamp = ''
+    ;
+    -- dss_ingestion_timestamp
+    UPDATE temp_sf_waitlist_raw_to_valid
+    SET
+    optional_fields_validated = FALSE,
+    dss_ingestion_timestamp = NULL
+    WHERE
+        -- dont include the coerced_to_timestamp() check because this field is already a timestamp
+        dss_ingestion_timestamp IS NULL
+    ;
+
+    --copy all records where required_fields_validated = FALSE OR optional_fields_validated = FALSE to a permanent errored table
+    --this can be reported on later to let data source owners fix the data upstream, where it will be re-ingested and fixed throughout all zones of the data warehouse
+    --the fixed_in_source field can be updated when a data owner fixes the record in the source.
+    INSERT INTO ft_ds_raw.validation_errors_sf_waitlist
+    SELECT
+        waitlist_id,
+        waitlist_name,
+        chapter_id,
+        chapter_name,
+        contact,
+        listing_session_location_name,
+        listing_session_name,
+        --membership_end_date,
+        --membership_start_date,
+        --membership_price,
+        --membership_required,
+        parent_contact,
+        status,
+        waitlist_participant_order,
+        waitlist_unique_key,
+        status_is_in_process_or_selected,
+        is_deleted,
+        sf_created_timestamp,
+        sf_last_modified_timestamp,
+        sf_system_modstamp,
+        listing_session,
+        dss_ingestion_timestamp,
+        required_fields_validated,
+        optional_fields_validated,
+        FALSE AS fixed_in_source
+    FROM temp_sf_waitlist_raw_to_valid
+    WHERE
+        required_fields_validated = FALSE
+        OR optional_fields_validated = FALSE
+    ;
+
+    --need to get rid of all the data from the temp table before we start in case it still exists from the last run
+    --we dont truncate at the end of this process because the temp table still briefly persists after execution, and then we can query it for debugging
+    DROP TABLE IF EXISTS temp_sf_waitlist_raw_to_valid_validated;
+
+    --now that we've flagged the valid data and set optional invalid fields to NULL, we can cast the values to their valid types
+    CREATE TABLE IF NOT EXISTS temp_sf_waitlist_raw_to_valid_validated (
+        waitlist_id CHAR(18),
+        waitlist_name VARCHAR(255),
+        chapter_id CHAR(18),
+        chapter_name VARCHAR(255),
+        contact VARCHAR(255),
+        listing_session_location_name VARCHAR(255),
+        listing_session_name VARCHAR(255),
+        --membership_end_date DATE,
+        --membership_start_date DATE,
+        --membership_price NUMERIC(4,2),
+        --membership_required BOOLEAN,
+        parent_contact VARCHAR(255),
+        status VARCHAR(255),
+        waitlist_participant_order VARCHAR(255),
+        waitlist_unique_key VARCHAR(255),
+        status_is_in_process_or_selected VARCHAR(255),
+        is_deleted BOOLEAN,
+        sf_created_timestamp TIMESTAMPTZ,
+        sf_last_modified_timestamp TIMESTAMPTZ,
+        sf_system_modstamp TIMESTAMPTZ,
+        listing_session VARCHAR(255),
+        dss_ingestion_timestamp TIMESTAMPTZ
+    );
+
+    --this statement then cleans the data to get the data types correct
+    INSERT INTO temp_sf_waitlist_raw_to_valid_validated
+    SELECT
+        waitlist_id,
+        waitlist_name,
+        chapter_id,
+        chapter_name,
+        contact,
+        listing_session_location_name,
+        listing_session_name,
+        --CAST(membership_end_date AS DATE) AS membership_end_date,
+        --CAST(membership_start_date AS DATE) AS membership_start_date,
+        --CAST(membership_price AS NUMERIC) AS membership_price,
+        --CAST(membership_required AS BOOLEAN) AS membership_required,
+        parent_contact,
+        status,
+        waitlist_participant_order,
+        waitlist_unique_key,
+        status_is_in_process_or_selected,
+        CAST(is_deleted AS BOOLEAN) AS is_deleted,
+        CAST(sf_created_timestamp AS TIMESTAMPTZ) AS sf_created_timestamp,
+        CAST(sf_last_modified_timestamp AS TIMESTAMPTZ) AS sf_last_modified_timestamp,
+        CAST(sf_system_modstamp AS TIMESTAMPTZ) AS sf_system_modstamp,
+        listing_session,
+        dss_ingestion_timestamp
+    FROM temp_sf_waitlist_raw_to_valid
+    WHERE
+        required_fields_validated = TRUE
+    ;
+
+    --this query gets the population correct for transitioning from raw to valid. It only includes records:
+    -- that were inserted into the raw zone since the last raw->valid run
+    -- that dont belong to testing chapters
+    -- that are unique to each sf_waitlist_id_18 value (no dups)
+    INSERT INTO ft_ds_valid.sf_waitlist
+    SELECT
+        all_values_but_dss_ingestion.*,
+        dss_ingestion.dss_ingestion_timestamp
+    FROM
+    (SELECT
+        waitlist_id,
+        waitlist_name,
+        chapter_id,
+        chapter_name,
+        contact,
+        listing_session_location_name,
+        listing_session_name,
+        --membership_end_date,
+        --membership_start_date,
+        --membership_price,
+        --membership_required,
+        parent_contact,
+        status,
+        waitlist_participant_order,
+        waitlist_unique_key,
+        status_is_in_process_or_selected,
+        is_deleted,
+        sf_created_timestamp,
+        sf_last_modified_timestamp,
+        sf_system_modstamp,
+        listing_session
+    FROM temp_sf_waitlist_raw_to_valid_validated
+    WHERE
+        chapter_id NOT IN (
+            '0011R00002oM2hNQAS',
+            '0013600000xOm3cAAC'
+        )
+    GROUP BY
+        --this group by clause exists to eliminate duplicates since multiple records with the same Id and system_modstamp can exist
+        --it is every field going into ft_ds_valid.sf_waitlist except dss_ingestion_timestamp
+        waitlist_id,
+        waitlist_name,
+        chapter_id,
+        chapter_name,
+        contact,
+        listing_session_location_name,
+        listing_session_name,
+        --membership_end_date,
+        --membership_start_date,
+        --membership_price,
+        --membership_required,
+        parent_contact,
+        status,
+        waitlist_participant_order,
+        waitlist_unique_key,
+        status_is_in_process_or_selected,
+        is_deleted,
+        sf_created_timestamp,
+        sf_last_modified_timestamp,
+        sf_system_modstamp,
+        listing_session    
+    ) all_values_but_dss_ingestion
+    JOIN
+    (SELECT
+        waitlist_id,
+        MAX(sf_system_modstamp) as max_date
+    FROM temp_sf_waitlist_raw_to_valid_validated
+    GROUP BY
+        waitlist_id
+    ) max_dates
+    ON all_values_but_dss_ingestion.waitlist_id = max_dates.waitlist_id
+    AND all_values_but_dss_ingestion.sf_system_modstamp = max_dates.max_date
+    JOIN
+    (SELECT
+        waitlist_id,
+        MAX(dss_ingestion_timestamp) as dss_ingestion_timestamp
+    FROM temp_sf_waitlist_raw_to_valid_validated
+    GROUP BY
+        waitlist_id
+    )dss_ingestion
+    ON all_values_but_dss_ingestion.waitlist_id = dss_ingestion.waitlist_id
+    ON CONFLICT (waitlist_id) DO UPDATE SET
+        waitlist_id = EXCLUDED.waitlist_id,
+        waitlist_name = EXCLUDED.waitlist_name,
+        chapter_id = EXCLUDED.chapter_id,
+        chapter_name = EXCLUDED.chapter_name,
+        contact = EXCLUDED.contact,
+        listing_session_location_name = EXCLUDED.listing_session_location_name,
+        listing_session_name = EXCLUDED.listing_session_name,
+        --membership_end_date = EXCLUDED.membership_end_date,
+        --membership_start_date = EXCLUDED.membership_start_date,
+        --membership_price = EXCLUDED.membership_price,
+        --membership_required = EXCLUDED.membership_required,
+        parent_contact = EXCLUDED.parent_contact,
+        status = EXCLUDED.status,
+        waitlist_participant_order = EXCLUDED.waitlist_participant_order,
+        waitlist_unique_key = EXCLUDED.waitlist_unique_key,
+        status_is_in_process_or_selected = EXCLUDED.status_is_in_process_or_selected,
+        is_deleted = EXCLUDED.is_deleted,
+        sf_created_timestamp = EXCLUDED.sf_created_timestamp,
+        sf_last_modified_timestamp = EXCLUDED.sf_last_modified_timestamp,
+        sf_system_modstamp = EXCLUDED.sf_system_modstamp,
+        listing_session = EXCLUDED.listing_session,
+        dss_ingestion_timestamp = EXCLUDED.dss_ingestion_timestamp
+    ;
+
+    INSERT INTO ft_ds_valid.raw_to_valid_execution_log
+    SELECT
+    MAX(dss_ingestion_timestamp) AS execution_timestamp,
+    'sf_waitlist' AS entity
+    FROM ft_ds_valid.sf_waitlist
+    ;
+END;
