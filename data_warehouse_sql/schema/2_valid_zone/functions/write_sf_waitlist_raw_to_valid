@@ -37,7 +37,7 @@ BEGIN
         CASE
             WHEN load_threshold_timestamp IS NULL THEN 
             COALESCE((SELECT MAX(execution_timestamp) from ft_ds_valid.raw_to_valid_execution_log WHERE entity = 'sf_waitlist'), 
-                     '1900-01-01'::timestamptz)  -- Use a very old date when NULL
+                     '1900-01-01'::timestamptz)
         ELSE load_threshold_timestamp
         END
     ;
