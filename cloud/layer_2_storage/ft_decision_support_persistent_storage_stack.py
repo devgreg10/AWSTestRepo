@@ -10,7 +10,8 @@ from aws_cdk import (
     aws_sns as sns,
     Duration,
     Stack,
-    RemovalPolicy
+    RemovalPolicy,
+    Tags
 )
 from constructs import Construct
 from dotenv import load_dotenv
@@ -223,6 +224,8 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             cloudwatch_logs_exports=["postgresql"], # postgresql (error logs) 
             cloudwatch_logs_retention=logs.RetentionDays.ONE_MONTH,
         )
+        
+        Tags.of(self.data_warehouse_db_cluster).add("ForceRecreateReaders", "v2"); 
 
         # Rotate the master user password every 30 days
         self.data_warehouse_db_cluster.add_rotation_single_user(
