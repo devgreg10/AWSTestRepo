@@ -142,6 +142,13 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             peer = ec2.Peer.ipv4(boostrap_stack.decision_support_vpc.vpc_cidr_block), 
             connection = ec2.Port.tcp(5432), 
             description ="Allow PostgreSQL traffic")
+        
+        # Allow Tableau Online IP range
+        rds_sg.add_ingress_rule(
+            peer = ec2.Peer.ipv4("155.226.144.0/22"),
+            connection = ec2.Port.tcp(5432),
+            description = "Allow PostgreSQL access from Tableau Online IP range"
+        )
 
         # Security Group for Bastion Host
         bastion_sg = ec2.SecurityGroup(
