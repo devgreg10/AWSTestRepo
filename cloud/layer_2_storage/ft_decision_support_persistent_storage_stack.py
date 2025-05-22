@@ -196,7 +196,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             f"ft-{env}-data-warehouse-db-cluster",
             vpc=boostrap_stack.decision_support_vpc,
             vpc_subnets=ec2.SubnetSelection(
-                subnets=boostrap_stack.decision_support_vpc.private_subnets
+                subnets=boostrap_stack.decision_support_vpc.public_subnets + boostrap_stack.decision_support_vpc.private_subnets
             ),
             credentials=rds.Credentials.from_secret(self.db_master_user_secret, username=db_username),
             engine=rds.DatabaseClusterEngine.aurora_postgres(
@@ -207,11 +207,13 @@ class FtDecisionSupportPersistentStorageStack(Stack):
                 rds.ClusterInstance.serverless_v2(
                     f"ft-{env}-reader-instance-1{reader_version}", 
                     scale_with_writer=True,
-                    enable_performance_insights=True
+                    enable_performance_insights=True,
+                    publicly_accessible=True
                 ),
                 rds.ClusterInstance.serverless_v2(
                     f"ft-{env}-reader-instance-2{reader_version}",
-                    enable_performance_insights=True
+                    enable_performance_insights=True,
+                    publicly_accessible=False
                 )
             ],
             writer=rds.ClusterInstance.serverless_v2(
