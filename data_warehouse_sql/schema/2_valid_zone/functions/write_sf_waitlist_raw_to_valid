@@ -1,3 +1,14 @@
+-- FUNCTION: ft_ds_admin.write_sf_waitlist_raw_to_valid(timestamp with time zone)
+
+-- DROP FUNCTION IF EXISTS ft_ds_admin.write_sf_waitlist_raw_to_valid(timestamp with time zone);
+
+CREATE OR REPLACE FUNCTION ft_ds_admin.write_sf_waitlist_raw_to_valid(
+	load_threshold_timestamp timestamp with time zone DEFAULT NULL::timestamp with time zone)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 BEGIN
 
     --need to get rid of all the data from the temp table before we start in case it still exists from the last run
@@ -473,3 +484,13 @@ BEGIN
     FROM ft_ds_valid.sf_waitlist
     ;
 END;
+$BODY$;
+
+ALTER FUNCTION ft_ds_admin.write_sf_waitlist_raw_to_valid(timestamp with time zone)
+    OWNER TO ft_uat_data_warehouse_master_user;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.write_sf_waitlist_raw_to_valid(timestamp with time zone) TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.write_sf_waitlist_raw_to_valid(timestamp with time zone) TO ft_uat_data_warehouse_master_user;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.write_sf_waitlist_raw_to_valid(timestamp with time zone) TO limited_writer_role;
