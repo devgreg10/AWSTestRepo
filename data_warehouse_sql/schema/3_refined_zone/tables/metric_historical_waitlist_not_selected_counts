@@ -1,0 +1,17 @@
+-- Table: ft_ds_refined.metric_historical_waitlist_not_selected_counts
+
+-- DROP TABLE IF EXISTS ft_ds_refined.metric_historical_waitlist_not_selected_counts;
+
+CREATE TABLE IF NOT EXISTS ft_ds_refined.metric_historical_waitlist_not_selected_counts
+(
+    metric_calc_date timestamp with time zone NOT NULL,
+    chapter_id character(18) COLLATE pg_catalog."default" NOT NULL,
+    waitlist_not_selected_count integer,
+    eoy_indicator character varying(20) COLLATE pg_catalog."default",
+    CONSTRAINT metric_historical_waitlist_not_selected_counts_pkey PRIMARY KEY (metric_calc_date, chapter_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS ft_ds_refined.metric_historical_waitlist_not_selected_counts
+    OWNER to ft_uat_data_warehouse_dev_user;
