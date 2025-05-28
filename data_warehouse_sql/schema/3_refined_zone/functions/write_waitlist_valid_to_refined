@@ -1,0 +1,32 @@
+-- FUNCTION: ft_ds_admin.write_waitlist_valid_to_refined()
+
+-- DROP FUNCTION IF EXISTS ft_ds_admin.write_waitlist_valid_to_refined();
+
+CREATE OR REPLACE FUNCTION ft_ds_admin.write_waitlist_valid_to_refined(
+	)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+BEGIN
+    TRUNCATE ft_ds_refined.waitlist;
+
+    INSERT INTO ft_ds_refined.waitlist
+    SELECT
+        *
+    FROM ft_ds_valid.sf_waitlist
+    WHERE
+        is_deleted = false
+    ;
+END;
+$BODY$;
+
+ALTER FUNCTION ft_ds_admin.write_waitlist_valid_to_refined()
+    OWNER TO ft_uat_data_warehouse_master_user;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.write_waitlist_valid_to_refined() TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.write_waitlist_valid_to_refined() TO ft_uat_data_warehouse_master_user;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.write_waitlist_valid_to_refined() TO limited_writer_role;
