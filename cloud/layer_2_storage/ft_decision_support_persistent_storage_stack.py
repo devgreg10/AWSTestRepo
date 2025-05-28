@@ -10,7 +10,8 @@ from aws_cdk import (
     aws_sns as sns,
     Duration,
     Stack,
-    RemovalPolicy
+    RemovalPolicy,
+    Tags
 )
 from constructs import Construct
 from dotenv import load_dotenv
@@ -141,7 +142,15 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         rds_sg.add_ingress_rule(
             peer = ec2.Peer.ipv4(boostrap_stack.decision_support_vpc.vpc_cidr_block), 
             connection = ec2.Port.tcp(5432), 
-            description ="Allow PostgreSQL traffic")
+            description ="Allow PostgreSQL traffic"
+        )
+        
+        # Allow Tableau Online IP range
+        rds_sg.add_ingress_rule(
+            peer = ec2.Peer.ipv4("155.226.144.0/22"),
+            connection = ec2.Port.tcp(5432),
+            description = "Allow PostgreSQL access from Tableau Online IP range"
+        )
 
         # Security Group for Bastion Host
         bastion_sg = ec2.SecurityGroup(
@@ -173,6 +182,12 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             )
         )
 
+        # Handle issue where Reader instances were deleted manually in DEV and UAT
+        is_nonprod = env in ["dev", "uat"]
+        reader_version = ""
+        if is_nonprod:
+            reader_version = "-v2"
+
         self.default_database_name = "postgres"
 
         # Aurora PostgreSQL Database Cluster
@@ -181,7 +196,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             f"ft-{env}-data-warehouse-db-cluster",
             vpc=boostrap_stack.decision_support_vpc,
             vpc_subnets=ec2.SubnetSelection(
-                subnets=boostrap_stack.decision_support_vpc.private_subnets
+                subnets=boostrap_stack.decision_support_vpc.public_subnets + boostrap_stack.decision_support_vpc.private_subnets
             ),
             credentials=rds.Credentials.from_secret(self.db_master_user_secret, username=db_username),
             engine=rds.DatabaseClusterEngine.aurora_postgres(
@@ -190,13 +205,15 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             default_database_name=self.default_database_name,
             readers=[
                 rds.ClusterInstance.serverless_v2(
-                    f"ft-{env}-reader-instance-1", 
+                    f"ft-{env}-reader-instance-1{reader_version}", 
                     scale_with_writer=True,
-                    enable_performance_insights=True
+                    enable_performance_insights=True,
+                    publicly_accessible=True
                 ),
                 rds.ClusterInstance.serverless_v2(
-                    f"ft-{env}-reader-instance-2",
-                    enable_performance_insights=True
+                    f"ft-{env}-reader-instance-2{reader_version}",
+                    enable_performance_insights=True,
+                    publicly_accessible=False
                 )
             ],
             writer=rds.ClusterInstance.serverless_v2(
@@ -216,6 +233,8 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             cloudwatch_logs_exports=["postgresql"], # postgresql (error logs) 
             cloudwatch_logs_retention=logs.RetentionDays.ONE_MONTH,
         )
+        
+        Tags.of(self.data_warehouse_db_cluster).add("ForceRecreateReaders", "v2"); 
 
         # Rotate the master user password every 30 days
         self.data_warehouse_db_cluster.add_rotation_single_user(

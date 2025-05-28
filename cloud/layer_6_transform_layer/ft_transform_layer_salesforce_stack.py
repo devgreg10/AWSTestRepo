@@ -165,7 +165,8 @@ class FtTransformLayerSalesforceStack(Stack):
             {"db_function": "calculate_historical_teen_percentage", "short_name": "teen-percentage"},
             {"db_function": "calculate_historical_ACE_participant_counts", "short_name": "ACE-counts"},
             {"db_function": "calculate_historical_ACE_certified_participant_counts", "short_name": "ACE-certified-counts"},
-            {"db_function": "calculate_historical_service_area_diversity_variance_percentage", "short_name": "service-area-diversity-variance"}
+            {"db_function": "calculate_historical_service_area_diversity_variance_percentage", "short_name": "service-area-diversity-variance"},
+            {"db_function": "calculate_historical_waitlist_not_selected_counts", "short_name": "waitlist_not_selected_counts"},
         ]
 
         # Historical Metric Functions should be run once per day at 3:00am EST, no modulo
