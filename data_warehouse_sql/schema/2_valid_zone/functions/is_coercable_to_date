@@ -1,0 +1,31 @@
+-- FUNCTION: ft_ds_admin.is_coercable_to_date(text)
+
+-- DROP FUNCTION IF EXISTS ft_ds_admin.is_coercable_to_date(text);
+
+CREATE OR REPLACE FUNCTION ft_ds_admin.is_coercable_to_date(
+	candidate_string text)
+    RETURNS boolean
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE date_var DATE DEFAULT NULL;
+BEGIN
+    BEGIN
+        date_var := candidate_string::DATE;
+    EXCEPTION WHEN OTHERS THEN
+        RETURN FALSE;
+    END;
+RETURN TRUE;
+END;
+$BODY$;
+
+ALTER FUNCTION ft_ds_admin.is_coercable_to_date(text)
+    OWNER TO ft_uat_data_warehouse_master_user;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.is_coercable_to_date(text) TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.is_coercable_to_date(text) TO ft_uat_data_warehouse_master_user;
+
+GRANT EXECUTE ON FUNCTION ft_ds_admin.is_coercable_to_date(text) TO limited_writer_role;
+
