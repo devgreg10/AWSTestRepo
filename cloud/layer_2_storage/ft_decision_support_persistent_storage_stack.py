@@ -181,7 +181,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             f"ft-{env}-data-warehouse-db-cluster",
             vpc=boostrap_stack.decision_support_vpc,
             vpc_subnets=ec2.SubnetSelection(
-                subnets=boostrap_stack.decision_support_vpc.private_subnets
+                subnets=boostrap_stack.decision_support_vpc.public_subnets
             ),
             credentials=rds.Credentials.from_secret(self.db_master_user_secret, username=db_username),
             engine=rds.DatabaseClusterEngine.aurora_postgres(
@@ -202,7 +202,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
             writer=rds.ClusterInstance.serverless_v2(
                 f"ft-{env}-writer-instance",
                 enable_performance_insights=True,
-                publicly_accessible=False
+                publicly_accessible=True
             ),
             serverless_v2_min_capacity=0.5,
             serverless_v2_max_capacity=2,
@@ -221,10 +221,9 @@ class FtDecisionSupportPersistentStorageStack(Stack):
         self.data_warehouse_db_cluster.add_rotation_single_user(
             automatically_after=Duration.days(30),
             vpc_subnets=ec2.SubnetSelection(
-                subnets=boostrap_stack.decision_support_vpc.private_subnets
+                subnets=boostrap_stack.decision_support_vpc.public_subnets
             ),
         )
-
         alarm_sns_topic = sns.Topic(
             self,
             id="ErrorSnsTopicForDb",
