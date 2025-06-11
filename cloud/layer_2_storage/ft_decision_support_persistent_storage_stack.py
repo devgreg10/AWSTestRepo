@@ -213,7 +213,7 @@ class FtDecisionSupportPersistentStorageStack(Stack):
                 rds.ClusterInstance.serverless_v2(
                     f"ft-{env}-reader-instance-2{reader_version}",
                     enable_performance_insights=True,
-                    publicly_accessible=False
+                    publicly_accessible=True
                 )
             ],
             writer=rds.ClusterInstance.serverless_v2(
